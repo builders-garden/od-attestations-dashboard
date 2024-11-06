@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import BadgeCard from "../badge/BadgeCard";
-import { badges } from "@/lib/constants";
+import { userBadges } from "@/lib/constants";
 
 export default function UserBadges() {
   return (
@@ -18,7 +18,7 @@ export default function UserBadges() {
 
       {/* Badges */}
       <div className="grid grid-cols-2 justify-start items-center gap-5 w-full">
-        {badges.map((badge) => (
+        {userBadges.map((badge) => (
           <BadgeCard key={badge.index} badge={badge} />
         ))}
       </div>
