@@ -19,13 +19,15 @@ export default function Home() {
         <h1 className="text-2xl font-black pb-2">✨Hello, Dreamer✨</h1>
         <div className="text-sm text-wrap">Please connect your Wallet to start using the Onchain Dreamers Passport!</div>
       </div>
-      {!account.address ? (
+
+      <div className="flex flex-col justify-center items-center gap-2">
         <ConnectButton />
-      ) : (
-        <Button className="bg-primary px-16">
-          <Link href="/user">Launch App</Link>
-        </Button>
-      )}
+        {account.address && (
+          <Button className="bg-primary px-16">
+            <Link href="/user">Launch App</Link>
+          </Button>
+        )}
+      </div>
     </motion.div>
   );
 }
