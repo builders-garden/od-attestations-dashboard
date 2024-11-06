@@ -1,6 +1,6 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
-import { ADMIN_ADDRESSES } from "@/lib/constants";
+import AdminBadges from "@/components/ui/admin/AdminBadges";
+import AdminHeader from "@/components/ui/admin/AdminHeader";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAccount } from "wagmi";
 
@@ -13,22 +13,13 @@ export default function Home() {
         <ConnectButton />
       </div>
     );
-  } else if (!ADMIN_ADDRESSES.includes(account.address)) {
-    return (
-      <div className="flex justify-center items-center min-h-screen h-full w-full bg-background">
-        <div className="flex flex-col max-w-xl w-full min-h-screen justify-start items-center bg-white shadow-lg p-5">
-          <ConnectButton />
-          <div className="pt-10">You should not be here</div>
-        </div>
-      </div>
-    );
   }
 
   return (
-    <div className="flex justify-center items-center min-h-screen h-full w-full bg-background">
-      <div className="flex flex-col max-w-xl w-full min-h-screen justify-start items-center bg-white shadow-lg p-5">
-        <ConnectButton />
-        <div className="pt-10">Admin Page</div>
+    <div className="flex justify-center items-center min-h-screen w-full bg-background sm:p-6">
+      <div className="flex flex-col justify-start items-center min-h-screen w-full sm:max-w-md bg-background rounded-lg sm:shadow-lg p-6">
+        <AdminHeader />
+        <AdminBadges />
       </div>
     </div>
   );
