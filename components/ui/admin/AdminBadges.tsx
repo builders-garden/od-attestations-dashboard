@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
-import Badge from "../Badge";
 import { Button } from "../button";
+import BadgeCard from "../badge/BadgeCard";
+import { badges } from "@/lib/constants";
 
 export default function AdminBadges() {
   return (
@@ -18,12 +19,9 @@ export default function AdminBadges() {
 
       {/* Badges */}
       <div className="grid grid-cols-2 justify-start items-center gap-5 w-full">
-        <Badge index={1} image="/badges/badge1.png" title="First Buyer" />
-        <Badge index={2} image="/badges/badge2.png" title="Onchain Sherpa" />
-        <Badge index={3} image="/badges/badge3.png" title="MEV Slayer" />
-        <Badge index={4} image="/badges/badge4.png" title="Spirit Guide" />
-        <Badge index={5} image="/badges/badge5.png" title="Pulcino Pio" />
-        <Badge index={6} image="/badges/badge6.png" title="OCCHIO BRUCIA AHIA!!" />
+        {badges.map((badge) => (
+          <BadgeCard key={badge.index} badge={badge} />
+        ))}
       </div>
     </div>
   );
