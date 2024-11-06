@@ -4,7 +4,7 @@ import UserHeader from "@/components/ui/user/UserHeader";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAccount } from "wagmi";
 
-export default function Home() {
+export default function UserHome() {
   const account = useAccount();
 
   if (!account.address) {
