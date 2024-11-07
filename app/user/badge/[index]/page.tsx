@@ -33,7 +33,7 @@ export default function BadgePage({
           transition={{ duration: 0.5 }}
           className="flex justify-between items-start w-full"
         >
-          <Link href="/user" className="p-1 rounded-full">
+          <Link href="/user" className="rounded-full">
             <ArrowLeft size={24} />
           </Link>
           <img

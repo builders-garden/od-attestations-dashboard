@@ -1,7 +1,8 @@
 import BadgeClass from "@/lib/classes/BadgeClass";
-import { Calendar, Hash, IdCard, Router, Tag } from "lucide-react";
+import { Calendar, CircleX, Hash, IdCard, Send, Tag } from "lucide-react";
 import { Button } from "../button";
 import { useRouter } from "next/navigation";
+import { Separator } from "../separator";
 
 interface BadgeInfoProps {
   badge: BadgeClass;
@@ -36,7 +37,8 @@ export default function BadgeInfo({ badge }: BadgeInfoProps) {
       </div>
 
       <Button
-        className="flex justify-start items-center gap-2 px-2 h-7 bg-primary rounded-md"
+        className="flex justify-start items-center gap-2 px-2 h-fit p-0 rounded-md hover:bg-none"
+        variant="ghost"
         onClick={() => Router.push(`/user/badge/${badge.index}/collectors`)}
       >
         <div className="flex justify-center items-center rounded-full bg-pink-400 w-4 h-4 p-2.5 text-xs">
@@ -48,10 +50,28 @@ export default function BadgeInfo({ badge }: BadgeInfoProps) {
         <div className="flex justify-center items-center rounded-full bg-slate-200 w-4 h-4 p-2.5 text-xs -ml-4">
           H
         </div>
-        <label className="text-white font-medium cursor-pointer">
+        <label className="text-black font-medium cursor-pointer">
           and 10 more...
         </label>
       </Button>
+
+      <div className="flex flex-col gap-0 w-full items-center">
+        <Separator />
+        <div className="flex gap-4">
+          <Button className="h-fit py-1 px-2" variant="destructive">
+            <CircleX size={16} />
+            Revoke
+          </Button>
+          <Button
+            className="h-fit py-1 px-2 bg-green-500 hover:bg-green-400"
+            variant="default"
+          >
+            <Send size={16} />
+            Reissue
+          </Button>
+        </div>
+        <Separator />
+      </div>
 
       <p className="text-sm font-medium text-center text-muted-foreground mt-2">
         {badge.description}

@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { Separator } from "../separator";
 
 export default function AdminHeader() {
   return (
@@ -24,13 +25,7 @@ export default function AdminHeader() {
           className="h-14 w-14"
         />
       </motion.div>
-      {/* Separator */}
-      <motion.div
-        className="max-w-72 w-full h-1 my-5 border-b border-primary-light"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-      />
+      <Separator />
     </>
   );
 }
