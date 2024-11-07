@@ -17,7 +17,9 @@ export default function CollectorRow({ collector, index }: CollectorRowProps) {
         <div className="p-4 bg-primary-light rounded-lg" />
         <label className="font-medium">{collector}</label>
       </div>
-      <div className="flex justify-center items-center font-medium px-2.5 bg-primary rounded-lg text-white">12</div>
+      <div className="flex justify-center items-center font-medium px-2.5 bg-primary rounded-lg text-white">
+        12
+      </div>
     </motion.div>
   );
 }

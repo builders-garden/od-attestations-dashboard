@@ -39,13 +39,23 @@ export default function BadgeInfo({ badge }: BadgeInfoProps) {
         className="flex justify-start items-center gap-2 px-2 h-7 bg-primary rounded-md"
         onClick={() => Router.push(`/user/badge/${badge.index}/collectors`)}
       >
-        <div className="flex justify-center items-center rounded-full bg-pink-400 w-4 h-4 p-2.5 text-xs">S</div>
-        <div className="flex justify-center items-center rounded-full bg-yellow-400 w-4 h-4 p-2.5 text-xs -ml-4">V</div>
-        <div className="flex justify-center items-center rounded-full bg-slate-200 w-4 h-4 p-2.5 text-xs -ml-4">H</div>
-        <label className="text-white font-medium cursor-pointer">and 10 more...</label>
+        <div className="flex justify-center items-center rounded-full bg-pink-400 w-4 h-4 p-2.5 text-xs">
+          S
+        </div>
+        <div className="flex justify-center items-center rounded-full bg-yellow-400 w-4 h-4 p-2.5 text-xs -ml-4">
+          V
+        </div>
+        <div className="flex justify-center items-center rounded-full bg-slate-200 w-4 h-4 p-2.5 text-xs -ml-4">
+          H
+        </div>
+        <label className="text-white font-medium cursor-pointer">
+          and 10 more...
+        </label>
       </Button>
 
-      <p className="text-sm font-medium text-center text-muted-foreground mt-2">{badge.description}</p>
+      <p className="text-sm font-medium text-center text-muted-foreground mt-2">
+        {badge.description}
+      </p>
     </>
   );
 }

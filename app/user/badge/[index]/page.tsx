@@ -8,7 +8,11 @@ import Link from "next/link";
 import { use } from "react";
 import { useAccount } from "wagmi";
 
-export default function BadgePage({ params }: { params: Promise<{ index: string }> }) {
+export default function BadgePage({
+  params,
+}: {
+  params: Promise<{ index: string }>;
+}) {
   const account = useAccount();
   const { index } = use(params);
 
@@ -32,7 +36,11 @@ export default function BadgePage({ params }: { params: Promise<{ index: string 
           <Link href="/user" className="p-1 rounded-full">
             <ArrowLeft size={24} />
           </Link>
-          <img src={`/badges/badge${index}.png`} alt="logo" className="w-52 h-52 rounded-full border-8 border-primary p-3" />
+          <img
+            src={`/badges/badge${index}.png`}
+            alt="logo"
+            className="w-52 h-52 rounded-full border-8 border-primary p-3"
+          />
           <Share2 size={24} />
         </motion.div>
 

@@ -12,7 +12,9 @@ export default function UserBadges() {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
       >
-        <h1 className="text-2xl font-black text-start text-black">Your Badges</h1>
+        <h1 className="text-2xl font-black text-start text-black">
+          Your Badges
+        </h1>
         <div className="text-xs">Owned 3/27</div>
       </motion.div>
 

@@ -13,7 +13,9 @@ export default function AdminBadges() {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
       >
-        <h1 className="text-2xl font-black text-start text-black">Issued Badges</h1>
+        <h1 className="text-2xl font-black text-start text-black">
+          Issued Badges
+        </h1>
         <Button className="text-xs w-20 h-5 ">New Badge</Button>
       </motion.div>
 

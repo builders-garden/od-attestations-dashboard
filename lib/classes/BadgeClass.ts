@@ -5,7 +5,13 @@ class Badge {
   description: string;
   unlocked: boolean;
 
-  constructor(index: number, image: string, title: string, unlocked: boolean = true, description: string) {
+  constructor(
+    index: number,
+    image: string,
+    title: string,
+    unlocked: boolean = true,
+    description: string,
+  ) {
     this.index = index;
     this.image = image;
     this.title = title;

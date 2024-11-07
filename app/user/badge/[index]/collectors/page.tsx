@@ -8,7 +8,11 @@ import Link from "next/link";
 import { use } from "react";
 import { useAccount } from "wagmi";
 
-export default function BadgeCollectorsPage({ params }: { params: Promise<{ index: string }> }) {
+export default function BadgeCollectorsPage({
+  params,
+}: {
+  params: Promise<{ index: string }>;
+}) {
   const account = useAccount();
   const { index } = use(params);
 
@@ -32,7 +36,9 @@ export default function BadgeCollectorsPage({ params }: { params: Promise<{ inde
           <Link href={`/user/badge/${index}`} className="p-1 rounded-full">
             <ArrowLeft size={24} />
           </Link>
-          <h1 className="font-black text-lg">65 Collectors of badge # {index}</h1>
+          <h1 className="font-black text-lg">
+            65 Collectors of badge # {index}
+          </h1>
         </motion.div>
 
         <div className="grid grid-cols-1 justify-start items-center gap-3 mt-5 w-full">

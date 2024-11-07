@@ -11,10 +11,18 @@ export default function UserHeader() {
         transition={{ duration: 0.5 }}
       >
         <div>
-          <h1 className="text-2xl font-black text-start text-black">GM Dreamer!👋</h1>
-          <div className="text-sm text-start text-black">You currently hold 69 badges</div>
+          <h1 className="text-2xl font-black text-start text-black">
+            GM Dreamer!👋
+          </h1>
+          <div className="text-sm text-start text-black">
+            You currently hold 69 badges
+          </div>
         </div>
-        <img alt="Profile Picture" src="./propic_placeholder.png" className="h-14 w-14" />
+        <img
+          alt="Profile Picture"
+          src="./propic_placeholder.png"
+          className="h-14 w-14"
+        />
       </motion.div>
       {/* Separator */}
       <motion.div
