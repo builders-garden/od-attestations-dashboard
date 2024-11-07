@@ -1,10 +1,11 @@
 "use client";
 
 import CollectorRow from "@/components/ui/collectors/CollectorRow";
+import { LinkTextWithIcon } from "@/components/ui/linkTextWithIcon";
 import { collectors, userBadges } from "@/lib/constants";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { motion } from "framer-motion";
-import { ArrowLeft, SquareArrowOutUpRight } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { use } from "react";
 import { useAccount } from "wagmi";
@@ -49,21 +50,10 @@ export default function BadgeCollectorsPage({
         <div className="grid grid-cols-1 justify-start items-center gap-3 w-full">
           <div className="flex w-full justify-between">
             <span className="font-bold">{badge.title} collectors</span>
-            <div className="flex items-center gap-1">
-              <Link
-                href={
-                  "https://easscan.org/offchain/attestation/view/0xb792c26858a5aaf25d48ef0773ecc15bb723ebf07b237448d337dba25bdcd5fb"
-                }
-                className="text-primary-light leading-none"
-                target="_blank"
-              >
-                Easscan
-              </Link>
-              <SquareArrowOutUpRight size={16} className="text-primary-light" />
-            </div>
+            <LinkTextWithIcon>Easscan</LinkTextWithIcon>
           </div>
           {collectors.map((collector, index) => (
-            <CollectorRow key={index} index={index} collector={collector} />
+            <CollectorRow key={index} collector={collector} />
           ))}
         </div>
       </div>

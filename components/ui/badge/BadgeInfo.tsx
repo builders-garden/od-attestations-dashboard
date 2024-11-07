@@ -58,7 +58,11 @@ export default function BadgeInfo({ badge }: BadgeInfoProps) {
       <div className="flex flex-col gap-0 w-full items-center">
         <Separator />
         <div className="flex gap-4">
-          <Button className="h-fit py-1 px-2" variant="destructive">
+          <Button
+            className="h-fit py-1 px-2"
+            variant="destructive"
+            onClick={() => Router.push(`/user/badge/${badge.index}/revoke`)}
+          >
             <CircleX size={16} />
             Revoke
           </Button>
