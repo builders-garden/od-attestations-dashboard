@@ -67,8 +67,9 @@ export default function BadgeInfo({ badge }: BadgeInfoProps) {
             Revoke
           </Button>
           <Button
-            className="h-fit py-1 px-2 bg-green-500 hover:bg-green-400"
-            variant="default"
+            className="h-fit py-1 px-2"
+            variant="green"
+            onClick={() => Router.push(`/user/badge/${badge.index}/reissue`)}
           >
             <Send size={16} />
             Reissue

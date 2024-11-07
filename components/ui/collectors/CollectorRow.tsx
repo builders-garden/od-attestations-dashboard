@@ -1,18 +1,22 @@
 import { cn } from "@/lib/utils";
-import { Check } from "lucide-react";
+import { Check, CircleX } from "lucide-react";
 
 interface CollectorRowProps {
   collector: string;
   selectable?: boolean;
   selected?: boolean;
+  removable?: boolean;
   onClick?: () => void;
+  handleRemove?: (collector: string) => void;
 }
 
 export default function CollectorRow({
   collector,
   selectable,
   selected,
+  removable,
   onClick,
+  handleRemove,
 }: CollectorRowProps) {
   const isAddress = collector.startsWith("0x");
   const name = isAddress
@@ -40,7 +44,7 @@ export default function CollectorRow({
           {name}
         </label>
       </div>
-      {!(selectable || selected) && (
+      {!(selectable || selected || removable) && (
         <div className="flex justify-center items-center font-medium px-2.5 bg-primary rounded-lg text-white">
           12
         </div>
@@ -49,6 +53,16 @@ export default function CollectorRow({
         <Check
           size="2rem"
           className="bg-green-600 p-1 rounded-md text-white transition-all duration-200 ease-in-out"
+        />
+      )}
+      {removable && handleRemove && (
+        <CircleX
+          size="2rem"
+          className="bg-destructive p-1 rounded-md text-white transition-all duration-200 ease-in-out cursor-pointer"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleRemove(collector);
+          }}
         />
       )}
     </div>
