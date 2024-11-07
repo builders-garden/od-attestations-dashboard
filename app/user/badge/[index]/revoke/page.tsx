@@ -2,6 +2,16 @@
 
 import { Button } from "@/components/ui/button";
 import CollectorRow from "@/components/ui/collectors/CollectorRow";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { LinkTextWithIcon } from "@/components/ui/linkTextWithIcon";
 import { collectors, userBadges } from "@/lib/constants";
@@ -102,16 +112,41 @@ export default function BadgeRevokePage({
             </div>
           </div>
         </div>
-        <Button
-          variant="destructive"
-          className={cn(
-            "text-2xl px-8 py-6 rounded-lg w-full transition-opacity duration-200 ease-in-out",
-            atLeastOneSelected && "opacity-1",
-            !atLeastOneSelected && "opacity-0",
-          )}
-        >
-          Revoke
-        </Button>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button
+              variant="destructive"
+              className={cn(
+                "text-2xl px-8 py-6 rounded-lg w-full transition-opacity duration-200 ease-in-out",
+                atLeastOneSelected && "opacity-1",
+                !atLeastOneSelected && "opacity-0",
+              )}
+            >
+              Revoke
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-sm gap-6">
+            <DialogHeader>
+              <DialogTitle className="text-center text-2xl font-extrabold">
+                Confirm Revocation
+              </DialogTitle>
+            </DialogHeader>
+            <DialogDescription className="text-center">
+              Are you sure you want to permanently revoke this badge from the
+              selected users? This action cannot be undone.
+            </DialogDescription>
+            <DialogFooter className="sm:justify-start">
+              <DialogClose asChild>
+                <Button type="button" variant="outline" className="w-full">
+                  Cancel
+                </Button>
+              </DialogClose>
+              <Button type="button" variant="destructive" className="w-full">
+                Revoke
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </motion.div>
     </div>
   );
