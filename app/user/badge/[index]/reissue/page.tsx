@@ -83,7 +83,7 @@ export default function BadgeReissuePage({
             >
               <Input
                 placeholder="ENS or Address..."
-                className="focus-visible:ring-primary w-full"
+                className="w-full"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
               />
