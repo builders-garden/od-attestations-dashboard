@@ -1,25 +1,70 @@
-import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
+import { Check, CircleX } from "lucide-react";
 
 interface CollectorRowProps {
   collector: string;
-  index: number;
+  selectable?: boolean;
+  selected?: boolean;
+  removable?: boolean;
+  onClick?: () => void;
+  handleRemove?: (collector: string) => void;
 }
 
-export default function CollectorRow({ collector, index }: CollectorRowProps) {
+export default function CollectorRow({
+  collector,
+  selectable,
+  selected,
+  removable,
+  onClick,
+  handleRemove,
+}: CollectorRowProps) {
+  const isAddress = collector.startsWith("0x");
+  const name = isAddress
+    ? collector.slice(0, 6) + "..." + collector.slice(-4)
+    : collector;
+
   return (
-    <motion.div
-      className="flex flex-row justify-between items-center w-full p-2 gap-2 bg-secondary rounded-lg"
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: index * 0.15 }}
+    <div
+      className={cn(
+        "flex flex-row justify-between items-center w-full p-2 gap-2 bg-secondary rounded-lg transition-all duration-200 ease-in-out",
+        selectable && "cursor-pointer hover:bg-green-200",
+        selected && "bg-green-300 hover:bg-green-300",
+      )}
+      onClick={onClick}
     >
       <div className="flex justify-start items-center gap-2">
         <div className="p-4 bg-primary-light rounded-lg" />
-        <label className="font-medium">{collector}</label>
+        <label
+          className={cn(
+            "font-medium",
+            selectable && "cursor-pointer",
+            isAddress && "font-mono",
+          )}
+        >
+          {name}
+        </label>
       </div>
-      <div className="flex justify-center items-center font-medium px-2.5 bg-primary rounded-lg text-white">
-        12
-      </div>
-    </motion.div>
+      {!(selectable || selected || removable) && (
+        <div className="flex justify-center items-center font-medium px-2.5 bg-primary rounded-lg text-white">
+          12
+        </div>
+      )}
+      {selected && (
+        <Check
+          size="2rem"
+          className="bg-green-600 p-1 rounded-md text-white transition-all duration-200 ease-in-out"
+        />
+      )}
+      {removable && handleRemove && (
+        <CircleX
+          size="2rem"
+          className="bg-destructive p-1 rounded-md text-white transition-all duration-200 ease-in-out cursor-pointer"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleRemove(collector);
+          }}
+        />
+      )}
+    </div>
   );
 }
