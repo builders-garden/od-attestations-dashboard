@@ -10,10 +10,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
+import { useDisconnect } from "wagmi";
 
 export default function UserHeader() {
   const isAdmin = true;
   const router = useRouter();
+
+  const { disconnect } = useDisconnect();
 
   return (
     <>
@@ -49,6 +52,12 @@ export default function UserHeader() {
               </DropdownMenuItem>
               <DropdownMenuItem className="cursor-pointer">
                 Proposals
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onClick={() => disconnect()}
+              >
+                Logout
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
