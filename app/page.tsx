@@ -1,5 +1,4 @@
 "use client";
-
 import { Icons } from "@/components/ui/icons";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { motion } from "framer-motion";
