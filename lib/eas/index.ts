@@ -48,12 +48,14 @@ export const schemasFromWallet = async (
 
 /**
  * A function that fetches all the attestations received by a specific wallet.
- * @param walletAddress - The wallet address of the attestations' recipient.
+ * @param recipientAddress - The wallet address of the attestations' recipient.
+ * @param issuerAddress - The wallet address of the attestations' issuer.
  * @param chainId - The chain ID of the blockchain where the attestations are registered.
  * @returns The response from the GraphQL query or null if there was an error.
  */
 export const getAttestationsFromWallet = async (
-  walletAddress: string,
+  recipientAddress: string,
+  issuerAddress: string,
   chainId: number | undefined,
 ): Promise<AttestationsResponse | null> => {
   if (!chainId) {
@@ -76,7 +78,10 @@ export const getAttestationsFromWallet = async (
         variables: {
           where: {
             recipient: {
-              equals: walletAddress,
+              equals: recipientAddress,
+            },
+            attester: {
+              equals: issuerAddress,
             },
           },
         },
