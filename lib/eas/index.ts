@@ -3,13 +3,13 @@ import { AttestationsFromWalletQuery, SchemasFromWalletQuery } from "./queries";
 import { AttestationsResponse, SchemataResponse } from "./types";
 
 /**
- * A function that fetches all the schemas registered by a specific wallet.
- * @param creatorAddress - The wallet address of the schemas' creator.
+ * A function that fetches all the schemas registered by specific wallets.
+ * @param creatorAddresses - An array of wallet addresses of the schemas' creators.
  * @param chainId - The chain ID of the blockchain where the schemas are registered.
  * @returns The response from the GraphQL query or null if there was an error.
  */
-export const schemasFromWallet = async (
-  creatorAddress: string,
+export const schemasFromWallets = async (
+  creatorAddresses: string[],
   chainId: number | undefined,
 ): Promise<SchemataResponse | null> => {
   if (!chainId) {
@@ -32,7 +32,7 @@ export const schemasFromWallet = async (
         variables: {
           where: {
             creator: {
-              equals: creatorAddress,
+              in: creatorAddresses,
             },
           },
         },

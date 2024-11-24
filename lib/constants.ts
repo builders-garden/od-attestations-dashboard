@@ -37,3 +37,9 @@ export const collectors = [
   "0xd6Fe95626eC1635f13ca6b331d5e7E076Cd23465",
   "camparimaximalist.eth",
 ];
+
+export const multisigSigners = [
+  "0xc7D67DF3f0277505C1CDF69DE8a451820909554A",
+  "0xb5C99bf3F9B8EDf2A532614049e9EE4302670a4a",
+  "0xd6Fe95626eC1635f13ca6b331d5e7E076Cd23465",
+];

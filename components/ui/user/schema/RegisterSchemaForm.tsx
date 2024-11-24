@@ -33,13 +33,7 @@ import { useState } from "react";
 import { SchemaRegistryAbi } from "@/lib/abi/SchemaRegistry";
 import { SCHEMA_REGISTRY_CONTRACT_ADDRESSES } from "@/lib/eas/constants";
 import { Switch } from "@/components/ui/switch";
-
-enum FieldType {
-  String = "String",
-  Address = "Address",
-  Number = "Number",
-  Boolean = "Boolean",
-}
+import { FieldType } from "@/lib/eas/types";
 
 const formSchema = z.object({
   fields: z.array(
@@ -98,7 +92,7 @@ export const RegisterSchemaForm: React.FC = () => {
 
   const stringifyFields = (fields: z.infer<typeof formSchema>["fields"]) => {
     return fields
-      .map((field) => `${field.fieldType.toLowerCase()} ${field.fieldName}`)
+      .map((field) => `${field.fieldType} ${field.fieldName}`)
       .join(", ");
   };
 
@@ -170,7 +164,8 @@ export const RegisterSchemaForm: React.FC = () => {
                         <SelectContent>
                           {Object.values(FieldType).map((type) => (
                             <SelectItem key={type} value={type}>
-                              {type}
+                              {type.charAt(0).toUpperCase() +
+                                type.slice(1).toLowerCase()}
                             </SelectItem>
                           ))}
                         </SelectContent>

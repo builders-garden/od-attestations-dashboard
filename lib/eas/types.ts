@@ -33,3 +33,15 @@ export type Attestation = {
   revoked: boolean;
   schemaId: string;
 };
+
+export enum FieldType {
+  String = "string",
+  Address = "address",
+  Number = "number",
+  Boolean = "boolean",
+}
+
+export type SchemaField = {
+  name: string;
+  type: FieldType;
+};

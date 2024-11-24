@@ -2,7 +2,7 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useState } from "react";
 import { useAccount } from "wagmi";
-import { getAttestationsFromWallet, schemasFromWallet } from "@/lib/eas";
+import { getAttestationsFromWallet, schemasFromWallets } from "@/lib/eas";
 import * as React from "react";
 import { useWriteContract } from "wagmi";
 import {
@@ -160,8 +160,8 @@ export default function AdminHome() {
               disabled={loading}
               className="flex justify-center items-center bg-gray-200 py-1 px-5 rounded-lg"
               onClick={async () => {
-                const schemas = await schemasFromWallet(
-                  deployedSchemasAddress,
+                const schemas = await schemasFromWallets(
+                  [deployedSchemasAddress],
                   account.chain?.id,
                 );
                 console.log(schemas?.data.schemata);

@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn, shorten } from "@/lib/utils";
 import { Check, CircleX } from "lucide-react";
 
 interface CollectorRowProps {
@@ -19,9 +19,7 @@ export default function CollectorRow({
   handleRemove,
 }: CollectorRowProps) {
   const isAddress = collector.startsWith("0x");
-  const name = isAddress
-    ? collector.slice(0, 6) + "..." + collector.slice(-4)
-    : collector;
+  const name = isAddress ? shorten(collector) : collector;
 
   return (
     <div
