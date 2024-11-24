@@ -18,8 +18,6 @@ import { Input } from "@/components/ui/input";
 import {
   Form,
   FormControl,
-  FormDescription,
-  FormField,
   FormItem,
   FormLabel,
   FormMessage,
@@ -32,8 +30,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { motion } from "framer-motion";
-import { ArrowLeft, CircleX } from "lucide-react";
+import { ArrowLeft, CircleX, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { Switch } from "@/components/ui/switch";
+import { useAccount, useWriteContract } from "wagmi";
+import { useState } from "react";
+import { SchemaRegistryAbi } from "@/lib/abi/SchemaRegistry";
+import { SCHEMA_REGISTRY_CONTRACT_ADDRESSES } from "@/lib/eas/constants";
 
 enum FieldType {
   String = "String",
@@ -78,12 +81,54 @@ export default function BadgeRevokePage() {
     name: "fields",
   });
 
-  // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
-  }
+  const account = useAccount();
+  const { data: hash, error, writeContractAsync } = useWriteContract();
+  const [loading, setLoading] = useState(false);
+  const [isRevocable, setIsRevocable] = useState(true);
+
+  const registerSchema = async (
+    schemaAddress: `0x${string}`,
+    schema: string,
+    resolverAddress: `0x${string}`,
+    isRevocable: boolean,
+  ) => {
+    await writeContractAsync({
+      address: schemaAddress,
+      abi: SchemaRegistryAbi,
+      functionName: "register",
+      args: [schema, resolverAddress, isRevocable],
+    });
+  };
+
+  const stringifyFields = (fields: z.infer<typeof formSchema>["fields"]) => {
+    return fields
+      .map((field) => `${field.fieldType.toLowerCase()} ${field.fieldName}`)
+      .join(", ");
+  };
+
+  const handleRegisterSchema = async (values: z.infer<typeof formSchema>) => {
+    try {
+      if (account.chain) {
+        setLoading(true);
+        await registerSchema(
+          SCHEMA_REGISTRY_CONTRACT_ADDRESSES[
+            account.chain.id as keyof typeof SCHEMA_REGISTRY_CONTRACT_ADDRESSES
+          ],
+          stringifyFields(values.fields),
+          "0x0000000000000000000000000000000000000000",
+          isRevocable,
+        );
+        setLoading(false);
+      }
+    } catch (err) {
+      console.error(err);
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = () => {
+    form.handleSubmit(handleRegisterSchema)();
+  };
 
   return (
     <div className="flex justify-center items-center min-h-screen w-full bg-background">
@@ -110,8 +155,13 @@ export default function BadgeRevokePage() {
             Create a new schema adding the fields and their value types.
           </span>
 
+          <div className="w-full flex justify-between">
+            <span className="font-bold">Revocable Attestations</span>
+            <Switch checked={isRevocable} onCheckedChange={setIsRevocable} />
+          </div>
+
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form className="space-y-6">
               {form.formState.errors.fields && (
                 <FormMessage>
                   {form.formState.errors.fields.message}
@@ -181,7 +231,7 @@ export default function BadgeRevokePage() {
                 <Dialog>
                   <DialogTrigger asChild>
                     <Button
-                      type="submit"
+                      type="button"
                       variant="green"
                       className="text-2xl px-8 py-6 rounded-lg w-full transition-opacity duration-200 ease-in-out"
                     >
@@ -191,7 +241,7 @@ export default function BadgeRevokePage() {
                   <DialogContent className="max-w-sm gap-6">
                     <DialogHeader>
                       <DialogTitle className="text-center text-2xl font-extrabold">
-                        Confirm Schema creation
+                        Confirm Schema Registration
                       </DialogTitle>
                     </DialogHeader>
                     <DialogDescription className="text-center">
@@ -207,7 +257,14 @@ export default function BadgeRevokePage() {
                           Cancel
                         </Button>
                       </DialogClose>
-                      <Button type="button" variant="green" className="w-full">
+                      <Button
+                        variant="green"
+                        className="w-full"
+                        type="button"
+                        onClick={handleSubmit}
+                        disabled={loading}
+                      >
+                        {loading && <Loader2 className="animate-spin" />}
                         Create
                       </Button>
                     </DialogFooter>
