@@ -167,7 +167,7 @@ export default function BadgeRevokePage() {
                 </div>
               ))}
 
-              <div className="flex gap-4 pt-2">
+              <div className="flex flex-col gap-4 pt-2">
                 <Button
                   type="button"
                   className="w-full"
@@ -180,7 +180,11 @@ export default function BadgeRevokePage() {
 
                 <Dialog>
                   <DialogTrigger asChild>
-                    <Button type="submit" variant="green" className="w-full">
+                    <Button
+                      type="submit"
+                      variant="green"
+                      className="text-2xl px-8 py-6 rounded-lg w-full transition-opacity duration-200 ease-in-out"
+                    >
                       Create
                     </Button>
                   </DialogTrigger>
