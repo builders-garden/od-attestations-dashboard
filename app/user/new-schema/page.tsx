@@ -5,7 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { RegisterSchemaForm } from "@/components/ui/user/schema/RegisterSchemaForm";
 
-export default function BadgeRevokePage() {
+export default function NewSchemaPage() {
   return (
     <div className="flex justify-center items-center min-h-screen w-full bg-background">
       <motion.div
@@ -24,7 +24,7 @@ export default function BadgeRevokePage() {
             <Link href={`/user`} className="rounded-full">
               <ArrowLeft size={24} />
             </Link>
-            <h1 className="font-black text-2xl">Create Schema ✨</h1>
+            <h1 className="font-black text-2xl">New Schema ✨</h1>
           </motion.div>
 
           <span className="w-full">
