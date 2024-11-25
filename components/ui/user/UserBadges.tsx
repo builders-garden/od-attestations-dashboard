@@ -1,8 +1,20 @@
 import { motion } from "framer-motion";
 import BadgeCard from "../badge/BadgeCard";
 import { userBadges } from "@/lib/constants";
+import { Attestation } from "@/lib/eas/types";
+import { useCountUp } from "@/components/hooks/useCountUp";
 
-export default function UserBadges() {
+interface UserBadgesProps {
+  userAttestations: Attestation[];
+  allAttestations: Attestation[];
+}
+
+export default function UserBadges({
+  userAttestations,
+  allAttestations,
+}: UserBadgesProps) {
+  const count = useCountUp(userAttestations.length, 2000); // 2 seconds duration
+
   return (
     <div className="flex flex-col gap-6 w-full">
       {/* Badges Header */}
@@ -15,7 +27,9 @@ export default function UserBadges() {
         <h1 className="text-2xl font-black text-start text-black">
           Your Badges
         </h1>
-        <div className="text-xs">Owned 3/27</div>
+        <div className="text-xs">
+          Owned {count}/{allAttestations.length}
+        </div>
       </motion.div>
 
       {/* Badges */}

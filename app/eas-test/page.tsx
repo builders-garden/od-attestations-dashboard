@@ -2,7 +2,7 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useState } from "react";
 import { useAccount } from "wagmi";
-import { getAttestationsFromWallet, schemasFromWallets } from "@/lib/eas";
+import { getAllAttestationsFromIssuers, schemasFromWallets } from "@/lib/eas";
 import * as React from "react";
 import { useWriteContract } from "wagmi";
 import {
@@ -164,7 +164,7 @@ export default function AdminHome() {
                   [deployedSchemasAddress],
                   account.chain?.id,
                 );
-                console.log(schemas?.data.schemata);
+                console.log(schemas);
               }}
             >
               Check
@@ -283,12 +283,12 @@ export default function AdminHome() {
               disabled={loading}
               className="flex justify-center items-center bg-gray-200 py-1 px-5 rounded-lg"
               onClick={async () => {
-                const attestations = await getAttestationsFromWallet(
+                const attestations = await getAllAttestationsFromIssuers(
                   checkAttestationsRecipient,
-                  checkAttestationsIssuer,
+                  [checkAttestationsIssuer],
                   account.chain?.id,
                 );
-                console.log(attestations?.data.attestations);
+                console.log(attestations);
               }}
             >
               Check

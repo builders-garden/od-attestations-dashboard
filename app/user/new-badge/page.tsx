@@ -71,11 +71,11 @@ export default function NewBadgePage() {
         multisigSigners,
         account.chain?.id,
       );
-      if (!schemas?.data) return;
-      setSchemas(schemas.data.schemata);
-      setSelectedSchema(schemas.data.schemata[0]);
+      if (!schemas) return;
+      setSchemas(schemas);
+      setSelectedSchema(schemas[0]);
       setSchemaFields(
-        schemas.data.schemata[0].schema.split(", ").map((field) => {
+        schemas[0].schema.split(", ").map((field) => {
           const [type, ...nameParts] = field.split(" ") as [
             FieldType,
             ...string[],

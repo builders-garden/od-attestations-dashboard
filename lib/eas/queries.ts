@@ -1,4 +1,5 @@
-// This query gets all the schemas registered by a specific wallet.
+// This query gets many schemas
+// This can be filtered specifying a wallet address that created the schemas.
 export const SchemasFromWalletQuery = `
 query Schemata($where: SchemaWhereInput) {
   schemata(where: $where) {
@@ -13,7 +14,8 @@ query Schemata($where: SchemaWhereInput) {
 }
 `;
 
-// This query gets all the attestations received by a specific wallet.
+// This query gets many attestations
+// This can be filtered specifying a recipient address and/or attester.
 export const AttestationsFromWalletQuery = `
 query Attestations($where: AttestationWhereInput) {
   attestations(where: $where) {

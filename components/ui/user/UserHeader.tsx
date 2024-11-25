@@ -1,5 +1,4 @@
 "use client";
-
 import { motion } from "framer-motion";
 import { Separator } from "../separator";
 import { Menu } from "lucide-react";
@@ -11,16 +10,26 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
 import { useDisconnect } from "wagmi";
+import { Attestation } from "@/lib/eas/types";
+import { useCountUp } from "@/components/hooks/useCountUp";
 
-export default function UserHeader() {
-  const isAdmin = true;
+interface UserHeaderProps {
+  isAdmin: boolean;
+  userAttestations: Attestation[];
+  allAttestations: Attestation[];
+}
+
+export default function UserHeader({
+  isAdmin,
+  userAttestations,
+  allAttestations,
+}: UserHeaderProps) {
   const router = useRouter();
-
   const { disconnect } = useDisconnect();
+  const count = useCountUp(userAttestations.length, 2000); // 2 seconds duration
 
   return (
     <>
-      {/* User Header with name and profile pic */}
       <motion.div
         className="flex flex-row justify-between items-start w-full"
         initial={{ opacity: 0 }}
@@ -32,7 +41,8 @@ export default function UserHeader() {
             GM Dreamer!👋
           </h1>
           <div className="text-sm text-start text-black">
-            You currently hold 69 badges
+            You currently hold{" "}
+            <span>{count + (count !== 1 ? " badges" : " badge")}</span>
           </div>
         </div>
         {isAdmin ? (

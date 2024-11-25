@@ -12,7 +12,7 @@ const config = getDefaultConfig({
   chains: [mainnet, sepolia, base, baseSepolia],
   transports: {
     [sepolia.id]: http(
-      "https://eth-sepolia.g.alchemy.com/v2/cZS5C6pUs9vGcs7yWAo6Pv9Q28vfhBcI",
+      "https://eth-sepolia.g.alchemy.com/v2/cZS5C6pUs9vGcs7yWAo6Pv9Q28vfhBcI", // TODO: change it to OD Alchemy key from .env
     ),
   },
   ssr: true, // If your dApp uses server side rendering (SSR)
