@@ -11,10 +11,10 @@ import { useAccount } from "wagmi";
 export default function BadgePage({
   params,
 }: {
-  params: Promise<{ index: string }>;
+  params: Promise<{ uid: string }>;
 }) {
   const account = useAccount();
-  const { index } = use(params);
+  const { uid } = use(params);
 
   if (!account.address) {
     return (
@@ -37,7 +37,7 @@ export default function BadgePage({
             <ArrowLeft size={24} />
           </Link>
           <img
-            src={`/badges/badge${index}.png`}
+            src={`/badges/badge${uid}.png`}
             alt="logo"
             className="w-52 h-52 rounded-full border-8 border-primary p-3"
           />
@@ -50,7 +50,7 @@ export default function BadgePage({
           transition={{ duration: 0.5, delay: 0.1 }}
           className="flex flex-col justify-center items-center w-full mt-6 gap-2.5"
         >
-          <BadgeInfo badge={userBadges[parseInt(index) - 1]} />
+          <BadgeInfo badge={userBadges[parseInt(uid) - 1]} />
         </motion.div>
       </div>
     </div>

@@ -13,10 +13,10 @@ import { useAccount } from "wagmi";
 export default function BadgeCollectorsPage({
   params,
 }: {
-  params: Promise<{ index: string }>;
+  params: Promise<{ uid: string }>;
 }) {
   const account = useAccount();
-  const { index } = use(params);
+  const { uid } = use(params);
 
   if (!account.address) {
     return (
@@ -26,7 +26,7 @@ export default function BadgeCollectorsPage({
     );
   }
 
-  const badge = userBadges[parseInt(index) - 1];
+  const badge = userBadges[parseInt(uid) - 1];
 
   return (
     <div className="flex justify-center items-center min-h-screen w-full bg-background sm:p-6">
@@ -37,7 +37,7 @@ export default function BadgeCollectorsPage({
           transition={{ duration: 0.5 }}
           className="flex justify-between items-center w-full"
         >
-          <Link href={`/user/badge/${index}`} className="rounded-full">
+          <Link href={`/user/badge/${uid}`} className="rounded-full">
             <ArrowLeft size={24} />
           </Link>
           <h1 className="font-black text-2xl">65 Collectors 👤</h1>
