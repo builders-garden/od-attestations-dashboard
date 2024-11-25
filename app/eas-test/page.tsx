@@ -62,18 +62,6 @@ export default function AdminHome() {
     isRevocable: boolean,
     refUID?: `0x${string}`,
   ) => {
-    console.log("easAddress", easAddress);
-    console.log("schemaUID", schemaUID);
-    console.log("recipientAddress", recipientAddress);
-    console.log("expirationTime", NO_EXPIRATION);
-    console.log("isRevocable", isRevocable);
-    console.log(
-      "refUID",
-      refUID ||
-        "0x0000000000000000000000000000000000000000000000000000000000000000",
-    );
-    console.log("encodedData", encodedData);
-
     if (!recipientAddress) {
       console.error("Recipient address is required.");
       return;

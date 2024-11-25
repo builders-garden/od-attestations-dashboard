@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { schemasFromWallets } from "@/lib/eas";
-import { useAccount } from "wagmi";
+import { useAccount, useWriteContract } from "wagmi";
 import { useEffect, useState } from "react";
 import { FieldType, Schema, SchemaField } from "@/lib/eas/types";
 import { multisigSigners } from "@/lib/constants";
@@ -38,18 +38,32 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { InputCollectorList } from "@/components/ui/collectors/InputCollectorList";
+import {
+  NO_EXPIRATION,
+  SchemaEncoder,
+  SchemaItem,
+} from "@ethereum-attestation-service/eas-sdk";
+import { EASAbi } from "@/lib/abi/EAS";
+import { EAS_CONTRACT_ADDRESSES } from "@/lib/eas/constants";
 
 const formSchema = z.object({
   fields: z.array(
     z.object({
-      fieldName: z.string(),
-      fieldType: z.nativeEnum({
+      name: z.string(),
+      type: z.nativeEnum({
         String: FieldType.String,
         Address: FieldType.Address,
         Number: FieldType.Number,
         Boolean: FieldType.Boolean,
       }),
-      fieldValue: z.string(),
+      value: z.string(),
     }),
   ),
 });
@@ -64,6 +78,8 @@ export default function NewBadgePage() {
     undefined,
   );
   const [loading, setLoading] = useState(false);
+  const [collectors, setCollectors] = useState<string[]>([]);
+  const { data: hash, error, writeContract } = useWriteContract();
 
   useEffect(() => {
     const fetchSchemas = async () => {
@@ -88,6 +104,21 @@ export default function NewBadgePage() {
     fetchSchemas();
   }, []);
 
+  useEffect(() => {
+    if (selectedSchema) {
+      setSchemaFields(
+        selectedSchema.schema.split(", ").map((field) => {
+          const [type, ...nameParts] = field.split(" ") as [
+            FieldType,
+            ...string[],
+          ];
+          const name = nameParts.join(" ");
+          return { name, type };
+        }),
+      );
+    }
+  }, [selectedSchema]);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -99,9 +130,9 @@ export default function NewBadgePage() {
     if (schemaFields) {
       form.reset({
         fields: schemaFields.map((field) => ({
-          fieldName: field.name,
-          fieldType: field.type,
-          fieldValue: "",
+          name: field.name,
+          type: field.type,
+          value: "",
         })),
       });
     }
@@ -112,9 +143,51 @@ export default function NewBadgePage() {
     name: "fields",
   });
 
+  const attestToAddresses = async (
+    easAddress: `0x${string}`,
+    schemaUID: `0x${string}`,
+    recipientAddresses: `0x${string}`[],
+    encodedData: `0x${string}`,
+    isRevocable: boolean,
+    refUID?: `0x${string}`,
+  ) => {
+    const request = {
+      schema: schemaUID as `0x${string}`,
+      data: recipientAddresses.map((recipientAddress) => ({
+        recipient: recipientAddress,
+        expirationTime: NO_EXPIRATION,
+        revocable: isRevocable,
+        refUID:
+          refUID ||
+          ("0x0000000000000000000000000000000000000000000000000000000000000000" as `0x${string}`),
+        data: encodedData,
+        value: BigInt(0),
+      })),
+    };
+
+    writeContract({
+      address: easAddress,
+      abi: EASAbi,
+      functionName: "multiAttest",
+      args: [[request]],
+    });
+  };
+
   const handleCreateBadge = (data: z.infer<typeof formSchema>) => {
     setLoading(true);
-    console.log(data);
+    if (account.chain) {
+      const schemaEncoder = new SchemaEncoder(selectedSchema?.schema as string);
+      const encodedData = schemaEncoder.encodeData(data.fields);
+      attestToAddresses(
+        EAS_CONTRACT_ADDRESSES[
+          account.chain.id as keyof typeof EAS_CONTRACT_ADDRESSES
+        ],
+        selectedSchema?.id as `0x${string}`,
+        collectors as `0x${string}`[],
+        encodedData as `0x${string}`,
+        true,
+      );
+    }
     setLoading(false);
   };
 
@@ -174,32 +247,67 @@ export default function NewBadgePage() {
 
           <Form {...form}>
             <form className="space-y-6">
-              {form.formState.errors.fields && (
-                <FormMessage>
-                  {form.formState.errors.fields.message}
-                </FormMessage>
-              )}
+              <div className="p-4 rounded-md bg-secondary">
+                {form.formState.errors.fields && (
+                  <FormMessage>
+                    {form.formState.errors.fields.message}
+                  </FormMessage>
+                )}
 
-              {fields.map((field, index) => (
-                <div
-                  className="flex w-full gap-4 justify-between items-end"
-                  key={field.id}
+                <Accordion
+                  type="single"
+                  collapsible
+                  className="w-full"
+                  defaultValue="form-fields"
                 >
-                  <Controller
-                    control={form.control}
-                    name={`fields.${index}.fieldValue` as const}
-                    render={({ field: subField }) => (
-                      <FormItem className="w-full">
-                        <FormLabel>{field.fieldName}</FormLabel>
-                        <FormControl>
-                          <Input placeholder={field.fieldType} {...subField} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              ))}
+                  <AccordionItem value="form-fields" className="border-none">
+                    <AccordionTrigger className="p-0">
+                      Please fill the badge info
+                    </AccordionTrigger>
+                    <AccordionContent className="pb-0 pt-4 px-1 space-y-6">
+                      {fields.map((field, index) => (
+                        <div
+                          className="flex w-full gap-4 justify-between items-end"
+                          key={field.id}
+                        >
+                          <Controller
+                            control={form.control}
+                            name={`fields.${index}.value` as const}
+                            render={({ field: subField }) => (
+                              <FormItem className="w-full">
+                                <FormLabel>{field.name}</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    placeholder={field.type}
+                                    {...subField}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                      ))}
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+              </div>
+
+              <div className="p-4 rounded-md bg-secondary">
+                <Accordion type="single" collapsible className="w-full">
+                  <AccordionItem value="collectors" className="border-none">
+                    <AccordionTrigger className="p-0">
+                      Please fill the collectors
+                    </AccordionTrigger>
+                    <AccordionContent className="pb-1 pt-4 px-1">
+                      <InputCollectorList
+                        collectors={collectors}
+                        setCollectors={setCollectors}
+                      />
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+              </div>
 
               <Dialog>
                 <DialogTrigger asChild>

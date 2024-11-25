@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import CollectorRow from "@/components/ui/collectors/CollectorRow";
+import { InputCollectorList } from "@/components/ui/collectors/InputCollectorList";
 import {
   Dialog,
   DialogClose,
@@ -12,7 +12,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { LinkTextWithIcon } from "@/components/ui/linkTextWithIcon";
 import { userBadges } from "@/lib/constants";
 import { cn } from "@/lib/utils";
@@ -30,20 +29,7 @@ export default function BadgeReissuePage({
 
   const badge = userBadges[parseInt(uid) - 1];
 
-  const [input, setInput] = useState("");
-
   const [collectors, setCollectors] = useState<string[]>([]);
-
-  const handleRemove = (collector: string) => {
-    setCollectors((prev) => prev.filter((c) => c !== collector));
-  };
-
-  const handleAdd = (collector: string) => {
-    setCollectors((prev) =>
-      prev.includes(collector) ? prev : [...prev, collector],
-    );
-    setInput("");
-  };
 
   return (
     <div className="flex justify-center items-center min-h-screen w-full bg-background">
@@ -75,39 +61,10 @@ export default function BadgeReissuePage({
               <span className="font-bold">New {badge.title} collectors</span>
               <LinkTextWithIcon>Easscan</LinkTextWithIcon>
             </div>
-            <div
-              className={cn(
-                "flex w-full gap-0 justify-between",
-                input.length > 0 && "gap-4",
-              )}
-            >
-              <Input
-                placeholder="ENS or Address..."
-                className="w-full"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-              />
-              <Button
-                onClick={() => handleAdd(input)}
-                className={cn(
-                  "w-fit transition-all duration-200 ease-in-out",
-                  input.length > 0 && "w-fit px-4",
-                  input.length === 0 && "w-0 p-0",
-                )}
-              >
-                Add
-              </Button>
-            </div>
-            <div className="flex flex-col gap-3 w-full max-h-[50rem] overflow-y-auto">
-              {collectors.map((collector, index) => (
-                <CollectorRow
-                  key={index}
-                  collector={collector}
-                  removable
-                  handleRemove={handleRemove}
-                />
-              ))}
-            </div>
+            <InputCollectorList
+              collectors={collectors}
+              setCollectors={setCollectors}
+            />
           </div>
         </div>
         <Dialog>
