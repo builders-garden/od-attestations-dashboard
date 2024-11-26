@@ -18,7 +18,7 @@ import { multisigSigners } from "@/lib/constants";
 import { shorten } from "@/lib/utils";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, Controller, useFieldArray, set } from "react-hook-form";
+import { useForm, Controller, useFieldArray } from "react-hook-form";
 import {
   Form,
   FormControl,
@@ -48,10 +48,10 @@ import { InputCollectorList } from "@/components/ui/collectors/InputCollectorLis
 import {
   NO_EXPIRATION,
   SchemaEncoder,
-  SchemaItem,
 } from "@ethereum-attestation-service/eas-sdk";
 import { EASAbi } from "@/lib/abi/EAS";
 import { EAS_CONTRACT_ADDRESSES } from "@/lib/eas/constants";
+import { LinkTextWithIcon } from "@/components/ui/linkTextWithIcon";
 
 const formSchema = z.object({
   fields: z.array(
@@ -102,7 +102,7 @@ export default function NewBadgePage() {
       );
     };
     fetchSchemas();
-  }, []);
+  }, [account.chain?.id]);
 
   useEffect(() => {
     if (selectedSchema) {
@@ -221,7 +221,16 @@ export default function NewBadgePage() {
           </span>
 
           <div className="flex flex-col gap-2">
-            <span className="text-sm">Select a Schema</span>
+            <div className="flex w-full justify-between">
+              <span className="text-sm">Select a Schema</span>
+              {selectedSchema?.id && (
+                <LinkTextWithIcon
+                  href={`https://base.easscan.org/schema/view/${selectedSchema.id}`}
+                >
+                  Easscan
+                </LinkTextWithIcon>
+              )}
+            </div>
             <Select
               value={selectedSchema?.id}
               onValueChange={(e) =>
@@ -264,7 +273,7 @@ export default function NewBadgePage() {
                     <AccordionTrigger className="p-0">
                       Please fill the badge info
                     </AccordionTrigger>
-                    <AccordionContent className="pb-0 pt-4 px-1 space-y-6">
+                    <AccordionContent className="p-1 pt-4 space-y-6">
                       {fields.map((field, index) => (
                         <div
                           className="flex w-full gap-4 justify-between items-end"
@@ -277,10 +286,19 @@ export default function NewBadgePage() {
                               <FormItem className="w-full">
                                 <FormLabel>{field.name}</FormLabel>
                                 <FormControl>
-                                  <Input
-                                    placeholder={field.type}
-                                    {...subField}
-                                  />
+                                  {field.name.toLowerCase() === "image" ? (
+                                    <Input
+                                      id="picture"
+                                      type="file"
+                                      className="h-auto"
+                                      {...subField}
+                                    />
+                                  ) : (
+                                    <Input
+                                      placeholder={field.type}
+                                      {...subField}
+                                    />
+                                  )}
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
@@ -297,7 +315,7 @@ export default function NewBadgePage() {
                 <Accordion type="single" collapsible className="w-full">
                   <AccordionItem value="collectors" className="border-none">
                     <AccordionTrigger className="p-0">
-                      Please fill the collectors
+                      Please add the collectors addresses
                     </AccordionTrigger>
                     <AccordionContent className="pb-1 pt-4 px-1">
                       <InputCollectorList

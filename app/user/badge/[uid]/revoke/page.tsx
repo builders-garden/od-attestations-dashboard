@@ -72,7 +72,7 @@ export default function BadgeRevokePage({
           <div className="grid grid-cols-1 justify-start items-center gap-3 w-full">
             <div className="flex w-full justify-between">
               <span className="font-bold">{badge.title} collectors</span>
-              <LinkTextWithIcon>Easscan</LinkTextWithIcon>
+              <LinkTextWithIcon href="">Easscan</LinkTextWithIcon>
             </div>
             <div
               className={cn(
