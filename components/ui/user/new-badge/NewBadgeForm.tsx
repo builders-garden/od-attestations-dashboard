@@ -34,7 +34,7 @@ import { SchemaEncoder } from "@ethereum-attestation-service/eas-sdk";
 import { Config, UseAccountReturnType, useWriteContract } from "wagmi";
 import { easMultiAttest } from "@/lib/eas/calls";
 import { EAS_CONTRACT_ADDRESSES } from "@/lib/eas/constants";
-import { getImageFromPinata, uploadImageToPinata } from "@/lib/pinata";
+import { getImageFromIpfs, uploadImageToIpfs } from "@/lib/ipfs";
 
 const formSchema = z.object({
   fields: z.array(
@@ -97,7 +97,7 @@ export const NewBadgeForm: React.FC<NewBadgeFormProps> = ({
 
   const handleUploadImage = async () => {
     setImageLoading(true);
-    const ipfsHash = await uploadImageToPinata(imageFile);
+    const ipfsHash = await uploadImageToIpfs(imageFile);
     if (!ipfsHash) {
       form.setError("fields", {
         type: "manual",
@@ -106,7 +106,7 @@ export const NewBadgeForm: React.FC<NewBadgeFormProps> = ({
       setImageLoading(false);
       return;
     }
-    const url = await getImageFromPinata(ipfsHash);
+    const url = await getImageFromIpfs(ipfsHash);
     setUploadedImageUrl(url);
     setImageLoading(false);
   };
@@ -168,7 +168,7 @@ export const NewBadgeForm: React.FC<NewBadgeFormProps> = ({
                         <FormItem className="w-full">
                           <FormLabel>{field.name}</FormLabel>
                           <FormControl>
-                            {field.name.toLowerCase() === "image" ? (
+                            {field.name.toLowerCase().includes("image") ? (
                               <div className="flex flex-col gap-4">
                                 <div className="flex w-full gap-4">
                                   <Input

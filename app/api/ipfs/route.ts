@@ -3,9 +3,14 @@ import { PinataSDK } from "pinata-web3";
 
 const pinata = new PinataSDK({
   pinataJwt: process.env.PINATA_JWT!,
-  pinataGateway: "black-gigantic-gayal-622.mypinata.cloud",
+  pinataGateway: process.env.PINATA_GATEWAY!,
 });
 
+/**
+ * Upload image to IPFS
+ * @param req Request object, must contain a file in the body of the request (e.g. from a form data)
+ * @returns IPFS hash of the uploaded image
+ */
 export async function POST(req: NextRequest) {
   if (req.method !== "POST") {
     return NextResponse.json({ error: "Method not allowed" }, { status: 405 });
@@ -34,6 +39,11 @@ export async function POST(req: NextRequest) {
   }
 }
 
+/**
+ * Get image from IPFS
+ * @param req Request object, must contain a query parameter "hash" with the IPFS hash of the image
+ * @returns Image blob stream
+ */
 export async function GET(req: NextRequest) {
   if (req.method !== "GET") {
     return NextResponse.json({ error: "Method not allowed" }, { status: 405 });

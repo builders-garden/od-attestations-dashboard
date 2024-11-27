@@ -1,4 +1,9 @@
-export const uploadImageToPinata: (
+/**
+ * Upload image to IPFS
+ * @param imageFile Image file to upload, must be a File object (e.g. from an input element)
+ * @returns IPFS hash of the uploaded image
+ */
+export const uploadImageToIpfs: (
   imageFile: File | null,
 ) => Promise<string | undefined> = async (imageFile: File | null) => {
   try {
@@ -7,7 +12,7 @@ export const uploadImageToPinata: (
     const formData = new FormData();
     formData.append("file", imageFile);
 
-    const response = await fetch("/api/pinata", {
+    const response = await fetch("/api/ipfs", {
       method: "POST",
       body: formData,
     });
@@ -28,11 +33,16 @@ export const uploadImageToPinata: (
   }
 };
 
-export const getImageFromPinata: (ipfsHash: string) => Promise<string> = async (
+/**
+ * Get image from IPFS as a URL
+ * @param ipfsHash IPFS hash of the image
+ * @returns URL of the image, insert this URL into the src attribute of an img tag to display the image
+ */
+export const getImageFromIpfs: (ipfsHash: string) => Promise<string> = async (
   ipfsHash: string,
 ) => {
   try {
-    const response = await fetch(`/api/pinata?hash=${ipfsHash}`, {
+    const response = await fetch(`/api/ipfs?hash=${ipfsHash}`, {
       method: "GET",
     });
 
