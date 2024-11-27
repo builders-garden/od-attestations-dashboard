@@ -34,6 +34,7 @@ import { SchemaEncoder } from "@ethereum-attestation-service/eas-sdk";
 import { Config, UseAccountReturnType, useWriteContract } from "wagmi";
 import { easMultiAttest } from "@/lib/eas/calls";
 import { EAS_CONTRACT_ADDRESSES } from "@/lib/eas/constants";
+import { uploadImageToPinata } from "@/lib/pinata";
 
 const formSchema = z.object({
   fields: z.array(
@@ -64,6 +65,14 @@ export const NewBadgeForm: React.FC<NewBadgeFormProps> = ({
   const [loading, setLoading] = useState(false);
   const { data: hash, error, writeContract } = useWriteContract();
   const [collectors, setCollectors] = useState<string[]>([]);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [ipfsHash, setIpfsHash] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    if (imageFile) {
+      console.log(imageFile.text());
+    }
+  }, [imageFile]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -88,6 +97,11 @@ export const NewBadgeForm: React.FC<NewBadgeFormProps> = ({
       });
     }
   }, [schemaFields, form]);
+
+  const handleUploadImage = async () => {
+    const ipfsHash = await uploadImageToPinata(imageFile);
+    setIpfsHash(ipfsHash);
+  };
 
   const handleCreateBadge = (data: z.infer<typeof formSchema>) => {
     setLoading(true);
@@ -128,7 +142,7 @@ export const NewBadgeForm: React.FC<NewBadgeFormProps> = ({
             defaultValue="form-fields"
           >
             <AccordionItem value="form-fields" className="border-none">
-              <AccordionTrigger className="p-0">
+              <AccordionTrigger className="p-0 font-bold">
                 Please fill the badge info
               </AccordionTrigger>
               <AccordionContent className="p-1 pt-4 space-y-6">
@@ -145,12 +159,30 @@ export const NewBadgeForm: React.FC<NewBadgeFormProps> = ({
                           <FormLabel>{field.name}</FormLabel>
                           <FormControl>
                             {field.name.toLowerCase() === "image" ? (
-                              <Input
-                                id="picture"
-                                type="file"
-                                className="h-auto"
-                                {...subField}
-                              />
+                              <div className="flex w-full gap-4">
+                                <Input
+                                  id="picture"
+                                  type="file"
+                                  className="h-auto"
+                                  {...subField}
+                                  onChange={(e) => {
+                                    subField.onChange(e);
+                                    const file = e.target.files?.[0];
+                                    if (file) {
+                                      setImageFile(file);
+                                    }
+                                  }}
+                                />
+                                <Button
+                                  variant="outline"
+                                  type="button"
+                                  className="w-1/2"
+                                  onClick={handleUploadImage}
+                                  disabled={!imageFile}
+                                >
+                                  Upload
+                                </Button>
+                              </div>
                             ) : (
                               <Input placeholder={field.type} {...subField} />
                             )}
@@ -169,7 +201,7 @@ export const NewBadgeForm: React.FC<NewBadgeFormProps> = ({
         <div className="p-4 rounded-md bg-secondary">
           <Accordion type="single" collapsible className="w-full">
             <AccordionItem value="collectors" className="border-none">
-              <AccordionTrigger className="p-0">
+              <AccordionTrigger className="p-0 font-bold">
                 Please add the collectors addresses
               </AccordionTrigger>
               <AccordionContent className="pb-1 pt-4 px-1">
