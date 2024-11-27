@@ -9,7 +9,7 @@ import {
 } from "./types";
 
 /**
- * A utility function that filters out the valid attestations from a list of attestations. A valid attestation is one that is not revoked and has the ODPassport flag set to true.
+ * A utility function that filters out the invalid attestations from a list of attestations. A valid attestation is one that is not revoked and has the ODPassport flag set to true.
  * @param attestations - An array of Attestations.
  * @returns The array of valid attestations.
  */
@@ -19,7 +19,8 @@ const getValidODAttestations = (attestations: Attestation[]) => {
       return false;
     }
     // Since the decodedDataJson is an array of objects, we need to check element by element
-    const attestationDecodedDataArray = JSON.parse(attestation.decodedDataJson);
+    const attestationDecodedDataArray: AttestationDecodedDataType[] =
+      JSON.parse(attestation.decodedDataJson);
     for (const element of attestationDecodedDataArray) {
       if (element.value.name === "ODPassport" && element.value.value) {
         return true;
@@ -63,8 +64,8 @@ const getUniqueAttestations = (attestations: Attestation[]) => {
     if (!attestation.decodedDataJson) {
       return;
     }
-    const attestationDecodedDataArray = JSON.parse(attestation.decodedDataJson);
-    console.log("attestationDecodedDataArray: ", attestationDecodedDataArray);
+    const attestationDecodedDataArray: AttestationDecodedDataType[] =
+      JSON.parse(attestation.decodedDataJson);
     // Create a unique key for the attestation
     const uniqueKey = createUniqueKey(
       attestation.schemaId,
@@ -207,7 +208,7 @@ export const getUserAttestations = async (
  * @param chainId - The chain ID of the blockchain where the attestations are registered.
  * @returns An array of Attestations or [] if there was an error.
  */
-export const getUserUniqueAttestations = async (
+export const getUserUniqueAttestation = async (
   recipientAddress: string,
   issuerAddresses: string[],
   chainId: number | undefined,
@@ -264,7 +265,7 @@ export const getUserUniqueAttestations = async (
  * @param chainId - The chain ID of the blockchain where the attestations are registered.
  * @returns An array of Attestations or [] if there was an error.
  */
-export const getEveryUniqueAttestations = async (
+export const getEveryUniqueAttestation = async (
   issuerAddresses: string[],
   chainId: number | undefined,
 ): Promise<Attestation[]> => {
@@ -275,35 +276,42 @@ export const getEveryUniqueAttestations = async (
   }
 
   const endpoint = GRAPHQL_ENDPOINTS[chainId as keyof typeof GRAPHQL_ENDPOINTS];
-  let attestations: Attestation[] = [];
   try {
-    for (const issuerAddress of issuerAddresses) {
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          query: AttestationsFromWalletQuery,
-          variables: {
-            where: {
-              // In this case only the attester is important to filter out the attestations
-              attester: {
-                equals: issuerAddress,
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        query: AttestationsFromWalletQuery,
+        variables: {
+          where: {
+            attester: {
+              in: issuerAddresses,
+            },
+            revoked: {
+              equals: false,
+            },
+            decodedDataJson: {
+              contains:
+                '{"name":"ODPassport","type":"bool","signature":"bool ODPassport","value":{"name":"ODPassport","type":"bool","value":true}}',
+            },
+            schema: {
+              is: {
+                schema: {
+                  contains:
+                    "string BadgeTitle,string BadgeDescription,string BadgeImageCID",
+                },
               },
             },
           },
-        }),
-      });
-      const payload: AttestationsResponse = await response.json();
-      attestations = [...attestations, ...payload.data.attestations];
-    }
+          distinct: "decodedDataJson",
+        },
+      }),
+    });
+    const payload: AttestationsResponse = await response.json();
 
-    // Since different attestations could have the same schema ID, we need to filter by their structure
-    const validAttestations = getValidODAttestations(attestations);
-    const uniqueAttestations = getUniqueAttestations(validAttestations);
-
-    return uniqueAttestations;
+    return payload.data.attestations;
   } catch (e) {
     console.log(e);
     return [];

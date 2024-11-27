@@ -32,6 +32,7 @@ export type Attestation = {
   revocable: boolean;
   revoked: boolean;
   schemaId: string;
+  schema: Schema;
 };
 
 export enum FieldType {

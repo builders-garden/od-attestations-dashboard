@@ -17,8 +17,8 @@ query Schemata($where: SchemaWhereInput) {
 // This query gets many attestations
 // This can be filtered specifying a recipient address and/or attester.
 export const AttestationsFromWalletQuery = `
-query Attestations($where: AttestationWhereInput) {
-  attestations(where: $where) {
+query Attestations($where: AttestationWhereInput, $distinct: [AttestationScalarFieldEnum!]) {
+  attestations(where: $where, distinct: $distinct) {
     id
     attester
     recipient
@@ -30,6 +30,15 @@ query Attestations($where: AttestationWhereInput) {
     revocable
     revoked
     schemaId
+    schema {
+      schema
+      id
+      creator
+      revocable
+      index
+      txid
+      time
+    }
   }
 }
 `;

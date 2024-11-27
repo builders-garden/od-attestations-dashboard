@@ -1,10 +1,7 @@
 "use client";
 import UserBadges from "@/components/ui/user/UserBadges";
 import UserHeader from "@/components/ui/user/UserHeader";
-import {
-  getUserUniqueAttestations,
-  getEveryUniqueAttestations,
-} from "@/lib/eas";
+import { getUserUniqueAttestation, getEveryUniqueAttestation } from "@/lib/eas";
 import { Attestation } from "@/lib/eas/types";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useEffect, useState } from "react";
@@ -18,7 +15,7 @@ export default function UserHome() {
   useEffect(() => {
     const fetchUserAttestations = async () => {
       if (!account.address || !account.chain?.id) return;
-      const allAttestations = await getEveryUniqueAttestations(
+      const allAttestations = await getEveryUniqueAttestation(
         [
           "0x82A29547CA8970c2aDECF4C2db7e364339f9a4B7",
           "0x4E123166e7DfDE7AbA29162Fb3a5c6Af562443D4",
@@ -29,7 +26,7 @@ export default function UserHome() {
       console.log("allAttestations:", allAttestations);
       setAllAttestations(allAttestations);
 
-      const userAttestations = await getUserUniqueAttestations(
+      const userAttestations = await getUserUniqueAttestation(
         account.address,
         [
           "0x82A29547CA8970c2aDECF4C2db7e364339f9a4B7",
