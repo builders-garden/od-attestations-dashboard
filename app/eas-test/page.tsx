@@ -2,7 +2,7 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useState } from "react";
 import { useAccount } from "wagmi";
-import { getAllAttestationsFromIssuers, schemasFromWallets } from "@/lib/eas";
+import { getUserAttestations, schemasFromWallets } from "@/lib/eas";
 import * as React from "react";
 import { useWriteContract } from "wagmi";
 import {
@@ -179,7 +179,7 @@ export default function AdminHome() {
                     account.chain
                       .id as keyof typeof SCHEMA_REGISTRY_CONTRACT_ADDRESSES
                   ],
-                  "string dio, bool caro",
+                  "string BadgeTitle,string BadgeDescription,string BadgeImageCID,string EventName,string EventLocation,string EventDate,bool ODPassport",
                   "0x0000000000000000000000000000000000000000",
                   true,
                 );
@@ -216,18 +216,44 @@ export default function AdminHome() {
                 // Creates a transaction to attest to an address.
                 if (account.chain) {
                   const schemaEncoder = new SchemaEncoder(
-                    "string pippo, bool fortissimo",
+                    "string BadgeTitle,string BadgeDescription,string BadgeImageCID,string EventName,string EventLocation,string EventDate,bool ODPassport",
                   );
                   const encodedData = schemaEncoder.encodeData([
-                    { name: "pippo", value: "Un Sacco", type: "string" },
-                    { name: "fortissimo", value: true, type: "bool" },
+                    {
+                      name: "BadgeTitle",
+                      value: "Bangkok attendance badge",
+                      type: "string",
+                    },
+                    {
+                      name: "BadgeDescription",
+                      value:
+                        "This badge is awarded to all attendees of the Bangkok event",
+                      type: "string",
+                    },
+                    {
+                      name: "BadgeImageCID",
+                      value: "QmR2c6n9mzV5qFJ9Z5n8qfZ3d7Z8...",
+                      type: "string",
+                    },
+                    {
+                      name: "EventName",
+                      value: "Annual Reunion in Bangkok",
+                      type: "string",
+                    },
+                    {
+                      name: "EventLocation",
+                      value: "Bangkok, Thailand",
+                      type: "string",
+                    },
+                    { name: "EventDate", value: "2022-12-31", type: "string" },
+                    { name: "ODPassport", value: true, type: "bool" },
                   ]);
 
                   attestToAddress(
                     EAS_CONTRACT_ADDRESSES[
                       account.chain.id as keyof typeof EAS_CONTRACT_ADDRESSES
                     ],
-                    "0x295dfcc122f135bc87b607026daa8834d0341381402717574a482b6895b07d3e",
+                    "0xac574d1be2d4b447556713e28025286cffbd303eaac34f281ab24f6ef9ec2386",
                     attestAddress,
                     encodedData as `0x${string}`,
                     true,
@@ -271,7 +297,7 @@ export default function AdminHome() {
               disabled={loading}
               className="flex justify-center items-center bg-gray-200 py-1 px-5 rounded-lg"
               onClick={async () => {
-                const attestations = await getAllAttestationsFromIssuers(
+                const attestations = await getUserAttestations(
                   checkAttestationsRecipient,
                   [checkAttestationsIssuer],
                   account.chain?.id,

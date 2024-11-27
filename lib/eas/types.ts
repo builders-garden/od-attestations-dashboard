@@ -45,3 +45,14 @@ export type SchemaField = {
   name: string;
   type: FieldType;
 };
+
+export type AttestationDecodedDataType = {
+  name: string;
+  signature: string;
+  type: string;
+  value: {
+    name: string;
+    type: string;
+    value: string | number | boolean;
+  };
+};

@@ -16,17 +16,15 @@ import { useCountUp } from "@/components/hooks/useCountUp";
 interface UserHeaderProps {
   isAdmin: boolean;
   userAttestations: Attestation[];
-  allAttestations: Attestation[];
 }
 
 export default function UserHeader({
   isAdmin,
   userAttestations,
-  allAttestations,
 }: UserHeaderProps) {
   const router = useRouter();
   const { disconnect } = useDisconnect();
-  const count = useCountUp(userAttestations.length, 2000); // 2 seconds duration
+  const userAttestationsCount = useCountUp(userAttestations.length, 2000); // 2 seconds duration
 
   return (
     <>
@@ -42,7 +40,10 @@ export default function UserHeader({
           </h1>
           <div className="text-sm text-start text-black">
             You currently hold{" "}
-            <span>{count + (count !== 1 ? " badges" : " badge")}</span>
+            <span>
+              {userAttestationsCount +
+                (userAttestationsCount !== 1 ? " badges" : " badge")}
+            </span>
           </div>
         </div>
         {isAdmin ? (
