@@ -28,16 +28,24 @@ export const uploadImageToPinata: (
   }
 };
 
-export const getImageFromPinata: (
+export const getImageFromPinata: (ipfsHash: string) => Promise<string> = async (
   ipfsHash: string,
-) => Promise<Response> = async (ipfsHash: string) => {
-  const response = await fetch(`/api/pinata?hash=${ipfsHash}`, {
-    method: "GET",
-  });
+) => {
+  try {
+    const response = await fetch(`/api/pinata?hash=${ipfsHash}`, {
+      method: "GET",
+    });
 
-  if (!response.ok) {
-    throw new Error("Failed to get image");
+    if (!response.ok) {
+      throw new Error("Failed to get image");
+    }
+
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+
+    return url;
+  } catch (error) {
+    console.error("Error getting image:", error);
+    return "";
   }
-
-  return response;
 };

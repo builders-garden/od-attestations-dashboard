@@ -47,8 +47,23 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Invalid hash" }, { status: 400 });
     }
 
-    const data = await pinata.gateways.get(hash);
-    return NextResponse.json(data);
+    const blob = (await pinata.gateways.get(hash))?.data as Blob;
+
+    if (!blob) {
+      return NextResponse.json(
+        { error: "Failed to get image" },
+        { status: 500 },
+      );
+    }
+
+    const stream = blob.stream();
+
+    return new NextResponse(stream, {
+      headers: {
+        "Content-Type": blob.type,
+        "Content-Length": blob.size.toString(),
+      },
+    });
   } catch (error) {
     console.error(error);
     return NextResponse.json(

@@ -29,12 +29,12 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
-import { Loader2 } from "lucide-react";
+import { CircleX, Loader2 } from "lucide-react";
 import { SchemaEncoder } from "@ethereum-attestation-service/eas-sdk";
 import { Config, UseAccountReturnType, useWriteContract } from "wagmi";
 import { easMultiAttest } from "@/lib/eas/calls";
 import { EAS_CONTRACT_ADDRESSES } from "@/lib/eas/constants";
-import { uploadImageToPinata } from "@/lib/pinata";
+import { getImageFromPinata, uploadImageToPinata } from "@/lib/pinata";
 
 const formSchema = z.object({
   fields: z.array(
@@ -63,16 +63,13 @@ export const NewBadgeForm: React.FC<NewBadgeFormProps> = ({
   schemaFields,
 }) => {
   const [loading, setLoading] = useState(false);
+  const [imageLoading, setImageLoading] = useState(false);
   const { data: hash, error, writeContract } = useWriteContract();
   const [collectors, setCollectors] = useState<string[]>([]);
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [ipfsHash, setIpfsHash] = useState<string | undefined>(undefined);
-
-  useEffect(() => {
-    if (imageFile) {
-      console.log(imageFile.text());
-    }
-  }, [imageFile]);
+  const [uploadedImageUrl, setUploadedImageUrl] = useState<string | undefined>(
+    undefined,
+  );
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -99,8 +96,19 @@ export const NewBadgeForm: React.FC<NewBadgeFormProps> = ({
   }, [schemaFields, form]);
 
   const handleUploadImage = async () => {
+    setImageLoading(true);
     const ipfsHash = await uploadImageToPinata(imageFile);
-    setIpfsHash(ipfsHash);
+    if (!ipfsHash) {
+      form.setError("fields", {
+        type: "manual",
+        message: "Failed to upload image to IPFS, please retry.",
+      });
+      setImageLoading(false);
+      return;
+    }
+    const url = await getImageFromPinata(ipfsHash);
+    setUploadedImageUrl(url);
+    setImageLoading(false);
   };
 
   const handleCreateBadge = (data: z.infer<typeof formSchema>) => {
@@ -132,7 +140,9 @@ export const NewBadgeForm: React.FC<NewBadgeFormProps> = ({
       <form className="space-y-6">
         <div className="p-4 rounded-md bg-secondary">
           {form.formState.errors.fields && (
-            <FormMessage>{form.formState.errors.fields.message}</FormMessage>
+            <FormMessage className="mb-3">
+              Error: {form.formState.errors.fields.message}
+            </FormMessage>
           )}
 
           <Accordion
@@ -159,29 +169,65 @@ export const NewBadgeForm: React.FC<NewBadgeFormProps> = ({
                           <FormLabel>{field.name}</FormLabel>
                           <FormControl>
                             {field.name.toLowerCase() === "image" ? (
-                              <div className="flex w-full gap-4">
-                                <Input
-                                  id="picture"
-                                  type="file"
-                                  className="h-auto"
-                                  {...subField}
-                                  onChange={(e) => {
-                                    subField.onChange(e);
-                                    const file = e.target.files?.[0];
-                                    if (file) {
-                                      setImageFile(file);
+                              <div className="flex flex-col gap-4">
+                                <div className="flex w-full gap-4">
+                                  <Input
+                                    id="picture"
+                                    type="file"
+                                    className="h-auto"
+                                    {...subField}
+                                    onChange={(e) => {
+                                      subField.onChange(e);
+                                      const file = e.target.files?.[0];
+                                      if (file) {
+                                        form.clearErrors("fields");
+                                        setUploadedImageUrl(undefined);
+                                        setImageFile(file);
+                                      }
+                                    }}
+                                  />
+                                  <Button
+                                    variant="outline"
+                                    type="button"
+                                    className="w-1/4"
+                                    onClick={handleUploadImage}
+                                    disabled={
+                                      !imageFile ||
+                                      !!uploadedImageUrl ||
+                                      imageLoading
                                     }
-                                  }}
-                                />
-                                <Button
-                                  variant="outline"
-                                  type="button"
-                                  className="w-1/2"
-                                  onClick={handleUploadImage}
-                                  disabled={!imageFile}
-                                >
-                                  Upload
-                                </Button>
+                                  >
+                                    {imageLoading && (
+                                      <Loader2 className="animate-spin" />
+                                    )}
+                                    Upload
+                                  </Button>
+                                  {imageFile && (
+                                    <Button
+                                      variant="outline"
+                                      type="button"
+                                      className="w-auto"
+                                      onClick={() => {
+                                        form.clearErrors("fields");
+                                        subField.onChange({
+                                          target: { value: "" },
+                                        });
+                                        setImageFile(null);
+                                        setUploadedImageUrl(undefined);
+                                      }}
+                                      disabled={imageLoading}
+                                    >
+                                      <CircleX />
+                                    </Button>
+                                  )}
+                                </div>
+                                {uploadedImageUrl && (
+                                  <img
+                                    src={uploadedImageUrl}
+                                    alt="Uploaded image"
+                                    className="mx-auto w-1/2"
+                                  />
+                                )}
                               </div>
                             ) : (
                               <Input placeholder={field.type} {...subField} />
