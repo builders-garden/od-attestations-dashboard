@@ -1,5 +1,8 @@
 const isCIDValid: (cid: string) => boolean = (cid: string) => {
-  return cid.startsWith("Qm") && cid.length === 46;
+  return (
+    (cid.startsWith("Qm") && cid.length === 46) ||
+    (cid.startsWith("baf") && cid.length === 59)
+  );
 };
 
 /**
