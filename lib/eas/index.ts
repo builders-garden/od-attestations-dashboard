@@ -137,6 +137,11 @@ export const schemasFromWallets = async (
               in: creatorAddresses,
             },
           },
+          schemaNamesWhere2: {
+            attesterAddress: {
+              in: creatorAddresses,
+            },
+          },
         },
       }),
     });
@@ -248,7 +253,7 @@ export const getUserUniqueAttestations = async (
               is: {
                 schema: {
                   contains:
-                    "string BadgeTitle,string BadgeDescription,string BadgeImageCID",
+                    "string BadgeTitle, string BadgeDescription, string BadgeImageCID",
                 },
               },
             },

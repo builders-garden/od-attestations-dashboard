@@ -1,6 +1,6 @@
 // This query gets many schemas and can be filtered.
 export const SchemasQuery = `
-query Schemata($where: SchemaWhereInput) {
+query Schemata($where: SchemaWhereInput, $schemaNamesWhere2: SchemaNameWhereInput) {
   schemata(where: $where) {
     id
     schema
@@ -9,6 +9,9 @@ query Schemata($where: SchemaWhereInput) {
     index
     txid
     time
+    schemaNames(where: $schemaNamesWhere2) {
+      name
+    }
   }
 }
 `;

@@ -24,6 +24,11 @@ export type Schema = {
   index: string;
   txid: string;
   time: number;
+  schemaNames: SchemaName[];
+};
+
+export type SchemaName = {
+  name: string;
 };
 
 export type Attestation = {
