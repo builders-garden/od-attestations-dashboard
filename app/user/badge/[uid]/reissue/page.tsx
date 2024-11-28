@@ -1,5 +1,6 @@
 "use client";
 
+import { useCreateBadge } from "@/components/hooks/useCreateBadge";
 import { Button } from "@/components/ui/button";
 import { InputCollectorList } from "@/components/ui/collectors/InputCollectorList";
 import {
@@ -13,12 +14,17 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { LinkTextWithIcon } from "@/components/ui/linkTextWithIcon";
-import { userBadges } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+import { SchemaEncoder } from "@ethereum-attestation-service/eas-sdk";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { motion } from "framer-motion";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
-import { use, useState } from "react";
+import { use, useEffect, useState } from "react";
+import { useAccount, useWriteContract } from "wagmi";
+import { easMultiAttest } from "@/lib/eas/calls";
+import { EAS_CONTRACT_ADDRESSES } from "@/lib/eas/constants";
+import { AttestationDecodedDataType } from "@/lib/eas/types";
 
 export default function BadgeReissuePage({
   params,
@@ -26,10 +32,53 @@ export default function BadgeReissuePage({
   params: Promise<{ uid: string }>;
 }) {
   const { uid } = use(params);
-
-  const badge = userBadges[parseInt(uid) - 1];
-
+  const account = useAccount();
+  const { badge, sourceAttestation, notFound } = useCreateBadge(uid, account);
+  const [loading, setLoading] = useState<boolean>(false);
   const [collectors, setCollectors] = useState<string[]>([]);
+  const { writeContract } = useWriteContract();
+
+  const handleReissueBadge = () => {
+    setLoading(true);
+    try {
+      if (account.chain && sourceAttestation) {
+        const schemaEncoder = new SchemaEncoder(
+          sourceAttestation?.schema.schema as string,
+        );
+        const decodedData: AttestationDecodedDataType[] = JSON.parse(
+          sourceAttestation.decodedDataJson,
+        );
+        const values = decodedData.map((data) => data.value);
+        const encodedData = schemaEncoder.encodeData(values);
+        writeContract(
+          easMultiAttest(
+            EAS_CONTRACT_ADDRESSES[
+              account.chain.id as keyof typeof EAS_CONTRACT_ADDRESSES
+            ],
+            sourceAttestation.schema.id as `0x${string}`,
+            collectors as `0x${string}`[],
+            encodedData as `0x${string}`,
+            true,
+          ),
+        );
+      }
+    } catch (err) {
+      console.error(err);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    console.log("loading", loading);
+  }, [loading]);
+
+  if (!account.address) {
+    return (
+      <div className="flex justify-center items-center min-h-screen h-full w-full bg-background">
+        <ConnectButton />
+      </div>
+    );
+  }
 
   return (
     <div className="flex justify-center items-center min-h-screen w-full bg-background">
@@ -58,7 +107,7 @@ export default function BadgeReissuePage({
 
           <div className="grid grid-cols-1 justify-start items-center gap-3 w-full">
             <div className="flex w-full justify-between">
-              <span className="font-bold">New {badge.title} collectors</span>
+              <span className="font-bold">New {badge?.title} collectors</span>
               <LinkTextWithIcon href="">Easscan</LinkTextWithIcon>
             </div>
             <InputCollectorList
@@ -96,7 +145,14 @@ export default function BadgeReissuePage({
                   Cancel
                 </Button>
               </DialogClose>
-              <Button type="button" variant="green" className="w-full">
+              <Button
+                type="button"
+                variant="green"
+                className="w-full"
+                onClick={handleReissueBadge}
+                disabled={loading}
+              >
+                {loading && <Loader2 className="animate-spin w-4" />}
                 Reissue
               </Button>
             </DialogFooter>
