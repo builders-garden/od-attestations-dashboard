@@ -20,7 +20,7 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { motion } from "framer-motion";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
-import { use, useEffect, useState } from "react";
+import { use, useState } from "react";
 import { useAccount, useWriteContract } from "wagmi";
 import { easMultiAttest } from "@/lib/eas/calls";
 import { EAS_CONTRACT_ADDRESSES } from "@/lib/eas/constants";
@@ -67,10 +67,6 @@ export default function BadgeReissuePage({
     }
     setLoading(false);
   };
-
-  useEffect(() => {
-    console.log("loading", loading);
-  }, [loading]);
 
   if (!account.address) {
     return (
@@ -141,12 +137,11 @@ export default function BadgeReissuePage({
             </DialogDescription>
             <DialogFooter className="sm:justify-start">
               <DialogClose asChild>
-                <Button type="button" variant="outline" className="w-full">
+                <Button variant="outline" className="w-full">
                   Cancel
                 </Button>
               </DialogClose>
               <Button
-                type="button"
                 variant="green"
                 className="w-full"
                 onClick={handleReissueBadge}
