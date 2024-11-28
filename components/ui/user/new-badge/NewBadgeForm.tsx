@@ -95,20 +95,27 @@ export const NewBadgeForm: React.FC<NewBadgeFormProps> = ({
     }
   }, [schemaFields, form]);
 
+  const imageError = "Failed to upload image to IPFS, please retry.";
+
+  const setFormError = (message: string) => {
+    form.setError("fields", {
+      type: "manual",
+      message,
+    });
+  };
+
   const handleUploadImage = async () => {
     setImageLoading(true);
     const ipfsHash = await uploadImageToIpfs(imageFile);
     if (!ipfsHash) {
-      form.setError("fields", {
-        type: "manual",
-        message: "Failed to upload image to IPFS, please retry.",
-      });
+      setFormError(imageError);
       setImageLoading(false);
       return;
     }
     const url = await getImageFromIpfs(ipfsHash);
     setUploadedImageUrl(url);
     setImageLoading(false);
+    return ipfsHash;
   };
 
   const handleCreateBadge = (data: z.infer<typeof formSchema>) => {
@@ -174,10 +181,8 @@ export const NewBadgeForm: React.FC<NewBadgeFormProps> = ({
                                   <Input
                                     id="picture"
                                     type="file"
-                                    className="h-auto"
-                                    {...subField}
+                                    className="h-auto hover:cursor-pointer"
                                     onChange={(e) => {
-                                      subField.onChange(e);
                                       const file = e.target.files?.[0];
                                       if (file) {
                                         form.clearErrors("fields");
@@ -186,11 +191,24 @@ export const NewBadgeForm: React.FC<NewBadgeFormProps> = ({
                                       }
                                     }}
                                   />
+                                  <Input type="hidden" {...subField} />
                                   <Button
                                     variant="outline"
                                     type="button"
                                     className="w-1/4"
-                                    onClick={handleUploadImage}
+                                    onClick={async () => {
+                                      const hash = await handleUploadImage();
+                                      if (hash) {
+                                        subField.onChange({
+                                          target: { value: hash },
+                                        });
+                                      } else {
+                                        setFormError(imageError);
+                                        subField.onChange({
+                                          target: { value: "" },
+                                        });
+                                      }
+                                    }}
                                     disabled={
                                       !imageFile ||
                                       !!uploadedImageUrl ||
