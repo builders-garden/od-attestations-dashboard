@@ -1,6 +1,5 @@
-// This query gets many schemas
-// This can be filtered specifying a wallet address that created the schemas.
-export const SchemasFromWalletQuery = `
+// This query gets many schemas and can be filtered.
+export const SchemasQuery = `
 query Schemata($where: SchemaWhereInput) {
   schemata(where: $where) {
     id
@@ -14,9 +13,36 @@ query Schemata($where: SchemaWhereInput) {
 }
 `;
 
-// This query gets many attestations
-// This can be filtered specifying a recipient address and/or attester.
-export const AttestationsFromWalletQuery = `
+// This query gets one attestation and can be filtered.
+export const AttestationQuery = `
+query Attestation($where: AttestationWhereUniqueInput!) {
+  attestation(where: $where) {
+    id
+    attester
+    recipient
+    decodedDataJson
+    time
+    timeCreated
+    expirationTime
+    revocationTime
+    revocable
+    revoked
+    schemaId
+    schema {
+      schema
+      id
+      creator
+      revocable
+      index
+      txid
+      time
+    }
+  }
+}
+`;
+
+// This query gets many attestations and can be filtered.
+export const AttestationsQuery = `
 query Attestations($where: AttestationWhereInput, $distinct: [AttestationScalarFieldEnum!]) {
   attestations(where: $where, distinct: $distinct) {
     id

@@ -1,3 +1,7 @@
+const isCIDValid: (cid: string) => boolean = (cid: string) => {
+  return cid.startsWith("Qm") && cid.length === 46;
+};
+
 /**
  * Upload image to IPFS
  * @param imageFile Image file to upload, must be a File object (e.g. from an input element)
@@ -41,6 +45,10 @@ export const uploadImageToIpfs: (
 export const getImageFromIpfs: (ipfsHash: string) => Promise<string> = async (
   ipfsHash: string,
 ) => {
+  if (!isCIDValid(ipfsHash)) {
+    console.log("Invalid IPFS hash");
+    return "";
+  }
   try {
     const response = await fetch(`/api/ipfs?hash=${ipfsHash}`, {
       method: "GET",
@@ -55,7 +63,7 @@ export const getImageFromIpfs: (ipfsHash: string) => Promise<string> = async (
 
     return url;
   } catch (error) {
-    console.error("Error getting image:", error);
+    console.log("Error getting image:", error);
     return "";
   }
 };

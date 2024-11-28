@@ -221,28 +221,28 @@ export default function AdminHome() {
                   const encodedData = schemaEncoder.encodeData([
                     {
                       name: "BadgeTitle",
-                      value: "Bangkok attendance badge",
+                      value: "Cannes attendance badge",
                       type: "string",
                     },
                     {
                       name: "BadgeDescription",
                       value:
-                        "This badge is awarded to all attendees of the Bangkok event",
+                        "This badge is awarded to all attendees of the Cannes event",
                       type: "string",
                     },
                     {
                       name: "BadgeImageCID",
-                      value: "QmR2c6n9mzV5qFJ9Z5n8qfZ3d7Z8...",
+                      value: "QmU5k7ee5ibyeWFxrTGJiDeMsQdnE6AzWFAkyPLo9jngFw",
                       type: "string",
                     },
                     {
                       name: "EventName",
-                      value: "Annual Reunion in Bangkok",
+                      value: "Annual Reunion in Cannes",
                       type: "string",
                     },
                     {
                       name: "EventLocation",
-                      value: "Bangkok, Thailand",
+                      value: "Cannes, France",
                       type: "string",
                     },
                     { name: "EventDate", value: "2022-12-31", type: "string" },

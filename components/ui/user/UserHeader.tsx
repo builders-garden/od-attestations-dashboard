@@ -15,16 +15,16 @@ import { useCountUp } from "@/components/hooks/useCountUp";
 
 interface UserHeaderProps {
   isAdmin: boolean;
-  userAttestations: Attestation[];
+  userAttestationsLength: number;
 }
 
 export default function UserHeader({
   isAdmin,
-  userAttestations,
+  userAttestationsLength,
 }: UserHeaderProps) {
   const router = useRouter();
   const { disconnect } = useDisconnect();
-  const userAttestationsCount = useCountUp(userAttestations.length, 2000); // 2 seconds duration
+  const userAttestationsCount = useCountUp(userAttestationsLength, 2000); // 2 seconds duration
 
   return (
     <>

@@ -10,6 +10,12 @@ export type AttestationsResponse = {
   };
 };
 
+export type AttestationResponse = {
+  data: {
+    attestation: Attestation;
+  };
+};
+
 export type Schema = {
   id: string;
   schema: string;

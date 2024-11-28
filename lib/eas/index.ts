@@ -1,11 +1,12 @@
 import { GRAPHQL_ENDPOINTS } from "./constants";
-import { AttestationsFromWalletQuery, SchemasFromWalletQuery } from "./queries";
+import { AttestationQuery, AttestationsQuery, SchemasQuery } from "./queries";
 import {
   Attestation,
   AttestationsResponse,
   Schema,
   SchemataResponse,
   AttestationDecodedDataType,
+  AttestationResponse,
 } from "./types";
 
 /**
@@ -118,7 +119,7 @@ export const schemasFromWallets = async (
 ): Promise<Schema[]> => {
   // Check if the chain ID was not provided
   if (!chainId) {
-    console.error("Chain ID was not provided.");
+    console.log("Chain ID was not provided.");
     return [];
   }
   const endpoint = GRAPHQL_ENDPOINTS[chainId as keyof typeof GRAPHQL_ENDPOINTS];
@@ -129,7 +130,7 @@ export const schemasFromWallets = async (
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        query: SchemasFromWalletQuery,
+        query: SchemasQuery,
         variables: {
           where: {
             creator: {
@@ -162,7 +163,7 @@ export const getUserAttestations = async (
 ): Promise<Attestation[]> => {
   // Check if the chain ID or issuer addresses were not provided
   if (!chainId || issuerAddresses.length === 0) {
-    console.error("Chain ID or issuer addresses were not provided.");
+    console.log("Chain ID or issuer addresses were not provided.");
     return [];
   }
 
@@ -176,7 +177,7 @@ export const getUserAttestations = async (
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          query: AttestationsFromWalletQuery,
+          query: AttestationsQuery,
           variables: {
             where: {
               recipient: {
@@ -208,51 +209,57 @@ export const getUserAttestations = async (
  * @param chainId - The chain ID of the blockchain where the attestations are registered.
  * @returns An array of Attestations or [] if there was an error.
  */
-export const getUserUniqueAttestation = async (
+export const getUserUniqueAttestations = async (
   recipientAddress: string,
   issuerAddresses: string[],
   chainId: number | undefined,
 ): Promise<Attestation[]> => {
   // Check if the chain ID or issuer addresses were not provided
   if (!chainId || issuerAddresses.length === 0) {
-    console.error("Chain ID or issuer addresses were not provided.");
+    console.log("Chain ID or issuer addresses were not provided.");
     return [];
   }
 
   const endpoint = GRAPHQL_ENDPOINTS[chainId as keyof typeof GRAPHQL_ENDPOINTS];
-  let attestations: Attestation[] = [];
   try {
-    for (const issuerAddress of issuerAddresses) {
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          query: AttestationsFromWalletQuery,
-          variables: {
-            where: {
-              recipient: {
-                equals: recipientAddress,
-              },
-              attester: {
-                equals: issuerAddress,
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        query: AttestationsQuery,
+        variables: {
+          where: {
+            recipient: {
+              equals: recipientAddress,
+            },
+            attester: {
+              in: issuerAddresses,
+            },
+            revoked: {
+              equals: false,
+            },
+            decodedDataJson: {
+              contains:
+                '{"name":"ODPassport","type":"bool","signature":"bool ODPassport","value":{"name":"ODPassport","type":"bool","value":true}}',
+            },
+            schema: {
+              is: {
+                schema: {
+                  contains:
+                    "string BadgeTitle,string BadgeDescription,string BadgeImageCID",
+                },
               },
             },
           },
-        }),
-      });
-      const payload: AttestationsResponse = await response.json();
-      attestations = [...attestations, ...payload.data.attestations];
-    }
+          distinct: "decodedDataJson",
+        },
+      }),
+    });
+    const payload: AttestationsResponse = await response.json();
 
-    // Since a wallet could have multiple attestations from the same issuer
-    // or have them doubled because of revoking and reissuing, we need to count the unique attestations
-    // by filtering out the revoked ones and getting the ones that are unique by their schema ID.
-    const validAttestations = getValidODAttestations(attestations);
-    const uniqueAttestations = getUniqueAttestations(validAttestations);
-
-    return uniqueAttestations;
+    return payload.data.attestations;
   } catch (e) {
     console.log(e);
     return [];
@@ -271,7 +278,7 @@ export const getEveryUniqueAttestation = async (
 ): Promise<Attestation[]> => {
   // Check if the chain ID or issuer addresses were not provided
   if (!chainId || issuerAddresses.length === 0) {
-    console.error("Chain ID or issuer addresses were not provided.");
+    console.log("Chain ID or issuer addresses were not provided.");
     return [];
   }
 
@@ -283,7 +290,7 @@ export const getEveryUniqueAttestation = async (
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        query: AttestationsFromWalletQuery,
+        query: AttestationsQuery,
         variables: {
           where: {
             attester: {
@@ -311,6 +318,88 @@ export const getEveryUniqueAttestation = async (
     });
     const payload: AttestationsResponse = await response.json();
 
+    return payload.data.attestations;
+  } catch (e) {
+    console.log(e);
+    return [];
+  }
+};
+
+/**
+ * A function that fetches an attestation given its UID.
+ * @param attestationUID - The UID of the attestation.
+ * @param chainId - The chain ID of the blockchain where the attestation is registered.
+ * @returns An Attestation or null if there was an error.
+ */
+export const getAttestationFromUID = async (
+  attestationUID: string,
+  chainId: number | undefined,
+): Promise<Attestation | null> => {
+  if (!chainId) {
+    console.log("Chain ID was not provided.");
+    return null;
+  }
+  const endpoint = GRAPHQL_ENDPOINTS[chainId as keyof typeof GRAPHQL_ENDPOINTS];
+  try {
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        query: AttestationQuery,
+        variables: {
+          where: {
+            id: attestationUID,
+          },
+        },
+      }),
+    });
+    const payload: AttestationResponse = await response.json();
+    return payload.data.attestation;
+  } catch (e) {
+    console.log(e);
+    return null;
+  }
+};
+
+/**
+ * A function to get all the attestations of a specific kind.
+ * @param decodedDataJson - The decoded data of the attestation.
+ * @param chainId - The chain ID of the blockchain where the attestations are registered.
+ * @returns An array of Attestations or [] if there was an error.
+ */
+export const getAllAttestationsOfAKind = async (
+  decodedDataJson: string | undefined,
+  chainId: number | undefined,
+): Promise<Attestation[]> => {
+  if (!chainId || !decodedDataJson) {
+    console.log("Chain ID or decodedDataJson was not provided.");
+    return [];
+  }
+  const endpoint = GRAPHQL_ENDPOINTS[chainId as keyof typeof GRAPHQL_ENDPOINTS];
+  try {
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        query: AttestationsQuery,
+        variables: {
+          where: {
+            decodedDataJson: {
+              equals: decodedDataJson,
+            },
+            revoked: {
+              equals: false,
+            },
+          },
+          distinct: "recipient",
+        },
+      }),
+    });
+    const payload: AttestationsResponse = await response.json();
     return payload.data.attestations;
   } catch (e) {
     console.log(e);

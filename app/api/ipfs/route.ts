@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { PinataSDK } from "pinata-web3";
 
 const pinata = new PinataSDK({
-  pinataJwt: process.env.PINATA_JWT!,
-  pinataGateway: process.env.PINATA_GATEWAY!,
+  pinataJwt: process.env.PINATA_JWT,
+  pinataGateway: process.env.PINATA_GATEWAY,
+  pinataGatewayKey: process.env.PINATA_GATEWAY_KEY,
 });
 
 /**
@@ -60,10 +61,7 @@ export async function GET(req: NextRequest) {
     const blob = (await pinata.gateways.get(hash))?.data as Blob;
 
     if (!blob) {
-      return NextResponse.json(
-        { error: "Failed to get image" },
-        { status: 500 },
-      );
+      return NextResponse.json({ error: "Image not found" }, { status: 404 });
     }
 
     const stream = blob.stream();
