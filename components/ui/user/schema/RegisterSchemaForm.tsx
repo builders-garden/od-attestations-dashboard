@@ -34,6 +34,12 @@ import { SchemaRegistryAbi } from "@/lib/abi/SchemaRegistry";
 import { SCHEMA_REGISTRY_CONTRACT_ADDRESSES } from "@/lib/eas/constants";
 import { Switch } from "@/components/ui/switch";
 import { FieldType } from "@/lib/eas/types";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const formSchema = z.object({
   fields: z.array(
@@ -49,20 +55,30 @@ const formSchema = z.object({
   ),
 });
 
+const mandatoryFields: z.infer<typeof formSchema>["fields"] = [
+  {
+    fieldName: "BadgeTitle",
+    fieldType: FieldType.String,
+  },
+  {
+    fieldName: "BadgeDescription",
+    fieldType: FieldType.String,
+  },
+  {
+    fieldName: "BadgeImageCID",
+    fieldType: FieldType.String,
+  },
+  {
+    fieldName: "ODPassport",
+    fieldType: FieldType.Boolean,
+  },
+];
+
 export const RegisterSchemaForm: React.FC = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      fields: [
-        {
-          fieldName: "OD Member Name",
-          fieldType: FieldType.String,
-        },
-        {
-          fieldName: "OD Member Address",
-          fieldType: FieldType.Address,
-        },
-      ],
+      fields: mandatoryFields,
     },
   });
 
@@ -175,10 +191,34 @@ export const RegisterSchemaForm: React.FC = () => {
                   </FormItem>
                 )}
               />
-              <CircleX
-                className="bg-destructive p-1 w-9 h-9 rounded-md text-white transition-all duration-200 ease-in-out cursor-pointer"
-                onClick={() => remove(index)}
-              />
+
+              {index < mandatoryFields.length ? (
+                <TooltipProvider>
+                  {" "}
+                  <Tooltip>
+                    <TooltipTrigger disabled>
+                      <Button
+                        variant="destructive"
+                        className="w-9 p-0"
+                        disabled
+                      >
+                        <CircleX className="w-full" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent className="bg-secondary text-black">
+                      <p>This is a mandatory field.</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              ) : (
+                <Button
+                  onClick={() => remove(index)}
+                  variant="destructive"
+                  className="w-9 p-0"
+                >
+                  <CircleX className="w-full" />
+                </Button>
+              )}
             </div>
           ))}
 
@@ -225,7 +265,7 @@ export const RegisterSchemaForm: React.FC = () => {
                     onClick={handleSubmit}
                     disabled={loading}
                   >
-                    {loading && <Loader2 className="animate-spin" />}
+                    {loading && <Loader2 className="animate-spin w-4" />}
                     Create
                   </Button>
                 </DialogFooter>

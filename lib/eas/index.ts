@@ -300,7 +300,7 @@ export const getEveryUniqueAttestation = async (
               is: {
                 schema: {
                   contains:
-                    "string BadgeTitle,string BadgeDescription,string BadgeImageCID",
+                    "string BadgeTitle, string BadgeDescription, string BadgeImageCID",
                 },
               },
             },

@@ -46,7 +46,7 @@ const formSchema = z.object({
         Number: FieldType.Number,
         Boolean: FieldType.Boolean,
       }),
-      value: z.string(),
+      value: z.union([z.string(), z.number(), z.boolean()]),
     }),
   ),
 });
@@ -64,12 +64,14 @@ export const NewBadgeForm: React.FC<NewBadgeFormProps> = ({
 }) => {
   const [loading, setLoading] = useState(false);
   const [imageLoading, setImageLoading] = useState(false);
-  const { data: hash, error, writeContract } = useWriteContract();
+  const { writeContract } = useWriteContract();
   const [collectors, setCollectors] = useState<string[]>([]);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string | undefined>(
     undefined,
   );
+
+  const ODPASSPORT_BOOLEAN_FIELD = "ODPassport";
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -89,7 +91,7 @@ export const NewBadgeForm: React.FC<NewBadgeFormProps> = ({
         fields: schemaFields.map((field) => ({
           name: field.name,
           type: field.type,
-          value: "",
+          value: field.name === ODPASSPORT_BOOLEAN_FIELD ? true : "",
         })),
       });
     }
@@ -120,20 +122,26 @@ export const NewBadgeForm: React.FC<NewBadgeFormProps> = ({
 
   const handleCreateBadge = (data: z.infer<typeof formSchema>) => {
     setLoading(true);
-    if (account.chain) {
-      const schemaEncoder = new SchemaEncoder(selectedSchema?.schema as string);
-      const encodedData = schemaEncoder.encodeData(data.fields);
-      writeContract(
-        easMultiAttest(
-          EAS_CONTRACT_ADDRESSES[
-            account.chain.id as keyof typeof EAS_CONTRACT_ADDRESSES
-          ],
-          selectedSchema?.id as `0x${string}`,
-          collectors as `0x${string}`[],
-          encodedData as `0x${string}`,
-          true,
-        ),
-      );
+    try {
+      if (account.chain) {
+        const schemaEncoder = new SchemaEncoder(
+          selectedSchema?.schema as string,
+        );
+        const encodedData = schemaEncoder.encodeData(data.fields);
+        writeContract(
+          easMultiAttest(
+            EAS_CONTRACT_ADDRESSES[
+              account.chain.id as keyof typeof EAS_CONTRACT_ADDRESSES
+            ],
+            selectedSchema?.id as `0x${string}`,
+            collectors as `0x${string}`[],
+            encodedData as `0x${string}`,
+            true,
+          ),
+        );
+      }
+    } catch (err) {
+      console.error(err);
     }
     setLoading(false);
   };
@@ -145,7 +153,7 @@ export const NewBadgeForm: React.FC<NewBadgeFormProps> = ({
   return (
     <Form {...form}>
       <form className="space-y-6">
-        <div className="p-4 rounded-md bg-secondary">
+        <div className="p-4 rounded-md border-[1px]">
           {form.formState.errors.fields && (
             <FormMessage className="mb-3">
               Error: {form.formState.errors.fields.message}
@@ -163,106 +171,118 @@ export const NewBadgeForm: React.FC<NewBadgeFormProps> = ({
                 Please fill the badge info
               </AccordionTrigger>
               <AccordionContent className="p-1 pt-4 space-y-6">
-                {fields.map((field, index) => (
-                  <div
-                    className="flex w-full gap-4 justify-between items-end"
-                    key={field.id}
-                  >
-                    <Controller
-                      control={form.control}
-                      name={`fields.${index}.value` as const}
-                      render={({ field: subField }) => (
-                        <FormItem className="w-full">
-                          <FormLabel>{field.name}</FormLabel>
-                          <FormControl>
-                            {field.name.toLowerCase().includes("image") ? (
-                              <div className="flex flex-col gap-4">
-                                <div className="flex w-full gap-4">
-                                  <Input
-                                    id="picture"
-                                    type="file"
-                                    className="h-auto hover:cursor-pointer"
-                                    onChange={(e) => {
-                                      const file = e.target.files?.[0];
-                                      if (file) {
-                                        form.clearErrors("fields");
-                                        setUploadedImageUrl(undefined);
-                                        setImageFile(file);
-                                      }
-                                    }}
-                                  />
-                                  <Input type="hidden" {...subField} />
-                                  <Button
-                                    variant="outline"
-                                    type="button"
-                                    className="w-1/4"
-                                    onClick={async () => {
-                                      const hash = await handleUploadImage();
-                                      if (hash) {
-                                        subField.onChange({
-                                          target: { value: hash },
-                                        });
-                                      } else {
-                                        setFormError(imageError);
-                                        subField.onChange({
-                                          target: { value: "" },
-                                        });
-                                      }
-                                    }}
-                                    disabled={
-                                      !imageFile ||
-                                      !!uploadedImageUrl ||
-                                      imageLoading
-                                    }
-                                  >
-                                    {imageLoading && (
-                                      <Loader2 className="animate-spin" />
+                {fields.map(
+                  (field, index) =>
+                    field.name !== ODPASSPORT_BOOLEAN_FIELD && (
+                      <div
+                        className="flex w-full gap-4 justify-between items-end"
+                        key={field.id}
+                      >
+                        <Controller
+                          control={form.control}
+                          name={`fields.${index}.value` as const}
+                          render={({ field: subField }) => (
+                            <FormItem className="w-full">
+                              <FormLabel>{field.name}</FormLabel>
+                              <FormControl>
+                                {field.name === "BadgeImageCID" ? (
+                                  <div className="flex flex-col gap-4">
+                                    <div className="flex w-full gap-4">
+                                      <Input
+                                        id="picture"
+                                        type="file"
+                                        className="h-auto hover:cursor-pointer"
+                                        onChange={(e) => {
+                                          const file = e.target.files?.[0];
+                                          if (file) {
+                                            form.clearErrors("fields");
+                                            setUploadedImageUrl(undefined);
+                                            setImageFile(file);
+                                          }
+                                        }}
+                                      />
+                                      <Input
+                                        type="hidden"
+                                        {...subField}
+                                        value={String(subField.value)}
+                                      />
+                                      <Button
+                                        variant="outline"
+                                        type="button"
+                                        className="w-1/4"
+                                        onClick={async () => {
+                                          const hash =
+                                            await handleUploadImage();
+                                          if (hash) {
+                                            subField.onChange({
+                                              target: { value: hash },
+                                            });
+                                          } else {
+                                            setFormError(imageError);
+                                            subField.onChange({
+                                              target: { value: "" },
+                                            });
+                                          }
+                                        }}
+                                        disabled={
+                                          !imageFile ||
+                                          !!uploadedImageUrl ||
+                                          imageLoading
+                                        }
+                                      >
+                                        {imageLoading && (
+                                          <Loader2 className="animate-spin w-4" />
+                                        )}
+                                        Upload
+                                      </Button>
+                                      {imageFile && (
+                                        <Button
+                                          variant="destructive"
+                                          type="button"
+                                          className="w-9"
+                                          onClick={() => {
+                                            form.clearErrors("fields");
+                                            subField.onChange({
+                                              target: { value: "" },
+                                            });
+                                            setImageFile(null);
+                                            setUploadedImageUrl(undefined);
+                                          }}
+                                          disabled={imageLoading}
+                                        >
+                                          <CircleX />
+                                        </Button>
+                                      )}
+                                    </div>
+                                    {uploadedImageUrl && (
+                                      <img
+                                        src={uploadedImageUrl}
+                                        alt="Uploaded image"
+                                        className="mx-auto w-1/2"
+                                      />
                                     )}
-                                    Upload
-                                  </Button>
-                                  {imageFile && (
-                                    <Button
-                                      variant="outline"
-                                      type="button"
-                                      className="w-auto"
-                                      onClick={() => {
-                                        form.clearErrors("fields");
-                                        subField.onChange({
-                                          target: { value: "" },
-                                        });
-                                        setImageFile(null);
-                                        setUploadedImageUrl(undefined);
-                                      }}
-                                      disabled={imageLoading}
-                                    >
-                                      <CircleX />
-                                    </Button>
-                                  )}
-                                </div>
-                                {uploadedImageUrl && (
-                                  <img
-                                    src={uploadedImageUrl}
-                                    alt="Uploaded image"
-                                    className="mx-auto w-1/2"
+                                  </div>
+                                ) : (
+                                  <Input
+                                    placeholder={field.type}
+                                    {...subField}
+                                    value={String(subField.value)}
                                   />
                                 )}
-                              </div>
-                            ) : (
-                              <Input placeholder={field.type} {...subField} />
-                            )}
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                ))}
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    ),
+                )}
               </AccordionContent>
             </AccordionItem>
           </Accordion>
         </div>
 
-        <div className="p-4 rounded-md bg-secondary">
+        <div className="p-4 rounded-md border-[1px]">
           <Accordion type="single" collapsible className="w-full">
             <AccordionItem value="collectors" className="border-none">
               <AccordionTrigger className="p-0 font-bold">
@@ -310,7 +330,7 @@ export const NewBadgeForm: React.FC<NewBadgeFormProps> = ({
                 onClick={handleSubmit}
                 disabled={loading}
               >
-                {loading && <Loader2 className="animate-spin" />}
+                {loading && <Loader2 className="animate-spin w-4" />}
                 Create
               </Button>
             </DialogFooter>

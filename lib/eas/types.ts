@@ -39,7 +39,7 @@ export enum FieldType {
   String = "string",
   Address = "address",
   Number = "number",
-  Boolean = "boolean",
+  Boolean = "bool",
 }
 
 export type SchemaField = {

@@ -20,6 +20,7 @@ export default function UserHome() {
           "0x82A29547CA8970c2aDECF4C2db7e364339f9a4B7",
           "0x4E123166e7DfDE7AbA29162Fb3a5c6Af562443D4",
           "0x23032A3D92D72a857EB4eB2D9ea417ff103A4008",
+          "0x883ac919B42b9065C1Bc1Ea7560ba2924655762E",
         ],
         account.chain.id,
       );
@@ -32,6 +33,7 @@ export default function UserHome() {
           "0x82A29547CA8970c2aDECF4C2db7e364339f9a4B7",
           "0x4E123166e7DfDE7AbA29162Fb3a5c6Af562443D4",
           "0x23032A3D92D72a857EB4eB2D9ea417ff103A4008",
+          "0x883ac919B42b9065C1Bc1Ea7560ba2924655762E",
         ],
         account.chain.id,
       );
