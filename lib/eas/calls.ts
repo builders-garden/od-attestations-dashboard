@@ -31,3 +31,24 @@ export const easMultiAttest = (
     args: [[request]],
   };
 };
+
+export const easMultiRevoke = (
+  easAddress: `0x${string}`,
+  schemaUID: `0x${string}`,
+  attestationUIDs: `0x${string}`[],
+): WriteContractParameters => {
+  const request = {
+    schema: schemaUID as `0x${string}`,
+    data: attestationUIDs.map((attestationUID) => ({
+      uid: attestationUID,
+      value: BigInt(0),
+    })),
+  };
+
+  return {
+    address: easAddress,
+    abi: EASAbi,
+    functionName: "multiRevoke",
+    args: [[request]],
+  };
+};

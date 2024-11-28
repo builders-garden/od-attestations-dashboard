@@ -20,8 +20,12 @@ export const useGetAllAttestationsOfAKind = ({
         sourceAttestation?.decodedDataJson,
         account.chain?.id,
       );
-
-      console.log("attestations: ", attestations);
+      const collectorAddresses: string[] = [];
+      attestations.forEach((attestation) => {
+        if (!collectorAddresses.includes(attestation.recipient)) {
+          collectorAddresses.push(attestation.recipient);
+        }
+      });
       setAllAttestationsOfAKind(attestations);
     };
     if (sourceAttestation) fetchAllAttestationsOfAKind();

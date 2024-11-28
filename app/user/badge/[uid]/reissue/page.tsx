@@ -38,7 +38,7 @@ export default function BadgeReissuePage({
   const [collectors, setCollectors] = useState<string[]>([]);
   const { writeContract } = useWriteContract();
 
-  const handleReissueBadge = () => {
+  const handleReissueBadges = () => {
     setLoading(true);
     try {
       if (account.chain && sourceAttestation) {
@@ -161,7 +161,7 @@ export default function BadgeReissuePage({
               <Button
                 variant="green"
                 className="w-full"
-                onClick={handleReissueBadge}
+                onClick={handleReissueBadges}
                 disabled={loading}
               >
                 {loading && <Loader2 className="animate-spin w-4" />}

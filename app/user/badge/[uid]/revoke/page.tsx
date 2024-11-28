@@ -1,6 +1,7 @@
 "use client";
 
 import { useCreateBadge } from "@/components/hooks/useCreateBadge";
+import { useGetAllAttestationsOfAKind } from "@/components/hooks/useGetAllAttestationsOfAKind";
 import { Button } from "@/components/ui/button";
 import CollectorRow from "@/components/ui/collectors/CollectorRow";
 import {
@@ -15,13 +16,15 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { LinkTextWithIcon } from "@/components/ui/linkTextWithIcon";
-import { collectors } from "@/lib/constants";
+import { easMultiRevoke } from "@/lib/eas/calls";
+import { EAS_CONTRACT_ADDRESSES } from "@/lib/eas/constants";
 import { cn } from "@/lib/utils";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { motion } from "framer-motion";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { use, useState } from "react";
-import { useAccount } from "wagmi";
+import { useAccount, useWriteContract } from "wagmi";
 
 export default function BadgeRevokePage({
   params,
@@ -32,6 +35,16 @@ export default function BadgeRevokePage({
 
   const account = useAccount();
   const { badge, sourceAttestation, notFound } = useCreateBadge(uid, account);
+  const [loading, setLoading] = useState<boolean>(false);
+  const { writeContract } = useWriteContract();
+  const allAttestationsOfAKind = useGetAllAttestationsOfAKind({
+    sourceAttestation,
+    account,
+  });
+
+  const collectors = allAttestationsOfAKind.map(
+    (attestation) => attestation.recipient,
+  );
 
   const [selectedCollectors, setSelectedCollectors] = useState<string[]>([]);
 
@@ -46,6 +59,38 @@ export default function BadgeRevokePage({
   const [input, setInput] = useState("");
 
   const atLeastOneSelected = selectedCollectors.length > 0;
+
+  const handleRevokeBadges = () => {
+    setLoading(true);
+    try {
+      if (account.chain && sourceAttestation) {
+        const attestationUIDs = selectedCollectors.map(
+          (collector) =>
+            allAttestationsOfAKind.find((a) => a.recipient === collector)?.id,
+        ) as `0x${string}`[];
+        writeContract(
+          easMultiRevoke(
+            EAS_CONTRACT_ADDRESSES[
+              account.chain.id as keyof typeof EAS_CONTRACT_ADDRESSES
+            ],
+            sourceAttestation.schema.id as `0x${string}`,
+            attestationUIDs,
+          ),
+        );
+      }
+    } catch (err) {
+      console.error(err);
+    }
+    setLoading(false);
+  };
+
+  if (!account.address) {
+    return (
+      <div className="flex justify-center items-center min-h-screen h-full w-full bg-background">
+        <ConnectButton />
+      </div>
+    );
+  }
 
   return (
     <div className="flex justify-center items-center min-h-screen w-full bg-background">
@@ -159,7 +204,13 @@ export default function BadgeRevokePage({
                   Cancel
                 </Button>
               </DialogClose>
-              <Button type="button" variant="destructive" className="w-full">
+              <Button
+                variant="destructive"
+                className="w-full"
+                onClick={handleRevokeBadges}
+                disabled={loading}
+              >
+                {loading && <Loader2 className="animate-spin w-4" />}
                 Revoke
               </Button>
             </DialogFooter>
