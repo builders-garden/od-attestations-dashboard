@@ -1,5 +1,6 @@
 "use client";
 
+import { useCreateBadge } from "@/components/hooks/useCreateBadge";
 import { Button } from "@/components/ui/button";
 import CollectorRow from "@/components/ui/collectors/CollectorRow";
 import {
@@ -14,12 +15,13 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { LinkTextWithIcon } from "@/components/ui/linkTextWithIcon";
-import { collectors, userBadges } from "@/lib/constants";
+import { collectors } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { use, useState } from "react";
+import { useAccount } from "wagmi";
 
 export default function BadgeRevokePage({
   params,
@@ -28,7 +30,8 @@ export default function BadgeRevokePage({
 }) {
   const { uid } = use(params);
 
-  const badge = userBadges[parseInt(uid) - 1];
+  const account = useAccount();
+  const { badge, sourceAttestation, notFound } = useCreateBadge(uid, account);
 
   const [selectedCollectors, setSelectedCollectors] = useState<string[]>([]);
 
@@ -65,52 +68,67 @@ export default function BadgeRevokePage({
             <h1 className="font-black text-2xl">Revoke 🚫</h1>
           </motion.div>
 
-          <span className="w-full">
-            Select one or more users to revoke the selected badge from them.
-          </span>
-
-          <div className="grid grid-cols-1 justify-start items-center gap-3 w-full">
-            <div className="flex w-full justify-between">
-              <span className="font-bold">{badge.title} collectors</span>
-              <LinkTextWithIcon href="">Easscan</LinkTextWithIcon>
-            </div>
-            <div
-              className={cn(
-                "flex w-full gap-0 justify-between",
-                atLeastOneSelected && "gap-4",
-              )}
+          {notFound ? (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+              className="flex justify-center pt-56 items-center w-full"
             >
-              <Input
-                placeholder="Search..."
-                className="focus-visible:ring-primary w-full"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-              />
-              <Button
-                onClick={() => setSelectedCollectors([])}
-                className={cn(
-                  "w-fit transition-all duration-200 ease-in-out",
-                  atLeastOneSelected && "w-fit px-4",
-                  !atLeastOneSelected && "w-0 p-0",
-                )}
-              >
-                Reset Selection
-              </Button>
-            </div>
-            <div className="flex flex-col gap-3 w-full max-h-[50rem] overflow-y-auto">
-              {collectors
-                .filter((collector) => collector.includes(input))
-                .map((collector, index) => (
-                  <CollectorRow
-                    key={index}
-                    collector={collector}
-                    selectable
-                    selected={selectedCollectors.includes(collector)}
-                    onClick={() => handleSelect(collector)}
+              <h1 className="text-2xl font-black text-black">
+                Badge not found...
+              </h1>
+            </motion.div>
+          ) : (
+            <>
+              <span className="w-full">
+                Select one or more users to revoke the selected badge from them.
+              </span>
+
+              <div className="grid grid-cols-1 justify-start items-center gap-3 w-full">
+                <div className="flex w-full justify-between">
+                  <span className="font-bold">{badge?.title} collectors</span>
+                  <LinkTextWithIcon href="">Easscan</LinkTextWithIcon>
+                </div>
+                <div
+                  className={cn(
+                    "flex w-full gap-0 justify-between",
+                    atLeastOneSelected && "gap-4",
+                  )}
+                >
+                  <Input
+                    placeholder="Search..."
+                    className="focus-visible:ring-primary w-full"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
                   />
-                ))}
-            </div>
-          </div>
+                  <Button
+                    onClick={() => setSelectedCollectors([])}
+                    className={cn(
+                      "w-fit transition-all duration-200 ease-in-out",
+                      atLeastOneSelected && "w-fit px-4",
+                      !atLeastOneSelected && "w-0 p-0",
+                    )}
+                  >
+                    Reset Selection
+                  </Button>
+                </div>
+                <div className="flex flex-col gap-3 w-full max-h-[50rem] overflow-y-auto">
+                  {collectors
+                    .filter((collector) => collector.includes(input))
+                    .map((collector, index) => (
+                      <CollectorRow
+                        key={index}
+                        collector={collector}
+                        selectable
+                        selected={selectedCollectors.includes(collector)}
+                        onClick={() => handleSelect(collector)}
+                      />
+                    ))}
+                </div>
+              </div>
+            </>
+          )}
         </div>
         <Dialog>
           <DialogTrigger asChild>

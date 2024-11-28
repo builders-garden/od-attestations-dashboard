@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import { RegisterSchemaForm } from "@/components/ui/user/schema/RegisterSchemaForm";
+import { RegisterSchemaForm } from "@/components/ui/user/new-schema/RegisterSchemaForm";
 
 export default function NewSchemaPage() {
   return (

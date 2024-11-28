@@ -97,20 +97,37 @@ export default function BadgeReissuePage({
             <h1 className="font-black text-2xl">Reissue 📤</h1>
           </motion.div>
 
-          <span className="w-full">
-            Insert one or more users to reissue the selected badge to them.
-          </span>
+          {notFound ? (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+              className="flex justify-center pt-56 items-center w-full"
+            >
+              <h1 className="text-2xl font-black text-black">
+                Badge not found...
+              </h1>
+            </motion.div>
+          ) : (
+            <>
+              <span className="w-full">
+                Insert one or more users to reissue the selected badge to them.
+              </span>
 
-          <div className="grid grid-cols-1 justify-start items-center gap-3 w-full">
-            <div className="flex w-full justify-between">
-              <span className="font-bold">New {badge?.title} collectors</span>
-              <LinkTextWithIcon href="">Easscan</LinkTextWithIcon>
-            </div>
-            <InputCollectorList
-              collectors={collectors}
-              setCollectors={setCollectors}
-            />
-          </div>
+              <div className="grid grid-cols-1 justify-start items-center gap-3 w-full">
+                <div className="flex w-full justify-between">
+                  <span className="font-bold">
+                    New {badge?.title} collectors
+                  </span>
+                  <LinkTextWithIcon href="">Easscan</LinkTextWithIcon>
+                </div>
+                <InputCollectorList
+                  collectors={collectors}
+                  setCollectors={setCollectors}
+                />
+              </div>
+            </>
+          )}
         </div>
         <Dialog>
           <DialogTrigger asChild>

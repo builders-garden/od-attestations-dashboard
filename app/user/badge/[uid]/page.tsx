@@ -1,13 +1,12 @@
 "use client";
 import { useCreateBadge } from "@/components/hooks/useCreateBadge";
+import { useGetAllAttestationsOfAKind } from "@/components/hooks/useGetAllAttestationsOfAKind";
 import BadgeInfo from "@/components/ui/badge/BadgeInfo";
-import { getAllAttestationsOfAKind } from "@/lib/eas";
-import { Attestation } from "@/lib/eas/types";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { motion } from "framer-motion";
 import { ArrowLeft, Share2 } from "lucide-react";
 import Link from "next/link";
-import { use, useEffect, useState } from "react";
+import { use } from "react";
 import { useAccount } from "wagmi";
 
 export default function BadgePage({
@@ -18,22 +17,11 @@ export default function BadgePage({
   const account = useAccount();
   const { uid } = use(params);
   const { badge, sourceAttestation, notFound } = useCreateBadge(uid, account);
-  const [allAttestationsOfAKind, setAllAttestationsOfAKind] = useState<
-    Attestation[]
-  >([]);
 
-  useEffect(() => {
-    const fetchAllAttestationsOfAKind = async () => {
-      const attestations = await getAllAttestationsOfAKind(
-        sourceAttestation?.decodedDataJson,
-        account.chain?.id,
-      );
-
-      console.log("attestations: ", attestations);
-      setAllAttestationsOfAKind(attestations);
-    };
-    if (sourceAttestation) fetchAllAttestationsOfAKind();
-  }, [sourceAttestation]);
+  const allAttestationsOfAKind = useGetAllAttestationsOfAKind({
+    sourceAttestation,
+    account,
+  });
 
   if (!account.address) {
     return (
