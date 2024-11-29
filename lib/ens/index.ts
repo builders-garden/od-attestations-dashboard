@@ -1,5 +1,5 @@
 import { createPublicClient, GetEnsNameReturnType, http } from "viem";
-import { mainnet, sepolia } from "viem/chains";
+import { mainnet } from "viem/chains";
 
 const client = createPublicClient({
   chain: mainnet,
