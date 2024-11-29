@@ -88,6 +88,10 @@ export const schemasFromWallets = async (
             creator: {
               in: creatorAddresses,
             },
+            schema: {
+              startsWith:
+                "string BadgeTitle, string BadgeDescription, string BadgeImageCID, bool ODPassport",
+            },
           },
           schemaNamesWhere2: {
             attesterAddress: {

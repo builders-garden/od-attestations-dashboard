@@ -45,8 +45,9 @@ export const SchemaSelector: React.FC<SchemaSelectorProps> = ({
         <span className="text-sm">Select a Schema</span>
         {selectedSchema?.id && (
           <LinkTextWithIcon
-            href={`https://base.easscan.org/schema/view/${selectedSchema.id}`}
+            href={`https://sepolia.easscan.org/schema/view/${selectedSchema.id}`}
           >
+            {/* TODO: Put the base easscan */}
             Easscan
           </LinkTextWithIcon>
         )}

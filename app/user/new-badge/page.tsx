@@ -27,7 +27,7 @@ export default function NewBadgePage() {
         multisigSigners,
         account.chain?.id,
       );
-      if (!schemas) return;
+      if (schemas.length === 0) return;
       setSchemas(schemas);
       setSelectedSchema(schemas[0]);
       setSchemaFields(
