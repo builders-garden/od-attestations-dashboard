@@ -21,7 +21,7 @@ interface CollectorRowProps {
 
 export default function CollectorRow({
   collector,
-  index = 1,
+  index = 0,
   selectable,
   selected,
   removable,
