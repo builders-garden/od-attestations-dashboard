@@ -1,6 +1,7 @@
 "use client";
 import UserBadges from "@/components/ui/user/UserBadges";
 import UserHeader from "@/components/ui/user/UserHeader";
+import { multisigSigners } from "@/lib/constants";
 import {
   getUserUniqueAttestations,
   getEveryUniqueAttestation,
@@ -20,24 +21,14 @@ export default function UserHome() {
     const fetchAttestations = async () => {
       if (!account.address || !account.chain?.id) return;
       const allAttestations = await getEveryUniqueAttestation(
-        [
-          "0x82A29547CA8970c2aDECF4C2db7e364339f9a4B7",
-          "0x4E123166e7DfDE7AbA29162Fb3a5c6Af562443D4",
-          "0x23032A3D92D72a857EB4eB2D9ea417ff103A4008",
-          "0x883ac919B42b9065C1Bc1Ea7560ba2924655762E",
-        ],
+        multisigSigners,
         account.chain.id,
       );
       setAllAttestations(allAttestations);
 
       const userAttestations = await getUserUniqueAttestations(
         account.address,
-        [
-          "0x82A29547CA8970c2aDECF4C2db7e364339f9a4B7",
-          "0x4E123166e7DfDE7AbA29162Fb3a5c6Af562443D4",
-          "0x23032A3D92D72a857EB4eB2D9ea417ff103A4008",
-          "0x883ac919B42b9065C1Bc1Ea7560ba2924655762E",
-        ],
+        multisigSigners,
         account.chain.id,
       );
       setUserAttestations(userAttestations);

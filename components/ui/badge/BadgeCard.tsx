@@ -30,43 +30,42 @@ export default function BadgeCard({ badge, index }: BadgeProps) {
   }, [image]);
 
   return (
-    <motion.div
-      className="flex flex-col justify-between items-center w-full h-full p-3 gap-2 bg-secondary rounded-lg"
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: unlocked ? 1 : 0.5, y: 0 }}
-      transition={{ duration: 0.5, delay: index * 0.25 }}
-    >
-      <h1 className="text-sm text-wrap font-black text-center">{title}</h1>
-      {imageLoading ? (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="bg-gray-300/60 animate-pulse rounded-full w-28 h-28"
-        />
-      ) : imageURL ? (
-        <motion.img
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          alt="badge image"
-          className="rounded-full w-28 h-28 object-cover"
-          src={imageURL}
-          width={100}
-          height={100}
-        />
-      ) : (
-        <motion.img
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          alt="badge image"
-          className="rounded-full w-28 h-28 object-cover"
-          src={"/badges/badge_placeholder.png"}
-          width={100}
-          height={100}
-        />
-      )}
-      <Button className="w-full h-6">
-        <Link href={`/user/badge/${attestationUID}`}>Details</Link>
-      </Button>
-    </motion.div>
+    <Link href={`/user/badge/${attestationUID}`}>
+      <motion.div
+        className="flex flex-col justify-between items-center w-full h-full pt-3 pb-5 gap-2 hover:bg-secondary-dark bg-secondary rounded-lg"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: unlocked ? 1 : 0.5, y: 0 }}
+        transition={{ duration: 0.5, delay: index * 0.25 }}
+      >
+        <h1 className="text-sm text-wrap font-black text-center">{title}</h1>
+        {imageLoading ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="bg-skeleton animate-pulse rounded-full w-28 h-28"
+          />
+        ) : imageURL ? (
+          <motion.img
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            alt="badge image"
+            className="rounded-full w-28 h-28 object-cover"
+            src={imageURL}
+            width={100}
+            height={100}
+          />
+        ) : (
+          <motion.img
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            alt="badge image"
+            className="rounded-full w-28 h-28 object-cover"
+            src={"/badges/badge_placeholder.png"}
+            width={100}
+            height={100}
+          />
+        )}
+      </motion.div>
+    </Link>
   );
 }

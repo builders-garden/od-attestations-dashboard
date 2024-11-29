@@ -77,7 +77,7 @@ export default function BadgeReissuePage({
   }
 
   return (
-    <div className="flex justify-center items-center min-h-screen w-full bg-background">
+    <div className="flex justify-center items-center min-h-screen w-full bg-background sm:p-6">
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -115,12 +115,32 @@ export default function BadgeReissuePage({
               </span>
 
               <div className="grid grid-cols-1 justify-start items-center gap-3 w-full">
-                <div className="flex w-full justify-between">
-                  <span className="font-bold">
-                    New {badge?.title} collectors
-                  </span>
-                  <LinkTextWithIcon href="">Easscan</LinkTextWithIcon>
-                </div>
+                {badge ? (
+                  <div className="flex w-full justify-between">
+                    <span className="font-bold">
+                      New {badge.title} collectors
+                    </span>
+                    <LinkTextWithIcon
+                      href={`https://sepolia.easscan.org/attestation/view/${badge.attestationUID}`}
+                    >
+                      Easscan
+                    </LinkTextWithIcon>
+                    {/* TODO: Change to base */}
+                  </div>
+                ) : (
+                  <div className="flex w-full justify-between items-center">
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="bg-skeleton h-6 w-48 rounded-md animate-pulse"
+                    />
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="bg-skeleton h-6 w-20 rounded-md animate-pulse"
+                    />
+                  </div>
+                )}
                 <InputCollectorList
                   collectors={collectors}
                   setCollectors={setCollectors}

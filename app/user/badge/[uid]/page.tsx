@@ -17,8 +17,7 @@ export default function BadgePage({
   const account = useAccount();
   const { uid } = use(params);
   const { badge, sourceAttestation, notFound } = useCreateBadge(uid, account);
-
-  const allAttestationsOfAKind = useGetAllAttestationsOfAKind({
+  const { allAttestationsOfAKind } = useGetAllAttestationsOfAKind({
     sourceAttestation,
     account,
   });
@@ -38,7 +37,7 @@ export default function BadgePage({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
-          className="flex justify-between items-start w-full"
+          className="flex justify-between items-center w-full h-[32px]"
         >
           <Link href="/user" className="rounded-full">
             <ArrowLeft size={24} />

@@ -10,29 +10,6 @@ import {
 } from "./types";
 
 /**
- * A utility function that filters out the invalid attestations from a list of attestations. A valid attestation is one that is not revoked and has the ODPassport flag set to true.
- * @param attestations - An array of Attestations.
- * @returns The array of valid attestations.
- */
-const getValidODAttestations = (attestations: Attestation[]) => {
-  const validAttestations = attestations.filter((attestation: Attestation) => {
-    if (attestation.revoked || !attestation.decodedDataJson) {
-      return false;
-    }
-    // Since the decodedDataJson is an array of objects, we need to check element by element
-    const attestationDecodedDataArray: AttestationDecodedDataType[] =
-      JSON.parse(attestation.decodedDataJson);
-    for (const element of attestationDecodedDataArray) {
-      if (element.value.name === "ODPassport" && element.value.value) {
-        return true;
-      }
-    }
-    return false;
-  });
-  return validAttestations;
-};
-
-/**
  * A utility function that filters out all the attestations that haven't the ODPassport flag set to true.
  * @param attestations - An array of Attestations.
  * @returns The array of valid attestations.
@@ -52,31 +29,6 @@ const getODAttestations = (attestations: Attestation[]) => {
     return false;
   });
   return validAttestations;
-};
-
-/**
- * A utility function to find all the unique attestations from a list of attestations. An attestation is considered unique if it has a different key composed by the concatenation of schema ID, BadgeTitle, and BadgeImageCID.
- * @param attestations - An array of Attestations.
- * @returns An array of unique Attestations.
- */
-const getUniqueAttestations = (attestations: Attestation[]) => {
-  const uniqueAttestationsMap = new Map<string, Attestation>();
-  attestations.forEach((attestation) => {
-    if (!attestation.decodedDataJson) {
-      return;
-    }
-    const attestationDecodedDataArray: AttestationDecodedDataType[] =
-      JSON.parse(attestation.decodedDataJson);
-    // Create a unique key for the attestation
-    const uniqueKey = createUniqueKey(
-      attestation.schemaId,
-      attestationDecodedDataArray,
-    );
-    if (!uniqueKey) return;
-    uniqueAttestationsMap.set(uniqueKey, attestation);
-  });
-  const uniqueAttestationsArray = Array.from(uniqueAttestationsMap.values());
-  return uniqueAttestationsArray;
 };
 
 /**

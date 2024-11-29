@@ -45,7 +45,7 @@ export default function NewBadgePage() {
   }, [account.chain?.id]);
 
   return (
-    <div className="flex justify-center items-center min-h-screen w-full bg-background">
+    <div className="flex justify-center items-center min-h-screen w-full bg-background sm:p-6">
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

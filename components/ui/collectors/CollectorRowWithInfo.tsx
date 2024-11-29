@@ -2,34 +2,23 @@ import { useEnsProfile } from "@/components/hooks/useEnsProfile";
 import { multisigSigners } from "@/lib/constants";
 import { getUserUniqueAttestations } from "@/lib/eas";
 import { Attestation } from "@/lib/eas/types";
-import { cn, shorten } from "@/lib/utils";
+import { shorten } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { Check, CircleX } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 
 interface CollectorRowProps {
   collector: string;
   index?: number;
-  selectable?: boolean;
-  selected?: boolean;
-  removable?: boolean;
-
   onClick?: () => void;
-  handleRemove?: (collector: string) => void;
 }
 
-export default function CollectorRow({
+export default function CollectorRowWithInfo({
   collector,
   index = 1,
-  selectable,
-  selected,
-  removable,
   onClick,
-  handleRemove,
 }: CollectorRowProps) {
-  const isAddress = collector.startsWith("0x");
-  const name = isAddress ? shorten(collector) : collector;
+  const shortedAddress = shorten(collector);
   const { ensProfile, loadingProfile } = useEnsProfile(
     collector as `0x${string}`,
   );
@@ -55,11 +44,7 @@ export default function CollectorRow({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5, delay: 0.2 * index }}
-      className={cn(
-        "flex flex-row justify-center items-center w-full p-2 gap-2 bg-secondary rounded-lg transition-all duration-200 ease-in-out",
-        selectable && "cursor-pointer hover:bg-green-200",
-        selected && "bg-green-300 hover:bg-green-300",
-      )}
+      className="flex flex-row justify-center items-center w-full p-2 gap-2 bg-secondary rounded-lg transition-all duration-200 ease-in-out"
       onClick={onClick}
     >
       {loadingProfile || !userAttestations ? (
@@ -89,37 +74,13 @@ export default function CollectorRow({
               className="w-8 h-8 rounded-full"
             />
 
-            <label
-              className={cn(
-                "font-medium",
-                selectable && "cursor-pointer",
-                isAddress && "font-mono",
-              )}
-            >
-              {ensProfile?.name || name}
+            <label className="font-medium font-mono">
+              {ensProfile?.name || shortedAddress}
             </label>
           </div>
-          {!(selectable || selected || removable) && (
-            <div className="flex justify-center items-center text-center font-medium px-2.5 bg-primary rounded-lg text-white">
-              {userAttestations.length}
-            </div>
-          )}
-          {selected && (
-            <Check
-              size="2rem"
-              className="bg-green-600 p-1 rounded-md text-white transition-all duration-200 ease-in-out"
-            />
-          )}
-          {removable && handleRemove && (
-            <CircleX
-              size="2rem"
-              className="bg-destructive p-1 rounded-md text-white transition-all duration-200 ease-in-out cursor-pointer"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleRemove(collector);
-              }}
-            />
-          )}
+          <div className="flex justify-center items-center text-center font-medium px-2.5 bg-primary rounded-lg text-white">
+            {userAttestations.length}
+          </div>
         </motion.div>
       )}
     </motion.div>

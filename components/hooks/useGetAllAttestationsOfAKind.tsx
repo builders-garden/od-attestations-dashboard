@@ -31,5 +31,5 @@ export const useGetAllAttestationsOfAKind = ({
     if (sourceAttestation) fetchAllAttestationsOfAKind();
   }, [sourceAttestation]);
 
-  return allAttestationsOfAKind;
+  return { allAttestationsOfAKind };
 };
