@@ -42,7 +42,6 @@ const formSchema = z.object({
       name: z.string(),
       type: z.nativeEnum({
         String: FieldType.String,
-        Address: FieldType.Address,
         Number: FieldType.Number,
         Boolean: FieldType.Boolean,
       }),
