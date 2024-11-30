@@ -35,6 +35,7 @@ import { Config, UseAccountReturnType, useWriteContract } from "wagmi";
 import { easMultiAttest } from "@/lib/eas/calls";
 import { EAS_CONTRACT_ADDRESSES } from "@/lib/eas/constants";
 import { getImageFromIpfs, uploadImageToIpfs } from "@/lib/ipfs";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const formSchema = z.object({
   fields: z.array(
@@ -181,7 +182,7 @@ export const NewBadgeForm: React.FC<NewBadgeFormProps> = ({
                           control={form.control}
                           name={`fields.${index}.value` as const}
                           render={({ field: subField }) => (
-                            <FormItem className="w-full">
+                            <FormItem className="w-full flex flex-col">
                               <FormLabel>{field.name}</FormLabel>
                               <FormControl>
                                 {field.name === "BadgeImageCID" ? (
@@ -261,11 +262,41 @@ export const NewBadgeForm: React.FC<NewBadgeFormProps> = ({
                                       />
                                     )}
                                   </div>
+                                ) : field.type === FieldType.Boolean ? (
+                                  <Checkbox
+                                    {...subField}
+                                    value={subField.value as string}
+                                    checked={subField.value as boolean}
+                                    onCheckedChange={(e) => {
+                                      subField.onChange({
+                                        target: { value: e.valueOf() },
+                                      });
+                                    }}
+                                  />
                                 ) : (
                                   <Input
                                     placeholder={field.type}
                                     {...subField}
-                                    value={String(subField.value)}
+                                    type={
+                                      field.type === FieldType.Number
+                                        ? "number"
+                                        : "text"
+                                    }
+                                    value={
+                                      field.type === FieldType.Number
+                                        ? Number(subField.value)
+                                        : String(subField.value)
+                                    }
+                                    onChange={(e) =>
+                                      subField.onChange({
+                                        target: {
+                                          value:
+                                            field.type === FieldType.Number
+                                              ? Number(e.target.value)
+                                              : String(e.target.value),
+                                        },
+                                      })
+                                    }
                                   />
                                 )}
                               </FormControl>

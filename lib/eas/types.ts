@@ -48,7 +48,7 @@ export type Attestation = {
 
 export enum FieldType {
   String = "string",
-  Number = "number",
+  Number = "uint256",
   Boolean = "bool",
 }
 

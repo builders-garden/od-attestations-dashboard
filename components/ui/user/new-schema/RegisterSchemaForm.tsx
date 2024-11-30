@@ -142,7 +142,7 @@ export const RegisterSchemaForm: React.FC = () => {
                 {prev}, {curr}
               </>
             ))}{" "}
-          will be added to the schema, so you don't need to add them again.
+          will be added to the schema, so you don&apos;t need to add them again.
         </span>
       </div>
       <Form {...form}>
@@ -225,8 +225,7 @@ export const RegisterSchemaForm: React.FC = () => {
                           <SelectContent>
                             {Object.values(FieldType).map((type) => (
                               <SelectItem key={type} value={type}>
-                                {type.charAt(0).toUpperCase() +
-                                  type.slice(1).toLowerCase()}
+                                {type}
                               </SelectItem>
                             ))}
                           </SelectContent>
