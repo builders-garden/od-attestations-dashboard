@@ -28,7 +28,7 @@ export default function NewSchemaPage() {
           </motion.div>
 
           <span className="w-full">
-            Create a new schema adding the fields and their value types.
+            Create a new schema adding the fields and their types.
           </span>
 
           <RegisterSchemaForm />
