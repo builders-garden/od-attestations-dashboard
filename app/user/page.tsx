@@ -1,6 +1,8 @@
 "use client";
+import { Clouds } from "@/components/ui/clouds";
 import UserBadges from "@/components/ui/user/UserBadges";
 import UserHeader from "@/components/ui/user/UserHeader";
+import { Wrapper } from "@/components/ui/wrapper";
 import { multisigSigners } from "@/lib/constants";
 import {
   getUserUniqueAttestations,
@@ -39,28 +41,27 @@ export default function UserHome() {
     fetchAttestations();
   }, [account.address, account.chain?.id]);
 
-  if (!account.address) {
+  if (!account.isConnecting && !account.address) {
     return (
-      <div className="flex justify-center items-center min-h-screen h-full w-full bg-background">
+      <Wrapper className="justify-center overflow-hidden">
         <ConnectButton />
-      </div>
+        <Clouds />
+      </Wrapper>
     );
   }
 
   return (
-    <div className="flex justify-center items-center min-h-screen w-full bg-background sm:p-6">
-      <div className="flex flex-col justify-start items-center min-h-screen w-full sm:max-w-md bg-background rounded-lg sm:shadow-lg p-6">
-        <UserHeader
-          userAttestationsLength={userAttestations.length}
-          isAdmin={true}
+    <Wrapper>
+      <UserHeader
+        userAttestationsLength={userAttestations.length}
+        isAdmin={true}
+      />
+      {!loadingAttestations && (
+        <UserBadges
+          allAttestations={allAttestations}
+          userAttestations={userAttestations}
         />
-        {!loadingAttestations && (
-          <UserBadges
-            allAttestations={allAttestations}
-            userAttestations={userAttestations}
-          />
-        )}
-      </div>
-    </div>
+      )}
+    </Wrapper>
   );
 }

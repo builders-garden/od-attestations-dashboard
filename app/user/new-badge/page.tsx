@@ -10,6 +10,9 @@ import { FieldType, Schema, SchemaField } from "@/lib/eas/types";
 import { multisigSigners } from "@/lib/constants";
 import { NewBadgeForm } from "@/components/ui/user/new-badge/NewBadgeForm";
 import { SchemaSelector } from "@/components/ui/user/new-badge/SchemaSelector";
+import { Wrapper } from "@/components/ui/wrapper";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { Clouds } from "@/components/ui/clouds";
 
 export default function NewBadgePage() {
   const account = useAccount();
@@ -44,45 +47,47 @@ export default function NewBadgePage() {
     fetchSchemas();
   }, [account.chain?.id]);
 
+  if (!account.isConnecting && !account.address) {
+    return (
+      <Wrapper className="justify-center overflow-hidden">
+        <ConnectButton />
+        <Clouds />
+      </Wrapper>
+    );
+  }
+
   return (
-    <div className="flex justify-center items-center min-h-screen w-full bg-background sm:p-6">
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-        className="flex flex-col justify-between items-center min-h-screen w-full sm:max-w-md bg-background rounded-lg sm:shadow-lg p-6"
-      >
-        <div className="flex flex-col gap-6 w-full">
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-            className="flex justify-between items-center w-full"
-          >
-            <Link href={`/user`} className="rounded-full">
-              <ArrowLeft size={24} />
-            </Link>
-            <h1 className="font-black text-2xl">New Badge ✨</h1>
-          </motion.div>
+    <Wrapper>
+      <div className="flex flex-col gap-6 w-full">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+          className="flex justify-between items-center w-full"
+        >
+          <Link href={`/user`} className="rounded-full">
+            <ArrowLeft size={24} />
+          </Link>
+          <h1 className="font-black text-2xl">New Badge ✨</h1>
+        </motion.div>
 
-          <span className="w-full">
-            Create and issue a new badge to one or more users.
-          </span>
+        <span className="w-full">
+          Create and issue a new badge to one or more users.
+        </span>
 
-          <SchemaSelector
-            schemas={schemas}
-            selectedSchema={selectedSchema}
-            setSelectedSchema={setSelectedSchema}
-            setSchemaFields={setSchemaFields}
-          />
+        <SchemaSelector
+          schemas={schemas}
+          selectedSchema={selectedSchema}
+          setSelectedSchema={setSelectedSchema}
+          setSchemaFields={setSchemaFields}
+        />
 
-          <NewBadgeForm
-            account={account}
-            selectedSchema={selectedSchema}
-            schemaFields={schemaFields}
-          />
-        </div>
-      </motion.div>
-    </div>
+        <NewBadgeForm
+          account={account}
+          selectedSchema={selectedSchema}
+          schemaFields={schemaFields}
+        />
+      </div>
+    </Wrapper>
   );
 }

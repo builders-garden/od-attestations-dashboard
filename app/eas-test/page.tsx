@@ -15,6 +15,8 @@ import {
   SchemaEncoder,
 } from "@ethereum-attestation-service/eas-sdk";
 import { EASAbi } from "@/lib/abi/EAS";
+import { Wrapper } from "@/components/ui/wrapper";
+import { Clouds } from "@/components/ui/clouds";
 
 function Separator() {
   return <div className="border-b border-gray-300 w-full my-3" />;
@@ -115,11 +117,12 @@ export default function AdminHome() {
     });
   };
 
-  if (!account.address) {
+  if (!account.isConnecting && !account.address) {
     return (
-      <div className="flex justify-center items-center min-h-screen h-full w-full bg-background">
+      <Wrapper className="justify-center overflow-hidden">
         <ConnectButton />
-      </div>
+        <Clouds />
+      </Wrapper>
     );
   }
 

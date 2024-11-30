@@ -1,7 +1,6 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import BadgeClass from "@/lib/classes/BadgeClass";
-import { Button } from "../button";
 import { getImageFromIpfs } from "@/lib/ipfs";
 import { useEffect, useState } from "react";
 

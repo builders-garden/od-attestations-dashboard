@@ -10,6 +10,9 @@ import Link from "next/link";
 import { use, useState, useMemo } from "react";
 import { useAccount } from "wagmi";
 import { Button } from "@/components/ui/button";
+import { Wrapper } from "@/components/ui/wrapper";
+import { Clouds } from "@/components/ui/clouds";
+import { Icons } from "@/components/ui/icons";
 
 export default function BadgeCollectorsPage({
   params,
@@ -36,32 +39,45 @@ export default function BadgeCollectorsPage({
 
   const totalPages = Math.ceil(allAttestationsOfAKind.length / itemsPerPage);
 
-  if (!account.address) {
+  if (!account.isConnecting && !account.address) {
     return (
-      <div className="flex justify-center items-center min-h-screen h-full w-full bg-background">
+      <Wrapper className="justify-center overflow-hidden">
         <ConnectButton />
-      </div>
+        <Clouds />
+      </Wrapper>
     );
   }
 
   return (
-    <div className="flex justify-center items-center min-h-screen w-full bg-background sm:p-6">
-      {badge ? (
-        <div className="flex flex-col gap-6 justify-start items-center min-h-screen w-full sm:max-w-md bg-background rounded-lg sm:shadow-lg p-6">
-          <motion.div
+    <Wrapper className="gap-6">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="flex justify-between items-center w-full"
+      >
+        <Link href={`/user/badge/${uid}`} className="rounded-full">
+          <ArrowLeft size={24} />
+        </Link>
+        {badge && (
+          <motion.h1
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
-            className="flex justify-between items-center w-full"
+            className="font-black text-2xl"
           >
-            <Link href={`/user/badge/${uid}`} className="rounded-full">
-              <ArrowLeft size={24} />
-            </Link>
-            <h1 className="font-black text-2xl">
-              {collectorsCount} Collectors 👤
-            </h1>
-          </motion.div>
+            {collectorsCount} Collectors 👤
+          </motion.h1>
+        )}
+      </motion.div>
 
+      {badge ? (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="flex flex-col justify-center items-center w-full gap-6"
+        >
           <span className="w-full">
             Check the list of users who received this badge
           </span>
@@ -110,22 +126,12 @@ export default function BadgeCollectorsPage({
               </Button>
             </div>
           )}
-        </div>
+        </motion.div>
       ) : (
-        <div className="flex flex-col gap-6 justify-start items-center min-h-screen w-full sm:max-w-md bg-background rounded-lg sm:shadow-lg p-6">
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-            className="flex justify-start items-center w-full h-[32px]"
-          >
-            <Link href={`/user/badge/${uid}`} className="rounded-full">
-              <ArrowLeft size={24} />
-            </Link>
-          </motion.div>
-          <Loader2 className="animate-spin w-4" />
+        <div className="flex justify-center items-center w-full h-full mt-32">
+          <Icons.spinner className="mr-2 h-10 w-10 animate-spin" />
         </div>
       )}
-    </div>
+    </Wrapper>
   );
 }

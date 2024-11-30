@@ -3,6 +3,7 @@
 import { useCreateBadge } from "@/components/hooks/useCreateBadge";
 import { useGetAllAttestationsOfAKind } from "@/components/hooks/useGetAllAttestationsOfAKind";
 import { Button } from "@/components/ui/button";
+import { Clouds } from "@/components/ui/clouds";
 import CollectorRow from "@/components/ui/collectors/CollectorRow";
 import {
   Dialog,
@@ -16,6 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { LinkTextWithIcon } from "@/components/ui/linkTextWithIcon";
+import { Wrapper } from "@/components/ui/wrapper";
 import { easMultiRevoke } from "@/lib/eas/calls";
 import { EAS_CONTRACT_ADDRESSES } from "@/lib/eas/constants";
 import { cn } from "@/lib/utils";
@@ -84,159 +86,153 @@ export default function BadgeRevokePage({
     setLoading(false);
   };
 
-  if (!account.address) {
+  if (!account.isConnecting && !account.address) {
     return (
-      <div className="flex justify-center items-center min-h-screen h-full w-full bg-background">
+      <Wrapper className="justify-center overflow-hidden">
         <ConnectButton />
-      </div>
+        <Clouds />
+      </Wrapper>
     );
   }
 
   return (
-    <div className="flex justify-center items-center min-h-screen w-full bg-background sm:p-6">
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-        className="flex flex-col justify-between items-center min-h-screen w-full sm:max-w-md bg-background rounded-lg sm:shadow-lg p-6"
-      >
-        <div className="flex flex-col gap-6">
+    <Wrapper>
+      <div className="flex flex-col gap-6">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+          className="flex justify-between items-center w-full"
+        >
+          <Link href={`/user/badge/${uid}`} className="rounded-full">
+            <ArrowLeft size={24} />
+          </Link>
+          <h1 className="font-black text-2xl">Revoke 🚫</h1>
+        </motion.div>
+
+        {notFound ? (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
-            className="flex justify-between items-center w-full"
+            className="flex justify-center pt-56 items-center w-full"
           >
-            <Link href={`/user/badge/${uid}`} className="rounded-full">
-              <ArrowLeft size={24} />
-            </Link>
-            <h1 className="font-black text-2xl">Revoke 🚫</h1>
+            <h1 className="text-2xl font-black text-black">
+              Badge not found...
+            </h1>
           </motion.div>
+        ) : (
+          <>
+            <span className="w-full">
+              Select one or more users to revoke the selected badge from them.
+            </span>
 
-          {notFound ? (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5 }}
-              className="flex justify-center pt-56 items-center w-full"
-            >
-              <h1 className="text-2xl font-black text-black">
-                Badge not found...
-              </h1>
-            </motion.div>
-          ) : (
-            <>
-              <span className="w-full">
-                Select one or more users to revoke the selected badge from them.
-              </span>
-
-              <div className="grid grid-cols-1 justify-start items-center gap-3 w-full">
-                {badge ? (
-                  <div className="flex w-full justify-between">
-                    <span className="font-bold">{badge.title} collectors</span>
-                    <LinkTextWithIcon
-                      href={`https://sepolia.easscan.org/attestation/view/${badge.attestationUID}`}
-                    >
-                      Easscan
-                    </LinkTextWithIcon>
-                    {/* TODO: Change to base */}
-                  </div>
-                ) : (
-                  <div className="flex w-full justify-between items-center">
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="bg-skeleton h-6 w-48 rounded-md animate-pulse"
-                    />
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="bg-skeleton h-6 w-20 rounded-md animate-pulse"
-                    />
-                  </div>
+            <div className="grid grid-cols-1 justify-start items-center gap-3 w-full">
+              {badge ? (
+                <div className="flex w-full justify-between">
+                  <span className="font-bold">{badge.title} collectors</span>
+                  <LinkTextWithIcon
+                    href={`https://sepolia.easscan.org/attestation/view/${badge.attestationUID}`}
+                  >
+                    Easscan
+                  </LinkTextWithIcon>
+                  {/* TODO: Change to base */}
+                </div>
+              ) : (
+                <div className="flex w-full justify-between items-center">
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="bg-skeleton h-6 w-48 rounded-md animate-pulse"
+                  />
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="bg-skeleton h-6 w-20 rounded-md animate-pulse"
+                  />
+                </div>
+              )}
+              <div
+                className={cn(
+                  "flex w-full gap-0 justify-between",
+                  atLeastOneSelected && "gap-4",
                 )}
-                <div
+              >
+                <Input
+                  placeholder="Search..."
+                  className="focus-visible:ring-primary w-full"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                />
+                <Button
+                  onClick={() => setSelectedCollectors([])}
                   className={cn(
-                    "flex w-full gap-0 justify-between",
-                    atLeastOneSelected && "gap-4",
+                    "w-fit transition-all duration-200 ease-in-out",
+                    atLeastOneSelected && "w-fit px-4",
+                    !atLeastOneSelected && "w-0 p-0",
                   )}
                 >
-                  <Input
-                    placeholder="Search..."
-                    className="focus-visible:ring-primary w-full"
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                  />
-                  <Button
-                    onClick={() => setSelectedCollectors([])}
-                    className={cn(
-                      "w-fit transition-all duration-200 ease-in-out",
-                      atLeastOneSelected && "w-fit px-4",
-                      !atLeastOneSelected && "w-0 p-0",
-                    )}
-                  >
-                    Reset Selection
-                  </Button>
-                </div>
-                <div className="flex flex-col gap-3 w-full max-h-[50rem] overflow-y-auto">
-                  {collectors
-                    .filter((collector) => collector.includes(input))
-                    .map((collector, index) => (
-                      <CollectorRow
-                        key={index}
-                        collector={collector}
-                        selectable
-                        selected={selectedCollectors.includes(collector)}
-                        onClick={() => handleSelect(collector)}
-                      />
-                    ))}
-                </div>
+                  Reset Selection
+                </Button>
               </div>
-            </>
-          )}
-        </div>
-        <Dialog>
-          <DialogTrigger asChild>
+              <div className="flex flex-col gap-3 w-full max-h-[50rem] overflow-y-auto">
+                {collectors
+                  .filter((collector) => collector.includes(input))
+                  .map((collector, index) => (
+                    <CollectorRow
+                      key={index}
+                      collector={collector}
+                      selectable
+                      selected={selectedCollectors.includes(collector)}
+                      onClick={() => handleSelect(collector)}
+                    />
+                  ))}
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button
+            variant="destructive"
+            className={cn(
+              "text-2xl px-8 py-6 rounded-lg w-full transition-opacity duration-200 ease-in-out",
+              atLeastOneSelected && "opacity-1",
+              !atLeastOneSelected && "opacity-0",
+            )}
+          >
+            Revoke
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="max-w-sm gap-6">
+          <DialogHeader>
+            <DialogTitle className="text-center text-2xl font-extrabold">
+              Confirm Revocation
+            </DialogTitle>
+          </DialogHeader>
+          <DialogDescription className="text-center">
+            Are you sure you want to permanently revoke this badge from the
+            selected users? This action cannot be undone.
+          </DialogDescription>
+          <DialogFooter className="sm:justify-start">
+            <DialogClose asChild>
+              <Button type="button" variant="outline" className="w-full">
+                Cancel
+              </Button>
+            </DialogClose>
             <Button
               variant="destructive"
-              className={cn(
-                "text-2xl px-8 py-6 rounded-lg w-full transition-opacity duration-200 ease-in-out",
-                atLeastOneSelected && "opacity-1",
-                !atLeastOneSelected && "opacity-0",
-              )}
+              className="w-full"
+              onClick={handleRevokeBadges}
+              disabled={loading}
             >
+              {loading && <Loader2 className="animate-spin w-4" />}
               Revoke
             </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-sm gap-6">
-            <DialogHeader>
-              <DialogTitle className="text-center text-2xl font-extrabold">
-                Confirm Revocation
-              </DialogTitle>
-            </DialogHeader>
-            <DialogDescription className="text-center">
-              Are you sure you want to permanently revoke this badge from the
-              selected users? This action cannot be undone.
-            </DialogDescription>
-            <DialogFooter className="sm:justify-start">
-              <DialogClose asChild>
-                <Button type="button" variant="outline" className="w-full">
-                  Cancel
-                </Button>
-              </DialogClose>
-              <Button
-                variant="destructive"
-                className="w-full"
-                onClick={handleRevokeBadges}
-                disabled={loading}
-              >
-                {loading && <Loader2 className="animate-spin w-4" />}
-                Revoke
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      </motion.div>
-    </div>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </Wrapper>
   );
 }
