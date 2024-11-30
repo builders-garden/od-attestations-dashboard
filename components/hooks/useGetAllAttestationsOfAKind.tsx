@@ -29,7 +29,7 @@ export const useGetAllAttestationsOfAKind = ({
       setAllAttestationsOfAKind(attestations);
     };
     if (sourceAttestation) fetchAllAttestationsOfAKind();
-  }, [sourceAttestation]);
+  }, [account.chain?.id, sourceAttestation]);
 
   return { allAttestationsOfAKind };
 };
