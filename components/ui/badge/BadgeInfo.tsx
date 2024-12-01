@@ -1,5 +1,5 @@
 import BadgeClass from "@/lib/classes/BadgeClass";
-import { Calendar, CircleX, Hash, IdCard, Send, Tag } from "lucide-react";
+import { Calendar, CircleX, Hash, IdCard, Send } from "lucide-react";
 import { Button } from "../button";
 import { useRouter } from "next/navigation";
 import { Separator } from "../separator";
@@ -7,6 +7,7 @@ import { shorten } from "@/lib/utils";
 import Link from "next/link";
 import { Attestation } from "@/lib/eas/types";
 import { useAccount } from "wagmi";
+import { ViewCollectorsButton } from "./ViewCollectorsButton";
 
 interface BadgeInfoProps {
   badge: BadgeClass;
@@ -18,7 +19,7 @@ export default function BadgeInfo({
   allAttestationsOfAKind,
 }: BadgeInfoProps) {
   const account = useAccount();
-  const Router = useRouter();
+  const router = useRouter();
 
   // Get the index of the attestation that has the same recipient address as account.address
   const userAttestationIndex =
@@ -71,39 +72,10 @@ export default function BadgeInfo({
         )}
       </div>
 
-      <Button
-        className="flex justify-start items-center gap-1.5 px-2 h-fit p-0 rounded-md hover:bg-none"
-        variant="ghost"
-        onClick={() =>
-          Router.push(`/user/badge/${badge.attestationUID}/collectors`)
-        }
-      >
-        <div className="flex">
-          {allAttestationsOfAKind[0] && (
-            <div className="flex justify-center items-center rounded-full bg-pink-400 w-4 h-4 p-2.5 text-xs">
-              {allAttestationsOfAKind[0].recipient.slice(2, 3).toUpperCase()}
-            </div>
-          )}
-
-          {allAttestationsOfAKind[1] && (
-            <div className="flex justify-center items-center rounded-full bg-yellow-400 w-4 h-4 p-2.5 -ml-2 text-xs">
-              {allAttestationsOfAKind[1].recipient.slice(2, 3).toUpperCase()}
-            </div>
-          )}
-
-          {allAttestationsOfAKind[2] && (
-            <div className="flex justify-center items-center rounded-full bg-slate-200 w-4 h-4 p-2.5 -ml-2 text-xs">
-              {allAttestationsOfAKind[2].recipient.slice(2, 3).toUpperCase()}
-            </div>
-          )}
-        </div>
-
-        <label className="text-black font-medium cursor-pointer">
-          {allAttestationsOfAKind.length - 3 < 0
-            ? "Collectors"
-            : "and " + (allAttestationsOfAKind.length - 3) + " others..."}
-        </label>
-      </Button>
+      <ViewCollectorsButton
+        badge={badge}
+        allAttestationsOfAKind={allAttestationsOfAKind}
+      />
 
       <div className="flex flex-col gap-0 w-full items-center">
         <Separator />
@@ -112,7 +84,7 @@ export default function BadgeInfo({
             className="h-fit py-1 px-2"
             variant="destructive"
             onClick={() =>
-              Router.push(`/user/badge/${badge.attestationUID}/revoke`)
+              router.push(`/user/badge/${badge.attestationUID}/revoke`)
             }
           >
             <CircleX size={16} />
@@ -122,7 +94,7 @@ export default function BadgeInfo({
             className="h-fit py-1 px-2"
             variant="green"
             onClick={() =>
-              Router.push(`/user/badge/${badge.attestationUID}/reissue`)
+              router.push(`/user/badge/${badge.attestationUID}/reissue`)
             }
           >
             <Send size={16} />
