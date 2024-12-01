@@ -27,9 +27,9 @@ export default function CollectorRowWithInfo({
 
   useEffect(() => {
     const fetchAttestations = async () => {
-      if (!account.address || !account.chain?.id) return;
+      if (!collector || !account.chain?.id) return;
       const userAttestations = await getUserUniqueAttestations(
-        account.address,
+        collector,
         multisigSigners,
         account.chain.id,
       );
@@ -37,7 +37,7 @@ export default function CollectorRowWithInfo({
     };
 
     fetchAttestations();
-  }, [account.address, account.chain?.id]);
+  }, [collector, account.chain?.id]);
 
   return (
     <motion.div

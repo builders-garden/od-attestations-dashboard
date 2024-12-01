@@ -50,6 +50,8 @@ export default function CollectorRow({
     fetchAttestations();
   }, [account.address, account.chain?.id]);
 
+  const isFetching = loadingProfile || !userAttestations;
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -57,12 +59,12 @@ export default function CollectorRow({
       transition={{ duration: 0.5, delay: 0.2 * index }}
       className={cn(
         "flex flex-row justify-center items-center w-full p-2 gap-2 bg-secondary rounded-lg transition-all duration-200 ease-in-out",
-        selectable && "cursor-pointer hover:bg-green-200",
-        selected && "bg-green-300 hover:bg-green-300",
+        !isFetching && selectable && "cursor-pointer hover:bg-green-200",
+        !isFetching && selected && "bg-green-300 hover:bg-green-300",
       )}
       onClick={onClick}
     >
-      {loadingProfile || !userAttestations ? (
+      {isFetching ? (
         <motion.div
           className="flex justify-between items-center w-full"
           initial={{ opacity: 0 }}

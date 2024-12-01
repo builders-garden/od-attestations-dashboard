@@ -36,16 +36,7 @@ export default function UserBadges({
       {/* Badges */}
       <div className="grid grid-cols-2 justify-start items-center gap-5 w-full">
         {allBadges.map((badge, index) => {
-          return (
-            <>
-              <BadgeCard key={index} index={index + 1} badge={badge} />
-              <BadgeCard key={index + 1} index={index + 1} badge={badge} />
-              <BadgeCard key={index + 2} index={index + 1} badge={badge} />
-              <BadgeCard key={index + 3} index={index + 1} badge={badge} />
-              <BadgeCard key={index + 4} index={index + 1} badge={badge} />
-              <BadgeCard key={index + 5} index={index + 1} badge={badge} />
-            </>
-          );
+          return <BadgeCard key={index} index={index + 1} badge={badge} />;
         })}
       </div>
     </div>
