@@ -262,7 +262,7 @@ export const RegisterSchemaForm: React.FC = () => {
               <DialogTrigger asChild>
                 <Button
                   type="button"
-                  variant="green"
+                  variant="success"
                   className="text-2xl px-8 py-6 rounded-lg w-full transition-opacity duration-200 ease-in-out"
                   onClick={(e) => {
                     // @ts-ignore
@@ -300,7 +300,7 @@ export const RegisterSchemaForm: React.FC = () => {
                     </Button>
                   </DialogClose>
                   <Button
-                    variant="green"
+                    variant="success"
                     className="w-full"
                     type="button"
                     disabled={loading}

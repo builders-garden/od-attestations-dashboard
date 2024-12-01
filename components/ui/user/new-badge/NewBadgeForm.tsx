@@ -332,7 +332,7 @@ export const NewBadgeForm: React.FC<NewBadgeFormProps> = ({
           <DialogTrigger asChild>
             <Button
               type="button"
-              variant="green"
+              variant="success"
               className="text-2xl px-8 py-6 rounded-lg w-full transition-opacity duration-200 ease-in-out"
             >
               Issue
@@ -354,7 +354,7 @@ export const NewBadgeForm: React.FC<NewBadgeFormProps> = ({
                 </Button>
               </DialogClose>
               <Button
-                variant="green"
+                variant="success"
                 className="w-full"
                 type="button"
                 onClick={handleSubmit}

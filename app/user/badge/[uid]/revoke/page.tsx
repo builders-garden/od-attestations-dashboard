@@ -1,9 +1,7 @@
 "use client";
-
 import { useCreateBadge } from "@/components/hooks/useCreateBadge";
 import { useGetAllAttestationsOfAKind } from "@/components/hooks/useGetAllAttestationsOfAKind";
 import { Button } from "@/components/ui/button";
-import { Clouds } from "@/components/ui/clouds";
 import CollectorRow from "@/components/ui/collectors/CollectorRow";
 import {
   Dialog,
@@ -21,7 +19,6 @@ import { Wrapper } from "@/components/ui/wrapper";
 import { easMultiRevoke } from "@/lib/eas/calls";
 import { EAS_CONTRACT_ADDRESSES } from "@/lib/eas/constants";
 import { cn } from "@/lib/utils";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { motion } from "framer-motion";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
@@ -86,17 +83,8 @@ export default function BadgeRevokePage({
     setLoading(false);
   };
 
-  if (!account.isConnecting && !account.address) {
-    return (
-      <Wrapper className="justify-center overflow-hidden">
-        <ConnectButton />
-        <Clouds />
-      </Wrapper>
-    );
-  }
-
   return (
-    <Wrapper>
+    <Wrapper className="justify-between gap-6">
       <div className="flex flex-col gap-6">
         <motion.div
           initial={{ opacity: 0 }}

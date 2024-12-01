@@ -3,15 +3,13 @@ import { useCountUp } from "@/components/hooks/useCountUp";
 import { useCreateBadge } from "@/components/hooks/useCreateBadge";
 import { useGetAllAttestationsOfAKind } from "@/components/hooks/useGetAllAttestationsOfAKind";
 import CollectorRowWithInfo from "@/components/ui/collectors/CollectorRowWithInfo";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { motion } from "framer-motion";
-import { ArrowLeft, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { use, useState, useMemo } from "react";
 import { useAccount } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { Wrapper } from "@/components/ui/wrapper";
-import { Clouds } from "@/components/ui/clouds";
 import { Icons } from "@/components/ui/icons";
 
 export default function BadgeCollectorsPage({
@@ -39,22 +37,13 @@ export default function BadgeCollectorsPage({
 
   const totalPages = Math.ceil(allAttestationsOfAKind.length / itemsPerPage);
 
-  if (!account.isConnecting && !account.address) {
-    return (
-      <Wrapper className="justify-center overflow-hidden">
-        <ConnectButton />
-        <Clouds />
-      </Wrapper>
-    );
-  }
-
   return (
     <Wrapper className="gap-6">
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
-        className="flex justify-between items-center w-full"
+        className="flex justify-between items-center w-full h-[32px]"
       >
         <Link href={`/user/badge/${uid}`} className="rounded-full">
           <ArrowLeft size={24} />

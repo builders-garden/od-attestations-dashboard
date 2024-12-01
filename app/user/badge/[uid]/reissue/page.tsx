@@ -1,5 +1,4 @@
 "use client";
-
 import { useCreateBadge } from "@/components/hooks/useCreateBadge";
 import { Button } from "@/components/ui/button";
 import { InputCollectorList } from "@/components/ui/collectors/InputCollectorList";
@@ -16,7 +15,6 @@ import {
 import { LinkTextWithIcon } from "@/components/ui/linkTextWithIcon";
 import { cn } from "@/lib/utils";
 import { SchemaEncoder } from "@ethereum-attestation-service/eas-sdk";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { motion } from "framer-motion";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
@@ -26,7 +24,6 @@ import { easMultiAttest } from "@/lib/eas/calls";
 import { EAS_CONTRACT_ADDRESSES } from "@/lib/eas/constants";
 import { AttestationDecodedDataType } from "@/lib/eas/types";
 import { Wrapper } from "@/components/ui/wrapper";
-import { Clouds } from "@/components/ui/clouds";
 
 export default function BadgeReissuePage({
   params,
@@ -70,17 +67,8 @@ export default function BadgeReissuePage({
     setLoading(false);
   };
 
-  if (!account.isConnecting && !account.address) {
-    return (
-      <Wrapper className="justify-center overflow-hidden">
-        <ConnectButton />
-        <Clouds />
-      </Wrapper>
-    );
-  }
-
   return (
-    <Wrapper>
+    <Wrapper className="justify-between">
       <div className="flex flex-col gap-6">
         <motion.div
           initial={{ opacity: 0 }}
@@ -146,6 +134,7 @@ export default function BadgeReissuePage({
           </>
         )}
       </div>
+
       <Dialog>
         <DialogTrigger asChild>
           <Button
@@ -154,7 +143,7 @@ export default function BadgeReissuePage({
               collectors.length > 0 && "opacity-1",
               collectors.length === 0 && "opacity-0",
             )}
-            variant="green"
+            variant="success"
           >
             Reissue
           </Button>
@@ -176,7 +165,7 @@ export default function BadgeReissuePage({
               </Button>
             </DialogClose>
             <Button
-              variant="green"
+              variant="success"
               className="w-full"
               onClick={handleReissueBadges}
               disabled={loading}

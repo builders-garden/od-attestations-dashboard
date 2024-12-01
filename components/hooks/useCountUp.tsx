@@ -1,7 +1,11 @@
 import { useState, useEffect } from "react";
 
-export function useCountUp(end: number, duration: number = 1000) {
-  const [count, setCount] = useState(0);
+export function useCountUp(
+  end: number,
+  duration: number = 1000,
+  start?: number,
+) {
+  const [count, setCount] = useState(start || 0);
 
   useEffect(() => {
     if (count === end) return;

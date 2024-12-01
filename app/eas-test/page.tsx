@@ -1,5 +1,4 @@
 "use client";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useState } from "react";
 import { useAccount } from "wagmi";
 import { getUserAttestations, schemasFromWallets } from "@/lib/eas";
@@ -15,8 +14,6 @@ import {
   SchemaEncoder,
 } from "@ethereum-attestation-service/eas-sdk";
 import { EASAbi } from "@/lib/abi/EAS";
-import { Wrapper } from "@/components/ui/wrapper";
-import { Clouds } from "@/components/ui/clouds";
 
 function Separator() {
   return <div className="border-b border-gray-300 w-full my-3" />;
@@ -116,15 +113,6 @@ export default function AdminHome() {
       ],
     });
   };
-
-  if (!account.isConnecting && !account.address) {
-    return (
-      <Wrapper className="justify-center overflow-hidden">
-        <ConnectButton />
-        <Clouds />
-      </Wrapper>
-    );
-  }
 
   return (
     <div className="flex justify-center items-center min-h-screen w-full bg-background sm:p-6">

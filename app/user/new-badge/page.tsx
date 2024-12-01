@@ -1,5 +1,4 @@
 "use client";
-
 import { motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
@@ -7,12 +6,10 @@ import { schemasFromWallets } from "@/lib/eas";
 import { useAccount } from "wagmi";
 import { useEffect, useState } from "react";
 import { FieldType, Schema, SchemaField } from "@/lib/eas/types";
-import { multisigSigners } from "@/lib/constants";
+import { adminAddresses } from "@/lib/constants";
 import { NewBadgeForm } from "@/components/ui/user/new-badge/NewBadgeForm";
 import { SchemaSelector } from "@/components/ui/user/new-badge/SchemaSelector";
 import { Wrapper } from "@/components/ui/wrapper";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { Clouds } from "@/components/ui/clouds";
 
 export default function NewBadgePage() {
   const account = useAccount();
@@ -27,7 +24,7 @@ export default function NewBadgePage() {
   useEffect(() => {
     const fetchSchemas = async () => {
       const schemas = await schemasFromWallets(
-        multisigSigners,
+        adminAddresses,
         account.chain?.id,
       );
       if (schemas.length === 0) return;
@@ -46,15 +43,6 @@ export default function NewBadgePage() {
     };
     fetchSchemas();
   }, [account.chain?.id]);
-
-  if (!account.isConnecting && !account.address) {
-    return (
-      <Wrapper className="justify-center overflow-hidden">
-        <ConnectButton />
-        <Clouds />
-      </Wrapper>
-    );
-  }
 
   return (
     <Wrapper>

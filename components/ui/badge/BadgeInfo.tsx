@@ -1,13 +1,11 @@
 import BadgeClass from "@/lib/classes/BadgeClass";
-import { Calendar, CircleX, Hash, IdCard, Send } from "lucide-react";
-import { Button } from "../button";
-import { useRouter } from "next/navigation";
-import { Separator } from "../separator";
+import { Calendar, Hash, IdCard } from "lucide-react";
 import { shorten } from "@/lib/utils";
 import Link from "next/link";
 import { Attestation } from "@/lib/eas/types";
 import { useAccount } from "wagmi";
 import { ViewCollectorsButton } from "./ViewCollectorsButton";
+import { Separator } from "../separator";
 
 interface BadgeInfoProps {
   badge: BadgeClass;
@@ -19,7 +17,6 @@ export default function BadgeInfo({
   allAttestationsOfAKind,
 }: BadgeInfoProps) {
   const account = useAccount();
-  const router = useRouter();
 
   // Get the index of the attestation that has the same recipient address as account.address
   const userAttestationIndex =
@@ -77,32 +74,7 @@ export default function BadgeInfo({
         allAttestationsOfAKind={allAttestationsOfAKind}
       />
 
-      <div className="flex flex-col gap-0 w-full items-center">
-        <Separator />
-        <div className="flex gap-4">
-          <Button
-            className="h-fit py-1 px-2"
-            variant="destructive"
-            onClick={() =>
-              router.push(`/user/badge/${badge.attestationUID}/revoke`)
-            }
-          >
-            <CircleX size={16} />
-            Revoke
-          </Button>
-          <Button
-            className="h-fit py-1 px-2"
-            variant="green"
-            onClick={() =>
-              router.push(`/user/badge/${badge.attestationUID}/reissue`)
-            }
-          >
-            <Send size={16} />
-            Reissue
-          </Button>
-        </div>
-        <Separator />
-      </div>
+      <Separator />
 
       <p className="text-sm font-medium text-center text-muted-foreground mt-2">
         {badge.description}

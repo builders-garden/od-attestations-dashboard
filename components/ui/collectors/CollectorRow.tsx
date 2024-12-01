@@ -1,5 +1,5 @@
 import { useEnsProfile } from "@/components/hooks/useEnsProfile";
-import { multisigSigners } from "@/lib/constants";
+import { adminAddresses } from "@/lib/constants";
 import { getUserUniqueAttestations } from "@/lib/eas";
 import { Attestation } from "@/lib/eas/types";
 import { cn, shorten } from "@/lib/utils";
@@ -41,7 +41,7 @@ export default function CollectorRow({
       if (!account.address || !account.chain?.id) return;
       const userAttestations = await getUserUniqueAttestations(
         account.address,
-        multisigSigners,
+        adminAddresses,
         account.chain.id,
       );
       setUserAttestations(userAttestations);
@@ -88,7 +88,7 @@ export default function CollectorRow({
             <img
               src={ensProfile?.avatar ?? "/propic_placeholder.png"}
               alt="avatar"
-              className="w-8 h-8 rounded-full"
+              className="w-8 h-8 rounded-full object-cover"
             />
 
             <label

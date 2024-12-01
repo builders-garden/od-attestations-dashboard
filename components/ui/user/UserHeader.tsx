@@ -1,7 +1,6 @@
 "use client";
 import { motion } from "framer-motion";
 import { Separator } from "../separator";
-import { Menu } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,27 +8,35 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
-import { useDisconnect } from "wagmi";
-import { Attestation } from "@/lib/eas/types";
+import { Config, UseAccountReturnType, useDisconnect } from "wagmi";
+import { Squash as Hamburger } from "hamburger-react";
 import { useCountUp } from "@/components/hooks/useCountUp";
+import { useState } from "react";
+import { useEnsProfile } from "@/components/hooks/useEnsProfile";
+import { adminAddresses } from "@/lib/constants";
+import { Attestation } from "@/lib/eas/types";
 
 interface UserHeaderProps {
-  isAdmin: boolean;
-  userAttestationsLength: number;
+  account: UseAccountReturnType<Config>;
+  userAttestations: Attestation[];
 }
 
 export default function UserHeader({
-  isAdmin,
-  userAttestationsLength,
+  account,
+  userAttestations,
 }: UserHeaderProps) {
   const router = useRouter();
   const { disconnect } = useDisconnect();
-  const userAttestationsCount = useCountUp(userAttestationsLength, 2000); // 2 seconds duration
+  const userAttestationsCount = useCountUp(userAttestations.length, 2000);
+  const { ensProfile, loadingProfile } = useEnsProfile(account.address!);
+  const [isOpen, setIsOpen] = useState(false);
+
+  const isAdmin = account.address! in adminAddresses;
 
   return (
     <>
       <motion.div
-        className="flex flex-row justify-between items-start w-full"
+        className="flex flex-row justify-between items-center w-full"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
@@ -38,53 +45,72 @@ export default function UserHeader({
           <h1 className="text-2xl font-black text-start text-black">
             GM Dreamer!👋
           </h1>
-          <div className="text-sm text-start text-black">
-            You currently hold{" "}
-            <span>
-              {userAttestationsCount +
-                (userAttestationsCount !== 1 ? " badges" : " badge")}
-            </span>
-          </div>
+          {userAttestations.length ? (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-sm text-start text-black"
+            >
+              You currently hold{" "}
+              <span>
+                {userAttestationsCount +
+                  (userAttestationsCount !== 1 ? " badges" : " badge")}
+              </span>
+            </motion.div>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="bg-skeleton h-5 w-40 rounded-md animate-pulse"
+            />
+          )}
         </div>
-        {isAdmin ? (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Menu
-                size={40}
-                className="text-primary cursor-pointer hover:text-primary/70 transition-all duration-200 ease-in-out"
-              />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem
-                className="cursor-pointer"
-                onClick={() => router.push("/user/new-schema")}
-              >
-                New Schema
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className="cursor-pointer"
-                onClick={() => router.push("/user/new-badge")}
-              >
-                New Badge
-              </DropdownMenuItem>
-              <DropdownMenuItem className="cursor-pointer">
-                Proposals
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className="cursor-pointer"
-                onClick={() => disconnect()}
-              >
-                Logout
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        ) : (
-          <img
-            alt="Profile Picture"
-            src="./propic_placeholder.png"
-            className="h-14 w-14"
-          />
-        )}
+        <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+          <DropdownMenuTrigger asChild>
+            <div className="flex justify-center items-center h-full cursor-pointer">
+              {isAdmin ? (
+                <Hamburger
+                  rounded
+                  toggled={isOpen}
+                  toggle={setIsOpen}
+                  color="#1A1AFF"
+                />
+              ) : !loadingProfile ? (
+                <img
+                  src={ensProfile?.avatar ?? "/propic_placeholder.png"}
+                  alt="User avatar"
+                  className="w-12 h-12 rounded-full object-cover border-[1px] border-secondary"
+                />
+              ) : (
+                <div className="w-12 h-12 rounded-full animate-pulse bg-skeleton" />
+              )}
+            </div>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            {isAdmin && (
+              <>
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onClick={() => router.push("/user/new-schema")}
+                >
+                  New Schema
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onClick={() => router.push("/user/new-badge")}
+                >
+                  New Badge
+                </DropdownMenuItem>
+              </>
+            )}
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onClick={() => disconnect()}
+            >
+              Logout
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </motion.div>
       <Separator />
     </>

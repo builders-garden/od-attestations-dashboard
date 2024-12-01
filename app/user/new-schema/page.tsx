@@ -4,22 +4,8 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { RegisterSchemaForm } from "@/components/ui/user/new-schema/RegisterSchemaForm";
 import { Wrapper } from "@/components/ui/wrapper";
-import { useAccount } from "wagmi";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { Clouds } from "@/components/ui/clouds";
 
 export default function NewSchemaPage() {
-  const account = useAccount();
-
-  if (!account.isConnecting && !account.address) {
-    return (
-      <Wrapper className="justify-center overflow-hidden">
-        <ConnectButton />
-        <Clouds />
-      </Wrapper>
-    );
-  }
-
   return (
     <Wrapper>
       <div className="flex flex-col gap-6 w-full">

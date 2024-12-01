@@ -1,5 +1,5 @@
 import { useEnsProfile } from "@/components/hooks/useEnsProfile";
-import { multisigSigners } from "@/lib/constants";
+import { adminAddresses } from "@/lib/constants";
 import { getUserUniqueAttestations } from "@/lib/eas";
 import { Attestation } from "@/lib/eas/types";
 import { cn, shorten } from "@/lib/utils";
@@ -30,7 +30,7 @@ export default function CollectorRowWithInfo({
       if (!collector || !account.chain?.id) return;
       const userAttestations = await getUserUniqueAttestations(
         collector,
-        multisigSigners,
+        adminAddresses,
         account.chain.id,
       );
       setUserAttestations(userAttestations);

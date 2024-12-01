@@ -1,15 +1,13 @@
 "use client";
-import { Clouds } from "@/components/ui/clouds";
 import UserBadges from "@/components/ui/user/UserBadges";
 import UserHeader from "@/components/ui/user/UserHeader";
 import { Wrapper } from "@/components/ui/wrapper";
-import { multisigSigners } from "@/lib/constants";
+import { adminAddresses } from "@/lib/constants";
 import {
   getUserUniqueAttestations,
   getEveryUniqueAttestation,
 } from "@/lib/eas";
 import { Attestation } from "@/lib/eas/types";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 
@@ -23,14 +21,14 @@ export default function UserHome() {
     const fetchAttestations = async () => {
       if (!account.address || !account.chain?.id) return;
       const allAttestations = await getEveryUniqueAttestation(
-        multisigSigners,
+        adminAddresses,
         account.chain.id,
       );
       setAllAttestations(allAttestations);
 
       const userAttestations = await getUserUniqueAttestations(
         account.address,
-        multisigSigners,
+        adminAddresses,
         account.chain.id,
       );
       setUserAttestations(userAttestations);
@@ -41,21 +39,9 @@ export default function UserHome() {
     fetchAttestations();
   }, [account.address, account.chain?.id]);
 
-  if (!account.isConnecting && !account.address) {
-    return (
-      <Wrapper className="justify-center overflow-hidden">
-        <ConnectButton />
-        <Clouds />
-      </Wrapper>
-    );
-  }
-
   return (
     <Wrapper>
-      <UserHeader
-        userAttestationsLength={userAttestations.length}
-        isAdmin={true}
-      />
+      <UserHeader userAttestations={userAttestations} account={account} />
       {!loadingAttestations && (
         <UserBadges
           allAttestations={allAttestations}
