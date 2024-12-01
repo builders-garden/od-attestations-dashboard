@@ -5,7 +5,7 @@ import { Attestation } from "@/lib/eas/types";
 import { cn, shorten } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { Check, CircleX } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 
 interface CollectorRowProps {
@@ -14,9 +14,9 @@ interface CollectorRowProps {
   selectable?: boolean;
   selected?: boolean;
   removable?: boolean;
-
   onClick?: () => void;
   handleRemove?: (collector: string) => void;
+  setCollectorsEns?: Dispatch<SetStateAction<Record<string, string>>>;
 }
 
 export default function CollectorRow({
@@ -27,6 +27,7 @@ export default function CollectorRow({
   removable,
   onClick,
   handleRemove,
+  setCollectorsEns,
 }: CollectorRowProps) {
   const isAddress = collector.startsWith("0x");
   const name = isAddress ? shorten(collector) : collector;
@@ -51,6 +52,15 @@ export default function CollectorRow({
   }, [account.address, account.chain?.id]);
 
   const isFetching = loadingProfile || !userAttestations;
+
+  useEffect(() => {
+    if (ensProfile && setCollectorsEns) {
+      setCollectorsEns((prev) => ({
+        ...prev,
+        [collector]: ensProfile.name ?? "",
+      }));
+    }
+  }, [ensProfile, setCollectorsEns, collector]);
 
   return (
     <motion.div

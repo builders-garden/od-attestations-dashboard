@@ -44,6 +44,9 @@ export default function BadgeRevokePage({
   const collectors = allAttestationsOfAKind.map(
     (attestation) => attestation.recipient,
   );
+  const [collectorsEns, setCollectorsEns] = useState<Record<string, string>>(
+    {},
+  );
 
   const [selectedCollectors, setSelectedCollectors] = useState<string[]>([]);
 
@@ -156,7 +159,7 @@ export default function BadgeRevokePage({
                   className={cn(
                     "w-fit transition-all duration-200 ease-in-out",
                     atLeastOneSelected && "w-fit px-4",
-                    !atLeastOneSelected && "w-0 p-0",
+                    !atLeastOneSelected && "text-transparent w-0 p-0",
                   )}
                 >
                   Reset Selection
@@ -164,7 +167,11 @@ export default function BadgeRevokePage({
               </div>
               <div className="flex flex-col gap-3 w-full max-h-[50rem] overflow-y-auto">
                 {collectors
-                  .filter((collector) => collector.includes(input))
+                  .filter(
+                    (collector) =>
+                      collector.includes(input) ||
+                      collectorsEns[collector]?.includes(input),
+                  )
                   .map((collector, index) => (
                     <CollectorRow
                       key={index}
@@ -172,6 +179,7 @@ export default function BadgeRevokePage({
                       selectable
                       selected={selectedCollectors.includes(collector)}
                       onClick={() => handleSelect(collector)}
+                      setCollectorsEns={setCollectorsEns}
                     />
                   ))}
               </div>
