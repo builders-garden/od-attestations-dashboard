@@ -32,7 +32,7 @@ export default function BadgeInfo({
         <>
           <div className="flex gap-3 items-center justify-center">
             <Link
-              href={`https://sepolia.easscan.org/attestation/view/${badge.attestationUID}`} // TODO: change to Base
+              href={`https://sepolia.easscan.org/attestation/view/${badge.attestationUID}`}
               className="flex justify-start items-center gap-2 px-2 h-7 bg-primary rounded-md"
               target="_blank"
             >
@@ -76,7 +76,7 @@ export default function BadgeInfo({
 
       <Separator />
 
-      <p className="text-sm font-medium text-center text-muted-foreground mt-2">
+      <p className="text-sm font-medium text-center text-muted-foreground">
         {badge.description}
       </p>
     </>

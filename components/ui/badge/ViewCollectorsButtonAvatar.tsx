@@ -13,7 +13,7 @@ export const ViewCollectorsButtonAvatar: React.FC<{
     return (
       <div
         className={
-          "flex justify-center items-center rounded-full w-4 h-4 p-2.5 text-xs bg-skeleton"
+          "flex justify-center items-center rounded-full w-4 h-4 p-2.5 text-xs bg-skeleton animate-pulse"
         }
       />
     );

@@ -27,7 +27,9 @@ export const Wrapper = ({ children, className }: WrapperProps) => {
       >
         {!account.isConnected ? (
           <>
-            <ConnectButton />
+            <div className="flex m-auto">
+              <ConnectButton />
+            </div>
             <Clouds />
           </>
         ) : (

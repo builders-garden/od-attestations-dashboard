@@ -57,7 +57,7 @@ export default function BadgePage({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="flex flex-col justify-center items-center w-full mt-6 gap-2.5"
+              className="flex flex-col justify-center items-center w-full gap-2.5"
             >
               <BadgeInfo
                 badge={badge}

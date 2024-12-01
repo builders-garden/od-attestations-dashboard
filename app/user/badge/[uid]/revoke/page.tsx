@@ -124,7 +124,6 @@ export default function BadgeRevokePage({
                   >
                     Easscan
                   </LinkTextWithIcon>
-                  {/* TODO: Change to base */}
                 </div>
               ) : (
                 <div className="flex w-full justify-between items-center">

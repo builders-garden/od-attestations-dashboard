@@ -31,7 +31,7 @@ export default function BadgeCard({ badge, index }: BadgeProps) {
   return (
     <Link href={`/user/badge/${attestationUID}`}>
       <motion.div
-        className="flex flex-col justify-between items-center w-full h-full pt-3 pb-5 gap-2 hover:bg-secondary-dark bg-secondary rounded-lg"
+        className="flex flex-col justify-between items-center w-full h-full pt-3 pb-5 gap-2 hover:bg-secondary-dark bg-secondary rounded-lg transition-all duration-200 ease-in-out"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: unlocked ? 1 : 0.5, y: 0 }}
         transition={{ duration: 0.5, delay: index * 0.25 }}
