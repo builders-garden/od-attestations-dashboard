@@ -71,3 +71,17 @@ query Attestations($where: AttestationWhereInput, $distinct: [AttestationScalarF
   }
 }
 `;
+
+export const SchemasNamesQuery = `
+query Attestations($where: AttestationWhereInput, $orderBy: [AttestationOrderByWithRelationInput!]) {
+  attestations(where: $where, orderBy: $orderBy) {
+    data
+    decodedDataJson
+    timeCreated
+    schemaId
+    refUID
+    recipient
+    attester
+  }
+}
+`;

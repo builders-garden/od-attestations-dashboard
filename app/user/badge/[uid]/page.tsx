@@ -24,6 +24,7 @@ export default function BadgePage({
     sourceAttestation,
     account,
   });
+  const isAdmin = account.address && adminAddresses.includes(account.address);
 
   return (
     <Wrapper className="justify-between">
@@ -83,7 +84,7 @@ export default function BadgePage({
         )}
       </div>
 
-      {account.address! in adminAddresses && badge && (
+      {isAdmin && badge && (
         <div className="flex w-full gap-4">
           <Link
             href={`/user/badge/${badge.attestationUID}/revoke`}

@@ -15,6 +15,7 @@ import { useState } from "react";
 import { useEnsProfile } from "@/components/hooks/useEnsProfile";
 import { adminAddresses } from "@/lib/constants";
 import { Attestation } from "@/lib/eas/types";
+import Link from "next/link";
 
 interface UserHeaderProps {
   account: UseAccountReturnType<Config>;
@@ -31,7 +32,7 @@ export default function UserHeader({
   const { ensProfile, loadingProfile } = useEnsProfile(account.address!);
   const [isOpen, setIsOpen] = useState(false);
 
-  const isAdmin = account.address! in adminAddresses;
+  const isAdmin = account.address && adminAddresses.includes(account.address);
 
   return (
     <>
@@ -89,17 +90,15 @@ export default function UserHeader({
           <DropdownMenuContent align="end">
             {isAdmin && (
               <>
-                <DropdownMenuItem
-                  className="cursor-pointer"
-                  onClick={() => router.push("/user/new-schema")}
-                >
-                  New Schema
+                <DropdownMenuItem className="cursor-pointer w-full">
+                  <Link href="/user/new-schema" className="w-full">
+                    New Schema
+                  </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                  className="cursor-pointer"
-                  onClick={() => router.push("/user/new-badge")}
-                >
-                  New Badge
+                <DropdownMenuItem className="cursor-pointer w-full">
+                  <Link href="/user/new-badge" className="w-full">
+                    New Badge
+                  </Link>
                 </DropdownMenuItem>
               </>
             )}

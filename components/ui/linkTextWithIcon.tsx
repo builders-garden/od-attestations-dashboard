@@ -9,7 +9,7 @@ const LinkTextWithIcon: React.FC<{
     <div className="flex items-center gap-1">
       <Link
         href={href}
-        className="text-primary-light leading-none"
+        className="text-primary-light leading-none hover:underline"
         target="_blank"
       >
         {children}

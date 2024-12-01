@@ -28,7 +28,7 @@ export const getEnsProfile = async (address: `0x${string}`) => {
     return { name: ensName, avatar };
   } catch (e) {
     console.log(e);
-    return { name: "", avatar: "" };
+    return { name: "", avatar: undefined };
   }
 };
 

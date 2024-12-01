@@ -68,6 +68,7 @@ export default function NewBadgePage() {
           selectedSchema={selectedSchema}
           setSelectedSchema={setSelectedSchema}
           setSchemaFields={setSchemaFields}
+          account={account}
         />
 
         <NewBadgeForm

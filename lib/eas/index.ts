@@ -1,5 +1,11 @@
-import { GRAPHQL_ENDPOINTS } from "./constants";
-import { AttestationQuery, AttestationsQuery, SchemasQuery } from "./queries";
+import { multisigAddress } from "../constants";
+import { EAS_NAME_SCHEMA_UID, GRAPHQL_ENDPOINTS } from "./constants";
+import {
+  AttestationQuery,
+  AttestationsQuery,
+  SchemasNamesQuery,
+  SchemasQuery,
+} from "./queries";
 import {
   Attestation,
   AttestationsResponse,
@@ -364,6 +370,56 @@ export const getAllAttestationsOfAKind = async (
     return payload.data.attestations;
   } catch (e) {
     console.log(e);
+    return [];
+  }
+};
+
+/**
+ * A function to get all the attestation names of one or more schemas.
+ * @param schemaIds - An array of schema IDs.
+ * @param chainId - The chain ID of the blockchain where the attestations are registered.
+ * @returns An array of Attestations or [] if there was an error - data and decodedDataJson will contain the schema name.
+ */
+export const getSchemasNamesAttestations = async (
+  schemaIds: string[],
+  chainId: number | undefined,
+): Promise<Attestation[]> => {
+  if (!chainId || schemaIds.length === 0) {
+    console.log("Chain ID or schema IDs were not provided.");
+    return [];
+  }
+
+  const endpoint = GRAPHQL_ENDPOINTS[chainId as keyof typeof GRAPHQL_ENDPOINTS];
+
+  try {
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        query: SchemasNamesQuery,
+        variables: {
+          where: {
+            schemaId: {
+              equals: EAS_NAME_SCHEMA_UID,
+            },
+            attester: {
+              equals: multisigAddress,
+            },
+            OR: schemaIds.map((id) => ({
+              decodedDataJson: {
+                contains: id,
+              },
+            })),
+          },
+        },
+      }),
+    });
+    const payload: AttestationsResponse = await response.json();
+    return payload.data.attestations;
+  } catch (e) {
+    console.error(e);
     return [];
   }
 };

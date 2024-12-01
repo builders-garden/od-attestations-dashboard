@@ -1,3 +1,5 @@
+import { SchemaItem } from "@ethereum-attestation-service/eas-sdk";
+
 const ETHEREUM_CHAIN_ID = 1;
 const ETHEREUM_SEPOLIA_CHAIN_ID = 11155111;
 const BASE_CHAIN_ID = 8453;
@@ -31,3 +33,6 @@ export const EAS_CONTRACT_ADDRESSES = {
   [BASE_SEPOLIA_CHAIN_ID]:
     "0x4200000000000000000000000000000000000021" as `0x${string}`,
 };
+
+export const EAS_NAME_SCHEMA_UID =
+  "0x44d562ac1d7cd77e232978687fea027ace48f719cf1d58c7888e509663bb87fc" as `0x${string}`;

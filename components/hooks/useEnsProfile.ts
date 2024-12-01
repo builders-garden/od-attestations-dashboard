@@ -7,6 +7,7 @@ export function useEnsProfile(address: `0x${string}`) {
 
   useEffect(() => {
     const fetchEnsProfile = async () => {
+      if (!address) return;
       const profile = await getEnsProfile(address);
       // if no ENS profile is found, simulate a small delay
       if (!profile.name) {
