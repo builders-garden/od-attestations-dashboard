@@ -1,8 +1,11 @@
 import { cn } from "@/lib/utils";
 import { Input } from "../input";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Button } from "../button";
 import CollectorRow from "./CollectorRow";
+import { isAddress } from "viem";
+import { getEnsAddress } from "@/lib/ens";
+import { toast } from "sonner";
 
 export interface InputCollectorListProps {
   collectors: string[];
@@ -14,17 +17,34 @@ export const InputCollectorList: React.FC<InputCollectorListProps> = ({
   setCollectors,
 }) => {
   const [input, setInput] = useState("");
+  const [inputIsValid, setInputIsValid] = useState(false);
 
   const handleRemove = (collector: string) => {
     setCollectors((prev) => prev.filter((c) => c !== collector));
   };
 
-  const handleAdd = (collector: string) => {
+  const handleAdd = async (collector: string) => {
+    if (collector.endsWith(".eth")) {
+      const resolvedAddress = await getEnsAddress(collector as `${string}.eth`);
+      if (resolvedAddress) {
+        collector = resolvedAddress;
+      } else {
+        setInput("");
+        toast.error("The ENS address you added doesn't exist.", {
+          position: "top-right",
+        });
+        return;
+      }
+    }
     setCollectors((prev) =>
       prev.includes(collector) ? prev : [...prev, collector],
     );
     setInput("");
   };
+
+  useEffect(() => {
+    setInputIsValid(isAddress(input) || input.endsWith(".eth"));
+  }, [input]);
 
   return (
     <div className="flex flex-col w-full gap-3">
@@ -43,6 +63,7 @@ export const InputCollectorList: React.FC<InputCollectorListProps> = ({
         <Button
           type="button"
           onClick={() => handleAdd(input)}
+          disabled={!inputIsValid}
           className={cn(
             "w-fit transition-all duration-200 ease-in-out",
             input.length > 0 && "w-fit px-4",

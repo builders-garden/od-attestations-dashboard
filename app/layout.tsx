@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Providers from "../components/providers/Providers";
-
+import { Toaster } from "@/components/ui/sonner";
 import { Inter_Tight } from "next/font/google";
 
 const interTight = Inter_Tight({
@@ -23,7 +23,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${interTight.variable} font-inter antialiased`}>
-        <Providers>{children}</Providers>
+        <Providers>
+          <Toaster />
+          {children}
+        </Providers>
       </body>
     </html>
   );
