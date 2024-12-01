@@ -47,7 +47,7 @@ const formSchema = z.object({
   ),
 });
 
-const mandatoryFields: z.infer<typeof formSchema>["fields"] = [
+export const mandatoryFields: z.infer<typeof formSchema>["fields"] = [
   {
     fieldName: "BadgeTitle",
     fieldType: FieldType.String,
@@ -146,7 +146,7 @@ export const RegisterSchemaForm: React.FC = () => {
         </span>
       </div>
       <Form {...form}>
-        <form className="space-y-6 flex flex-col max-h-[528px] overflow-y-auto p-1">
+        <form className="space-y-6 flex flex-col p-1 mb-[132px]">
           {form.formState.errors.fields && (
             <FormMessage>
               {
@@ -247,7 +247,7 @@ export const RegisterSchemaForm: React.FC = () => {
               </div>
             ))}
 
-          <div className="flex flex-col gap-4 m-auto fixed bottom-0 left-0 right-0 bg-white p-4 w-full sm:max-w-md">
+          <div className="flex flex-col gap-4 m-auto fixed bottom-0 left-0 right-0 bg-white p-4 w-full sm:max-w-md shadow-2xl shadow-zinc-500 rounded-2xl">
             <Button
               type="button"
               className="w-full"

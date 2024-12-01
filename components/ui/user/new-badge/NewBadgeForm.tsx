@@ -150,6 +150,14 @@ export const NewBadgeForm: React.FC<NewBadgeFormProps> = ({
     form.handleSubmit(handleCreateBadge)();
   };
 
+  const currentFields = form.getValues("fields");
+  const requiredFields = ["BadgeTitle", "BadgeDescription", "BadgeImageCID"];
+  const missingFields = requiredFields.filter(
+    (field) => currentFields.find((f) => f.name === field)?.value === "",
+  );
+  const disableIssueButton =
+    missingFields.length > 0 || collectors.length === 0;
+
   return (
     <Form {...form}>
       <form className="space-y-6">
@@ -312,7 +320,7 @@ export const NewBadgeForm: React.FC<NewBadgeFormProps> = ({
           </Accordion>
         </div>
 
-        <div className="p-4 rounded-md border-[1px]">
+        <div className="p-4 rounded-md border-[1px] !mb-[80px]">
           <Accordion type="single" collapsible className="w-full">
             <AccordionItem value="collectors" className="border-none">
               <AccordionTrigger className="p-0 font-bold">
@@ -328,44 +336,47 @@ export const NewBadgeForm: React.FC<NewBadgeFormProps> = ({
           </Accordion>
         </div>
 
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button
-              type="button"
-              variant="success"
-              className="text-2xl px-8 py-6 rounded-lg w-full transition-opacity duration-200 ease-in-out"
-            >
-              Issue
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-sm gap-6">
-            <DialogHeader>
-              <DialogTitle className="text-center text-2xl font-extrabold">
-                Confirm New Badge Issuance
-              </DialogTitle>
-            </DialogHeader>
-            <DialogDescription className="text-center">
-              Are you sure you want to issue this badge?
-            </DialogDescription>
-            <DialogFooter className="sm:justify-start">
-              <DialogClose asChild>
-                <Button type="button" variant="outline" className="w-full">
-                  Cancel
-                </Button>
-              </DialogClose>
+        <div className="flex flex-col gap-4 m-auto fixed bottom-0 left-0 right-0 bg-white p-4 w-full sm:max-w-md shadow-2xl shadow-zinc-500 rounded-2xl">
+          <Dialog>
+            <DialogTrigger asChild>
               <Button
-                variant="success"
-                className="w-full"
                 type="button"
-                onClick={handleSubmit}
-                disabled={loading}
+                variant="success"
+                className="text-2xl px-8 py-6 rounded-lg w-full transition-opacity duration-200 ease-in-out"
+                disabled={disableIssueButton}
               >
-                {loading && <Loader2 className="animate-spin w-4" />}
-                Create
+                Issue
               </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+            </DialogTrigger>
+            <DialogContent className="max-w-sm gap-6">
+              <DialogHeader>
+                <DialogTitle className="text-center text-2xl font-extrabold">
+                  Confirm New Badge Issuance
+                </DialogTitle>
+              </DialogHeader>
+              <DialogDescription className="text-center">
+                Are you sure you want to issue this badge?
+              </DialogDescription>
+              <DialogFooter className="sm:justify-start">
+                <DialogClose asChild>
+                  <Button type="button" variant="outline" className="w-full">
+                    Cancel
+                  </Button>
+                </DialogClose>
+                <Button
+                  variant="success"
+                  className="w-full"
+                  type="button"
+                  onClick={handleSubmit}
+                  disabled={loading}
+                >
+                  {loading && <Loader2 className="animate-spin w-4" />}
+                  Create
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
       </form>
     </Form>
   );
