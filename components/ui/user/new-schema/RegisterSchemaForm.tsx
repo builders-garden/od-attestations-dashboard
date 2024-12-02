@@ -33,7 +33,9 @@ import { useState } from "react";
 import { SchemaRegistryAbi } from "@/lib/abi/SchemaRegistry";
 import { SCHEMA_REGISTRY_CONTRACT_ADDRESSES } from "@/lib/eas/constants";
 import { FieldType } from "@/lib/eas/types";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
+import { SafeDashboardDialog } from "../../safe-dashboard-dialog";
+import { toast } from "sonner";
 
 const formSchema = z.object({
   fields: z.array(
@@ -85,15 +87,17 @@ export const RegisterSchemaForm: React.FC = () => {
 
   const account = useAccount();
   const { writeContractAsync } = useWriteContract();
-  const [loading, setLoading] = useState(false);
+  const [openSafeDialog, setOpenSafeDialog] = useState(false);
+  const [openRegisterSchemaDialog, setOpenRegisterSchemaDialog] =
+    useState(false);
 
-  const registerSchema = async (
+  const registerSchema = (
     schemaAddress: `0x${string}`,
     schema: string,
     resolverAddress: `0x${string}`,
     isRevocable: boolean,
   ) => {
-    await writeContractAsync({
+    writeContractAsync({
       address: schemaAddress,
       abi: SchemaRegistryAbi,
       functionName: "register",
@@ -110,8 +114,7 @@ export const RegisterSchemaForm: React.FC = () => {
   const handleRegisterSchema = async (values: z.infer<typeof formSchema>) => {
     try {
       if (account.chain) {
-        setLoading(true);
-        await registerSchema(
+        registerSchema(
           SCHEMA_REGISTRY_CONTRACT_ADDRESSES[
             account.chain.id as keyof typeof SCHEMA_REGISTRY_CONTRACT_ADDRESSES
           ],
@@ -119,12 +122,14 @@ export const RegisterSchemaForm: React.FC = () => {
           "0x0000000000000000000000000000000000000000",
           true,
         );
-        setLoading(false);
+        setOpenRegisterSchemaDialog(false);
+        setOpenSafeDialog(true);
       }
     } catch (err) {
       console.error(err);
-      setLoading(false);
+      toast.error("An error occurred while registering the schema.");
     }
+    setOpenRegisterSchemaDialog(false);
   };
 
   const startFieldsIndex = mandatoryFields.length;
@@ -271,12 +276,23 @@ export const RegisterSchemaForm: React.FC = () => {
               Add Field
             </Button>
 
-            <Dialog>
+            <Dialog
+              open={openRegisterSchemaDialog}
+              onOpenChange={setOpenRegisterSchemaDialog}
+            >
               <DialogTrigger asChild>
                 <Button
                   type="button"
                   variant="success"
                   className="text-2xl px-8 py-6 rounded-lg w-full transition-opacity duration-200 ease-in-out"
+                  disabled={
+                    // @ts-ignore
+                    form.formState.errors.fields?.some((error) => error) ||
+                    // disabled if there are empty field names
+                    form.getValues().fields.some((field) => !field.fieldName) ||
+                    // disabled if there are no fields
+                    form.getValues().fields.length === mandatoryFields.length
+                  }
                   onClick={(e) => {
                     // @ts-ignore
                     if (form.formState.errors.fields?.some((error) => error)) {
@@ -291,6 +307,8 @@ export const RegisterSchemaForm: React.FC = () => {
                         message: "Field name cannot be empty.",
                       });
                       e.preventDefault();
+                    } else {
+                      setOpenRegisterSchemaDialog(true);
                     }
                   }}
                 >
@@ -316,15 +334,17 @@ export const RegisterSchemaForm: React.FC = () => {
                     variant="success"
                     className="w-full"
                     type="button"
-                    disabled={loading}
                     onClick={form.handleSubmit(handleRegisterSchema)}
                   >
-                    {loading && <Loader2 className="animate-spin w-4" />}
                     Create
                   </Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
+            <SafeDashboardDialog
+              open={openSafeDialog}
+              onOpenChange={setOpenSafeDialog}
+            />
           </div>
         </form>
       </Form>
