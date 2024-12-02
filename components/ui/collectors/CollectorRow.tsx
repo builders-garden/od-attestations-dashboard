@@ -1,13 +1,8 @@
-import { useEnsProfiles } from "@/components/hooks/useEnsProfile";
-import { adminAddresses } from "@/lib/constants";
-import { getUserUniqueAttestations } from "@/lib/eas";
-import { Attestation } from "@/lib/eas/types";
 import { EnsProfileType } from "@/lib/ens";
 import { cn, shorten } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { Check, CircleX } from "lucide-react";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { useAccount } from "wagmi";
+import { Dispatch, SetStateAction, useEffect } from "react";
 
 interface CollectorRowProps {
   profile: EnsProfileType;

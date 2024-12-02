@@ -9,7 +9,7 @@ export function useEnsProfiles(addresses: `0x${string}`[]) {
     const fetchEnsProfiles = async () => {
       if (addresses.length === 0) {
         setLoadingProfiles(false);
-        return;
+        setEnsProfiles([]);
       }
       const profiles = await getEnsProfiles(addresses);
       setEnsProfiles(profiles);
