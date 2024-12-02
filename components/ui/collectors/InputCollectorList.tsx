@@ -30,9 +30,7 @@ export const InputCollectorList: React.FC<InputCollectorListProps> = ({
         collector = resolvedAddress;
       } else {
         setInput("");
-        toast.error("The ENS address you added doesn't exist.", {
-          position: "top-right",
-        });
+        toast.error("The ENS address you added doesn't exist.");
         return;
       }
     }

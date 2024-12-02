@@ -147,9 +147,7 @@ export const NewBadgeForm: React.FC<NewBadgeFormProps> = ({
     } catch (err) {
       console.error(err);
       setOpenTxDialog(false);
-      toast.error("Failed to issue badge, please try again.", {
-        position: "top-right",
-      });
+      toast.error("Failed to issue badge, please try again.");
     }
   };
 

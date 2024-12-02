@@ -11,7 +11,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
-import { Loader2 } from "lucide-react";
 import { easAttest } from "@/lib/eas/calls";
 import {
   EAS_CONTRACT_ADDRESSES,
@@ -22,14 +21,17 @@ import {
   SchemaItem,
 } from "@ethereum-attestation-service/eas-sdk";
 import { useWriteContract } from "wagmi";
+import { SafeDashboardDialog } from "../../safe-dashboard-dialog";
+import { toast } from "sonner";
 
 export const ChangeSchemaName: React.FC<{
   schemaId: string | undefined;
   chainId: number | undefined;
 }> = ({ schemaId, chainId }) => {
   const [schemaName, setSchemaName] = useState("");
-  const [loading, setLoading] = useState(false);
   const { writeContract } = useWriteContract();
+  const [openChangeNameDialog, setOpenChangeNameDialog] = useState(false);
+  const [openSafeDialog, setOpenSafeDialog] = useState(false);
 
   const dataToEncode: SchemaItem[] = [
     {
@@ -45,7 +47,6 @@ export const ChangeSchemaName: React.FC<{
   ];
 
   const handleChangeName = () => {
-    setLoading(true);
     try {
       if (schemaName && chainId) {
         const schemaEncoder = new SchemaEncoder("bytes32 schemaId,string name");
@@ -61,51 +62,64 @@ export const ChangeSchemaName: React.FC<{
             true,
           ),
         );
+        setOpenSafeDialog(true);
       }
     } catch (err) {
       console.error(err);
+      toast.error("An error occurred while changing the schema name.");
     }
-    setLoading(false);
+    setOpenChangeNameDialog(false);
   };
 
   return (
-    <Dialog onOpenChange={() => setSchemaName("")}>
-      <DialogTrigger asChild>
-        <Button className="w-1/2 transition-opacity duration-200 ease-in-out">
-          Change Name
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="max-w-sm gap-6">
-        <DialogHeader>
-          <DialogTitle>Change Schema Name</DialogTitle>
-        </DialogHeader>
-        <DialogDescription className="flex flex-col gap-2">
-          <span>Choose a new name for your schema.</span>
-          <Input
-            placeholder="My Beatiful Schema"
-            className="focus-visible:ring-primary w-full"
-            value={schemaName}
-            onChange={(e) => setSchemaName(e.target.value)}
-          />
-        </DialogDescription>
-        <DialogFooter className="sm:justify-start">
-          <DialogClose asChild>
-            <Button type="button" variant="outline" className="w-full">
-              Cancel
-            </Button>
-          </DialogClose>
-          <Button
-            variant="success"
-            className="w-full"
-            type="button"
-            onClick={handleChangeName}
-            disabled={!schemaName || loading}
-          >
-            {loading && <Loader2 className="animate-spin w-4" />}
-            Confirm
+    <>
+      <Dialog
+        open={openChangeNameDialog}
+        onOpenChange={(open) => {
+          setSchemaName("");
+          setOpenChangeNameDialog(open);
+        }}
+      >
+        <DialogTrigger asChild>
+          <Button className="w-1/2 transition-opacity duration-200 ease-in-out">
+            Change Name
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </DialogTrigger>
+        <DialogContent className="max-w-sm gap-6">
+          <DialogHeader>
+            <DialogTitle>Change Schema Name</DialogTitle>
+          </DialogHeader>
+          <DialogDescription className="flex flex-col gap-2">
+            <span>Choose a new name for your schema.</span>
+            <Input
+              placeholder="My Beatiful Schema"
+              className="focus-visible:ring-primary w-full"
+              value={schemaName}
+              onChange={(e) => setSchemaName(e.target.value)}
+            />
+          </DialogDescription>
+          <DialogFooter className="sm:justify-start">
+            <DialogClose asChild>
+              <Button type="button" variant="outline" className="w-full">
+                Cancel
+              </Button>
+            </DialogClose>
+            <Button
+              variant="success"
+              className="w-full"
+              type="button"
+              onClick={handleChangeName}
+              disabled={!schemaName}
+            >
+              Confirm
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <SafeDashboardDialog
+        open={openSafeDialog}
+        onOpenChange={setOpenSafeDialog}
+      />
+    </>
   );
 };
