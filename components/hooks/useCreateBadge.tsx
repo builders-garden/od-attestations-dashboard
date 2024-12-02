@@ -31,6 +31,7 @@ export const useCreateBadge = (uid: string, account: UseAccountReturnType) => {
       let badgeImageURL = "";
       let badgeTitle = "";
       let badgeDescription = "";
+      let details: { name: string; value: string }[] = [];
       for (const element of attestationDecodedDataArray) {
         if (element.value.name === "BadgeTitle") {
           badgeTitle = element.value.value as string;
@@ -38,6 +39,33 @@ export const useCreateBadge = (uid: string, account: UseAccountReturnType) => {
           badgeImageURL = await getImageFromIpfs(element.value.value as string);
         } else if (element.value.name === "BadgeDescription") {
           badgeDescription = element.value.value as string;
+        } else if (element.value.name === "ODPassport") {
+          continue;
+        } else {
+          if (
+            (
+              element.value.value as {
+                type: string;
+              }
+            ).type === "BigNumber"
+          ) {
+            details.push({
+              name: element.value.name,
+              value: parseInt(
+                (
+                  element.value.value as {
+                    hex: string;
+                  }
+                ).hex,
+                16,
+              ).toString(),
+            });
+          } else {
+            details.push({
+              name: element.value.name,
+              value: String(element.value.value),
+            });
+          }
         }
       }
 
@@ -48,6 +76,7 @@ export const useCreateBadge = (uid: string, account: UseAccountReturnType) => {
         badgeDescription,
         attestation.id,
         attestation.timeCreated,
+        details,
       );
       setBadge(badge);
       setSourceAttestation(attestation);

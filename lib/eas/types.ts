@@ -64,6 +64,13 @@ export type AttestationDecodedDataType = {
   value: {
     name: string;
     type: string;
-    value: string | number | boolean;
+    value:
+      | string
+      | number
+      | boolean
+      | {
+          type: string;
+          hex: string;
+        };
   };
 };

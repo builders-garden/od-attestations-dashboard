@@ -5,6 +5,7 @@ class Badge {
   unlocked: boolean;
   attestationUID: string;
   timeCreated: number;
+  details: { name: string; value: string }[];
 
   constructor(
     image: string,
@@ -13,6 +14,7 @@ class Badge {
     description: string,
     attestationUID: string,
     timeCreated: number,
+    details: { name: string; value: string }[],
   ) {
     this.image = image;
     this.title = title;
@@ -20,6 +22,7 @@ class Badge {
     this.description = description;
     this.attestationUID = attestationUID;
     this.timeCreated = timeCreated;
+    this.details = details;
   }
 
   getBadgeInfo() {
@@ -30,6 +33,7 @@ class Badge {
       unlocked: this.unlocked,
       attestationUID: this.attestationUID,
       timeCreated: this.timeCreated,
+      details: this.details,
     };
   }
 }
