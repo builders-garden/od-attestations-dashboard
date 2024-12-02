@@ -13,10 +13,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { LinkTextWithIcon } from "@/components/ui/linkTextWithIcon";
-import { cn } from "@/lib/utils";
 import { SchemaEncoder } from "@ethereum-attestation-service/eas-sdk";
 import { motion } from "framer-motion";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { use, useState } from "react";
 import { useAccount, useWriteContract } from "wagmi";
@@ -24,6 +23,8 @@ import { easMultiAttest } from "@/lib/eas/calls";
 import { EAS_CONTRACT_ADDRESSES } from "@/lib/eas/constants";
 import { AttestationDecodedDataType } from "@/lib/eas/types";
 import { Wrapper } from "@/components/ui/wrapper";
+import { SafeDashboardDialog } from "@/components/ui/safe-dashboard-dialog";
+import { toast } from "sonner";
 
 export default function BadgeReissuePage({
   params,
@@ -33,12 +34,12 @@ export default function BadgeReissuePage({
   const { uid } = use(params);
   const account = useAccount();
   const { badge, sourceAttestation, notFound } = useCreateBadge(uid, account);
-  const [loading, setLoading] = useState<boolean>(false);
   const [collectors, setCollectors] = useState<string[]>([]);
   const { writeContract } = useWriteContract();
+  const [openSafeDialog, setOpenSafeDialog] = useState(false);
+  const [openReissueDialog, setOpenReissueDialog] = useState(false);
 
   const handleReissueBadges = () => {
-    setLoading(true);
     try {
       if (account.chain && sourceAttestation) {
         const schemaEncoder = new SchemaEncoder(
@@ -60,11 +61,14 @@ export default function BadgeReissuePage({
             true,
           ),
         );
+        setOpenReissueDialog(false);
+        setOpenSafeDialog(true);
       }
     } catch (err) {
       console.error(err);
+      toast.error("An error occurred while reissuing the badge.");
+      setOpenReissueDialog(false);
     }
-    setLoading(false);
   };
 
   return (
@@ -134,14 +138,11 @@ export default function BadgeReissuePage({
         )}
       </div>
 
-      <Dialog>
+      <Dialog open={openReissueDialog} onOpenChange={setOpenReissueDialog}>
         <DialogTrigger asChild>
           <Button
-            className={cn(
-              "text-2xl px-8 py-6 rounded-lg w-full transition-opacity duration-200 ease-in-out",
-              collectors.length > 0 && "opacity-1",
-              collectors.length === 0 && "opacity-0",
-            )}
+            className="text-2xl px-8 py-6 rounded-lg w-full transition-opacity duration-200 ease-in-out"
+            disabled={collectors.length === 0}
             variant="success"
           >
             Reissue
@@ -167,14 +168,21 @@ export default function BadgeReissuePage({
               variant="success"
               className="w-full"
               onClick={handleReissueBadges}
-              disabled={loading}
             >
-              {loading && <Loader2 className="animate-spin w-4" />}
               Reissue
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      <SafeDashboardDialog
+        open={openSafeDialog}
+        onOpenChange={(open) => {
+          setOpenSafeDialog(open);
+          if (!open) {
+            setCollectors([]);
+          }
+        }}
+      />
     </Wrapper>
   );
 }

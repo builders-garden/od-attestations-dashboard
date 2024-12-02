@@ -16,14 +16,16 @@ import {
 import { Input } from "@/components/ui/input";
 import { LinkTextWithIcon } from "@/components/ui/linkTextWithIcon";
 import PaginatorButtons from "@/components/ui/paginatorButtons";
+import { SafeDashboardDialog } from "@/components/ui/safe-dashboard-dialog";
 import { Wrapper } from "@/components/ui/wrapper";
 import { easMultiRevoke } from "@/lib/eas/calls";
 import { EAS_CONTRACT_ADDRESSES } from "@/lib/eas/constants";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { ArrowLeft, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { use, useMemo, useState } from "react";
+import { toast } from "sonner";
 import { useAccount, useWriteContract } from "wagmi";
 
 export default function BadgeRevokePage({
@@ -34,7 +36,6 @@ export default function BadgeRevokePage({
   const { uid } = use(params);
   const account = useAccount();
   const { badge, sourceAttestation, notFound } = useCreateBadge(uid, account);
-  const [loading, setLoading] = useState<boolean>(false);
   const { writeContract } = useWriteContract();
   const { allAttestationsOfAKind } = useGetAllAttestationsOfAKind({
     sourceAttestation,
@@ -42,6 +43,8 @@ export default function BadgeRevokePage({
   });
   const [input, setInput] = useState("");
   const [selectedCollectors, setSelectedCollectors] = useState<string[]>([]);
+  const [openSafeDialog, setOpenSafeDialog] = useState(false);
+  const [openRevokeDialog, setOpenRevokeDialog] = useState(false);
 
   // Collectors logic
   const collectors = allAttestationsOfAKind.map(
@@ -76,7 +79,6 @@ export default function BadgeRevokePage({
   };
 
   const handleRevokeBadges = () => {
-    setLoading(true);
     try {
       if (account.chain && sourceAttestation) {
         const attestationUIDs = selectedCollectors.map(
@@ -92,11 +94,14 @@ export default function BadgeRevokePage({
             attestationUIDs,
           ),
         );
+        setOpenRevokeDialog(false);
+        setOpenSafeDialog(true);
       }
     } catch (err) {
       console.error(err);
+      toast.error("An error occurred while revoking the badge.");
+      setOpenRevokeDialog(false);
     }
-    setLoading(false);
   };
 
   return (
@@ -206,15 +211,12 @@ export default function BadgeRevokePage({
           </>
         )}
       </div>
-      <Dialog>
+      <Dialog open={openRevokeDialog} onOpenChange={setOpenRevokeDialog}>
         <DialogTrigger asChild>
           <Button
             variant="destructive"
-            className={cn(
-              "text-2xl px-8 py-6 rounded-lg w-full transition-opacity duration-200 ease-in-out",
-              atLeastOneSelected && "opacity-1",
-              !atLeastOneSelected && "opacity-0",
-            )}
+            className="text-2xl px-8 py-6 rounded-lg w-full transition-opacity duration-200 ease-in-out"
+            disabled={!atLeastOneSelected}
           >
             Revoke
           </Button>
@@ -239,14 +241,21 @@ export default function BadgeRevokePage({
               variant="destructive"
               className="w-full"
               onClick={handleRevokeBadges}
-              disabled={loading}
             >
-              {loading && <Loader2 className="animate-spin w-4" />}
               Revoke
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      <SafeDashboardDialog
+        open={openSafeDialog}
+        onOpenChange={(open) => {
+          setOpenSafeDialog(open);
+          if (!open) {
+            setSelectedCollectors([]);
+          }
+        }}
+      />
     </Wrapper>
   );
 }
