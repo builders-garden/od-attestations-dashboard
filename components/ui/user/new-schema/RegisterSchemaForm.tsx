@@ -33,6 +33,7 @@ import { useState } from "react";
 import { SchemaRegistryAbi } from "@/lib/abi/SchemaRegistry";
 import { SCHEMA_REGISTRY_CONTRACT_ADDRESSES } from "@/lib/eas/constants";
 import { FieldType } from "@/lib/eas/types";
+import { AnimatePresence, motion } from "framer-motion";
 
 const formSchema = z.object({
   fields: z.array(
@@ -83,7 +84,7 @@ export const RegisterSchemaForm: React.FC = () => {
   });
 
   const account = useAccount();
-  const { data: hash, error, writeContractAsync } = useWriteContract();
+  const { writeContractAsync } = useWriteContract();
   const [loading, setLoading] = useState(false);
 
   const registerSchema = async (
@@ -149,17 +150,23 @@ export const RegisterSchemaForm: React.FC = () => {
         <form className="space-y-6 flex flex-col p-1 mb-[132px]">
           {form.formState.errors.fields && (
             <FormMessage>
-              {
-                // @ts-ignore
-                form.formState.errors.fields.map(
-                  (error, i) =>
-                    error && (
-                      <span key={i} className="text-red-500 text-sm">
-                        {error.fieldName?.message}
-                      </span>
-                    ),
-                )
-              }
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.2 }}
+              >
+                {
+                  // @ts-ignore
+                  form.formState.errors.fields.map(
+                    (error, i) =>
+                      error && (
+                        <span key={i} className="text-red-500 text-sm">
+                          {error.fieldName?.message}
+                        </span>
+                      ),
+                  )
+                }
+              </motion.div>
             </FormMessage>
           )}
 
@@ -175,34 +182,40 @@ export const RegisterSchemaForm: React.FC = () => {
                   name={`fields.${startFieldsIndex + j}.fieldName` as const}
                   render={({ field }) => (
                     <FormItem className="w-2/5">
-                      <FormLabel>Field</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Field name"
-                          {...field}
-                          onChange={(e) => {
-                            field.onChange(e.target.value);
-                            const value = e.target.value;
-                            const isValid = /^[a-zA-Z]+$/.test(value);
-                            if (e.target.value && !isValid) {
-                              form.setError(
-                                `fields.${startFieldsIndex + j}.fieldName`,
-                                {
-                                  type: "manual",
-                                  message:
-                                    "The field names must not contain any special characters, numbers or spaces (and must not be empty).",
-                                },
-                              );
-                            } else {
-                              form.clearErrors(
-                                `fields.${startFieldsIndex + j}.fieldName`,
-                              );
-                            }
-                            field.onBlur();
-                          }}
-                        />
-                      </FormControl>
-                      <FormMessage />
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.1 }}
+                      >
+                        <FormLabel>Field</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Field name"
+                            {...field}
+                            onChange={(e) => {
+                              field.onChange(e.target.value);
+                              const value = e.target.value;
+                              const isValid = /^[a-zA-Z]+$/.test(value);
+                              if (e.target.value && !isValid) {
+                                form.setError(
+                                  `fields.${startFieldsIndex + j}.fieldName`,
+                                  {
+                                    type: "manual",
+                                    message:
+                                      "The field names must not contain any special characters, numbers or spaces (and must not be empty).",
+                                  },
+                                );
+                              } else {
+                                form.clearErrors(
+                                  `fields.${startFieldsIndex + j}.fieldName`,
+                                );
+                              }
+                              field.onBlur();
+                            }}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </motion.div>
                     </FormItem>
                   )}
                 />

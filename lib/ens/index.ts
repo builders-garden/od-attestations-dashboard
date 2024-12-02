@@ -17,6 +17,7 @@ export interface EnsProfileType {
  * @returns The ENS profile of the address
  */
 export const getEnsProfile = async (address: `0x${string}`) => {
+  return undefined;
   try {
     const ensName = await client.getEnsName({ address: address });
     let avatar: string | undefined = undefined;
@@ -28,7 +29,7 @@ export const getEnsProfile = async (address: `0x${string}`) => {
     return { name: ensName, avatar };
   } catch (e) {
     console.log(e);
-    return { name: "", avatar: undefined };
+    return;
   }
 };
 

@@ -1,5 +1,3 @@
-import { SchemaItem } from "@ethereum-attestation-service/eas-sdk";
-
 const ETHEREUM_CHAIN_ID = 1;
 const ETHEREUM_SEPOLIA_CHAIN_ID = 11155111;
 const BASE_CHAIN_ID = 8453;

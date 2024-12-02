@@ -31,7 +31,7 @@ export const useCreateBadge = (uid: string, account: UseAccountReturnType) => {
       let badgeImageURL = "";
       let badgeTitle = "";
       let badgeDescription = "";
-      let details: { name: string; value: string }[] = [];
+      const details: { name: string; value: string }[] = [];
       for (const element of attestationDecodedDataArray) {
         if (element.value.name === "BadgeTitle") {
           badgeTitle = element.value.value as string;

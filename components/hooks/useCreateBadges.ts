@@ -35,6 +35,7 @@ export const useCreateBadges = (
       let badgeImageCID = "";
       let badgeTitle = "";
       let badgeDescription = "";
+      const details: { name: string; value: string }[] = [];
       for (const element of attestationDecodedDataArray) {
         if (element.value.name === "BadgeTitle") {
           badgeTitle = element.value.value as string;
@@ -42,8 +43,36 @@ export const useCreateBadges = (
           badgeImageCID = element.value.value as string;
         } else if (element.value.name === "BadgeDescription") {
           badgeDescription = element.value.value as string;
+        } else if (element.value.name === "ODPassport") {
+          continue;
+        } else {
+          if (
+            (
+              element.value.value as {
+                type: string;
+              }
+            ).type === "BigNumber"
+          ) {
+            details.push({
+              name: element.value.name,
+              value: parseInt(
+                (
+                  element.value.value as {
+                    hex: string;
+                  }
+                ).hex,
+                16,
+              ).toString(),
+            });
+          } else {
+            details.push({
+              name: element.value.name,
+              value: String(element.value.value),
+            });
+          }
         }
       }
+
       const badge = new BadgeClass(
         badgeImageCID,
         badgeTitle,
@@ -51,6 +80,7 @@ export const useCreateBadges = (
         badgeDescription,
         attestation.id,
         attestation.timeCreated,
+        details,
       );
       allBadges.push(badge);
     });
@@ -73,6 +103,7 @@ export const useCreateBadges = (
       let badgeImageCID = "";
       let badgeTitle = "";
       let badgeDescription = "";
+      const details: { name: string; value: string }[] = [];
       for (const element of attestationDecodedDataArray) {
         if (element.value.name === "BadgeTitle") {
           badgeTitle = element.value.value as string;
@@ -80,6 +111,31 @@ export const useCreateBadges = (
           badgeImageCID = element.value.value as string;
         } else if (element.value.name === "BadgeDescription") {
           badgeDescription = element.value.value as string;
+        } else {
+          if (
+            (
+              element.value.value as {
+                type: string;
+              }
+            ).type === "BigNumber"
+          ) {
+            details.push({
+              name: element.value.name,
+              value: parseInt(
+                (
+                  element.value.value as {
+                    hex: string;
+                  }
+                ).hex,
+                16,
+              ).toString(),
+            });
+          } else {
+            details.push({
+              name: element.value.name,
+              value: String(element.value.value),
+            });
+          }
         }
       }
 
@@ -90,6 +146,7 @@ export const useCreateBadges = (
         badgeDescription,
         attestation.id,
         attestation.timeCreated,
+        details,
       );
       allBadges.push(badge);
     });

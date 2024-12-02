@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@ensdomains/ensjs": "^4.0.2",
     "@ethereum-attestation-service/eas-sdk": "^2.7.0",
     "@hookform/resolvers": "^3.9.1",
     "@radix-ui/react-accordion": "^1.2.1",
@@ -39,7 +40,7 @@
     "sonner": "^1.7.0",
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",
-    "viem": "2.x",
+    "viem": "^2.21.53",
     "wagmi": "^2.12.25",
     "zod": "^3.23.8"
   },

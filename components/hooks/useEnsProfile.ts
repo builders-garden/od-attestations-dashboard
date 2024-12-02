@@ -10,7 +10,7 @@ export function useEnsProfile(address: `0x${string}`) {
       if (!address) return;
       const profile = await getEnsProfile(address);
       // if no ENS profile is found, simulate a small delay
-      if (!profile.name) {
+      if (!profile?.name) {
         await new Promise((resolve) => setTimeout(resolve, 500));
       }
       setEnsProfile(profile);

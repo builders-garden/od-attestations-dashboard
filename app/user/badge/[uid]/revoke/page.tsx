@@ -15,14 +15,15 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { LinkTextWithIcon } from "@/components/ui/linkTextWithIcon";
+import PaginatorButtons from "@/components/ui/paginatorButtons";
 import { Wrapper } from "@/components/ui/wrapper";
 import { easMultiRevoke } from "@/lib/eas/calls";
 import { EAS_CONTRACT_ADDRESSES } from "@/lib/eas/constants";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import Link from "next/link";
-import { use, useState } from "react";
+import { use, useMemo, useState } from "react";
 import { useAccount, useWriteContract } from "wagmi";
 
 export default function BadgeRevokePage({
@@ -31,7 +32,6 @@ export default function BadgeRevokePage({
   params: Promise<{ uid: string }>;
 }) {
   const { uid } = use(params);
-
   const account = useAccount();
   const { badge, sourceAttestation, notFound } = useCreateBadge(uid, account);
   const [loading, setLoading] = useState<boolean>(false);
@@ -40,15 +40,28 @@ export default function BadgeRevokePage({
     sourceAttestation,
     account,
   });
+  const [input, setInput] = useState("");
+  const [selectedCollectors, setSelectedCollectors] = useState<string[]>([]);
 
+  // Collectors logic
   const collectors = allAttestationsOfAKind.map(
     (attestation) => attestation.recipient,
   );
   const [collectorsEns, setCollectorsEns] = useState<Record<string, string>>(
     {},
   );
+  const atLeastOneSelected = selectedCollectors.length > 0;
 
-  const [selectedCollectors, setSelectedCollectors] = useState<string[]>([]);
+  // Pagination logic
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
+
+  const paginatedCollectors = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return collectors.slice(startIndex, startIndex + itemsPerPage);
+  }, [collectors, currentPage]);
+
+  const totalPages = Math.ceil(allAttestationsOfAKind.length / itemsPerPage);
 
   const handleSelect = (collector: string) => {
     setSelectedCollectors((prev) =>
@@ -58,9 +71,9 @@ export default function BadgeRevokePage({
     );
   };
 
-  const [input, setInput] = useState("");
-
-  const atLeastOneSelected = selectedCollectors.length > 0;
+  const handleSelectAll = () => {
+    setSelectedCollectors(collectors);
+  };
 
   const handleRevokeBadges = () => {
     setLoading(true);
@@ -142,18 +155,16 @@ export default function BadgeRevokePage({
                   />
                 </div>
               )}
-              <div
-                className={cn(
-                  "flex w-full gap-0 justify-between",
-                  atLeastOneSelected && "gap-4",
-                )}
-              >
+              <div className="flex w-fulljustify-between gap-1">
                 <Input
                   placeholder="Search..."
                   className="focus-visible:ring-primary w-full"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                 />
+                <Button onClick={handleSelectAll} className="w-fit">
+                  Select All
+                </Button>
                 <Button
                   onClick={() => setSelectedCollectors([])}
                   className={cn(
@@ -161,12 +172,13 @@ export default function BadgeRevokePage({
                     atLeastOneSelected && "w-fit px-4",
                     !atLeastOneSelected && "text-transparent w-0 p-0",
                   )}
+                  variant="destructive"
                 >
-                  Reset Selection
+                  {atLeastOneSelected && "Reset"}
                 </Button>
               </div>
               <div className="flex flex-col gap-3 w-full max-h-[50rem] overflow-y-auto">
-                {collectors
+                {paginatedCollectors
                   .filter(
                     (collector) =>
                       collector.includes(input) ||
@@ -182,6 +194,13 @@ export default function BadgeRevokePage({
                       setCollectorsEns={setCollectorsEns}
                     />
                   ))}
+                {totalPages > 1 && (
+                  <PaginatorButtons
+                    currentPage={currentPage}
+                    setCurrentPage={setCurrentPage}
+                    totalPages={totalPages}
+                  />
+                )}
               </div>
             </div>
           </>

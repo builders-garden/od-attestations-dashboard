@@ -24,7 +24,6 @@ export default function BadgePage({
     sourceAttestation,
     account,
   });
-  const isAdmin = account.address && adminAddresses.includes(account.address);
 
   return (
     <Wrapper className="justify-between">
@@ -43,17 +42,14 @@ export default function BadgePage({
         </motion.div>
         {badge && allAttestationsOfAKind.length > 0 ? (
           <>
-            <motion.div
+            <motion.img
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-            >
-              <img
-                src={badge.image || "/badges/badge_placeholder.png"}
-                alt="logo"
-                className="w-52 h-52 rounded-full object-cover border-8 border-primary p-3"
-              />
-            </motion.div>
+              src={badge.image || "/badges/badge_placeholder.png"}
+              alt="logo"
+              className="w-[270px] h-[270px] rounded-full object-cover border-8 border-primary p-3"
+            />
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -84,8 +80,13 @@ export default function BadgePage({
         )}
       </div>
 
-      {isAdmin && badge && (
-        <div className="flex w-full gap-4">
+      {adminAddresses.includes(account.address!) && badge && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="flex w-full gap-4"
+        >
           <Link
             href={`/user/badge/${badge.attestationUID}/revoke`}
             className="w-full"
@@ -110,7 +111,7 @@ export default function BadgePage({
               Reissue
             </Button>
           </Link>
-        </div>
+        </motion.div>
       )}
     </Wrapper>
   );

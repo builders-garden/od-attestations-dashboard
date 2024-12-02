@@ -7,7 +7,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useRouter } from "next/navigation";
 import { Config, UseAccountReturnType, useDisconnect } from "wagmi";
 import { Squash as Hamburger } from "hamburger-react";
 import { useCountUp } from "@/components/hooks/useCountUp";
@@ -26,7 +25,6 @@ export default function UserHeader({
   account,
   userAttestations,
 }: UserHeaderProps) {
-  const router = useRouter();
   const { disconnect } = useDisconnect();
   const userAttestationsCount = useCountUp(userAttestations.length, 2000);
   const { ensProfile, loadingProfile } = useEnsProfile(account.address!);
@@ -46,7 +44,7 @@ export default function UserHeader({
           <h1 className="text-2xl font-black text-start text-black">
             GM Dreamer!👋
           </h1>
-          {userAttestations.length ? (
+          {userAttestations ? (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -77,13 +75,19 @@ export default function UserHeader({
                   color="#1A1AFF"
                 />
               ) : !loadingProfile ? (
-                <img
+                <motion.img
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
                   src={ensProfile?.avatar ?? "/propic_placeholder.png"}
                   alt="User avatar"
                   className="w-12 h-12 rounded-full object-cover border-[1px] border-secondary"
                 />
               ) : (
-                <div className="w-12 h-12 rounded-full animate-pulse bg-skeleton" />
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="w-12 h-12 rounded-full animate-pulse bg-skeleton"
+                />
               )}
             </div>
           </DropdownMenuTrigger>

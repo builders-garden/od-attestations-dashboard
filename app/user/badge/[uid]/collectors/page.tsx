@@ -11,6 +11,7 @@ import { useAccount } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { Wrapper } from "@/components/ui/wrapper";
 import { Icons } from "@/components/ui/icons";
+import PaginatorButtons from "@/components/ui/paginatorButtons";
 
 export default function BadgeCollectorsPage({
   params,
@@ -91,29 +92,11 @@ export default function BadgeCollectorsPage({
           </div>
 
           {totalPages > 1 && (
-            <div className="flex justify-center items-center gap-4 mt-4">
-              <Button
-                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
-                variant="outline"
-                size="icon"
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <span>
-                Page {currentPage} of {totalPages}
-              </span>
-              <Button
-                onClick={() =>
-                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                }
-                disabled={currentPage === totalPages}
-                variant="outline"
-                size="icon"
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
+            <PaginatorButtons
+              currentPage={currentPage}
+              setCurrentPage={setCurrentPage}
+              totalPages={totalPages}
+            />
           )}
         </motion.div>
       ) : (

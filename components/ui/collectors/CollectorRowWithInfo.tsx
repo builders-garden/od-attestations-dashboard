@@ -77,7 +77,7 @@ export default function CollectorRowWithInfo({
               className="w-8 h-8 rounded-full"
             />
 
-            <label className="font-medium font-mono">
+            <label className="font-medium font-mono cursor-pointer">
               {ensProfile?.name || shortedAddress}
             </label>
           </div>
