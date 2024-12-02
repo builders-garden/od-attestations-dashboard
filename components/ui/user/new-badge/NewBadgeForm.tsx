@@ -36,6 +36,8 @@ import { easMultiAttest } from "@/lib/eas/calls";
 import { EAS_CONTRACT_ADDRESSES } from "@/lib/eas/constants";
 import { getImageFromIpfs, uploadImageToIpfs } from "@/lib/ipfs";
 import { Checkbox } from "@/components/ui/checkbox";
+import { SafeDashboardDialog } from "@/components/ui/safe-dashboard-dialog";
+import { toast } from "sonner";
 
 const formSchema = z.object({
   fields: z.array(
@@ -62,7 +64,6 @@ export const NewBadgeForm: React.FC<NewBadgeFormProps> = ({
   selectedSchema,
   schemaFields,
 }) => {
-  const [loading, setLoading] = useState(false);
   const [imageLoading, setImageLoading] = useState(false);
   const { writeContract } = useWriteContract();
   const [collectors, setCollectors] = useState<string[]>([]);
@@ -70,6 +71,8 @@ export const NewBadgeForm: React.FC<NewBadgeFormProps> = ({
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string | undefined>(
     undefined,
   );
+  const [openTxDialog, setOpenTxDialog] = useState(false);
+  const [openSafeDialog, setOpenSafeDialog] = useState(false);
 
   const ODPASSPORT_BOOLEAN_FIELD = "ODPassport";
 
@@ -121,7 +124,6 @@ export const NewBadgeForm: React.FC<NewBadgeFormProps> = ({
   };
 
   const handleCreateBadge = (data: z.infer<typeof formSchema>) => {
-    setLoading(true);
     try {
       if (account.chain) {
         const schemaEncoder = new SchemaEncoder(
@@ -139,11 +141,16 @@ export const NewBadgeForm: React.FC<NewBadgeFormProps> = ({
             true,
           ),
         );
+        setOpenTxDialog(false);
+        setOpenSafeDialog(true);
       }
     } catch (err) {
       console.error(err);
+      setOpenTxDialog(false);
+      toast.error("Failed to issue badge, please try again.", {
+        position: "top-right",
+      });
     }
-    setLoading(false);
   };
 
   const handleSubmit = () => {
@@ -337,7 +344,7 @@ export const NewBadgeForm: React.FC<NewBadgeFormProps> = ({
         </div>
 
         <div className="flex flex-col gap-4 m-auto fixed bottom-0 left-0 right-0 bg-white p-4 w-full sm:max-w-md shadow-2xl shadow-zinc-500 rounded-2xl">
-          <Dialog>
+          <Dialog open={openTxDialog} onOpenChange={setOpenTxDialog}>
             <DialogTrigger asChild>
               <Button
                 type="button"
@@ -368,14 +375,16 @@ export const NewBadgeForm: React.FC<NewBadgeFormProps> = ({
                   className="w-full"
                   type="button"
                   onClick={handleSubmit}
-                  disabled={loading}
                 >
-                  {loading && <Loader2 className="animate-spin w-4" />}
                   Create
                 </Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
+          <SafeDashboardDialog
+            open={openSafeDialog}
+            onOpenChange={setOpenSafeDialog}
+          />
         </div>
       </form>
     </Form>
