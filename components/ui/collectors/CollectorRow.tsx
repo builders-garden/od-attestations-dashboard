@@ -1,7 +1,8 @@
-import { useEnsProfile } from "@/components/hooks/useEnsProfile";
+import { useEnsProfiles } from "@/components/hooks/useEnsProfile";
 import { adminAddresses } from "@/lib/constants";
 import { getUserUniqueAttestations } from "@/lib/eas";
 import { Attestation } from "@/lib/eas/types";
+import { EnsProfileType } from "@/lib/ens";
 import { cn, shorten } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { Check, CircleX } from "lucide-react";
@@ -9,7 +10,7 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 
 interface CollectorRowProps {
-  collector: string;
+  profile: EnsProfileType;
   index?: number;
   selectable?: boolean;
   selected?: boolean;
@@ -20,7 +21,7 @@ interface CollectorRowProps {
 }
 
 export default function CollectorRow({
-  collector,
+  profile,
   index = 0,
   selectable,
   selected,
@@ -29,52 +30,31 @@ export default function CollectorRow({
   handleRemove,
   setCollectorsEns,
 }: CollectorRowProps) {
-  const isAddress = collector.startsWith("0x");
-  const name = isAddress ? shorten(collector) : collector;
-  const { ensProfile, loadingProfile } = useEnsProfile(
-    collector as `0x${string}`,
-  );
-  const account = useAccount();
-  const [userAttestations, setUserAttestations] = useState<Attestation[]>();
+  const isAddress = profile.address.startsWith("0x");
+  const name = isAddress ? shorten(profile.address) : profile.name;
 
   useEffect(() => {
-    const fetchAttestations = async () => {
-      if (!account.address || !account.chain?.id) return;
-      const userAttestations = await getUserUniqueAttestations(
-        account.address,
-        adminAddresses,
-        account.chain.id,
-      );
-      setUserAttestations(userAttestations);
-    };
-
-    fetchAttestations();
-  }, [account.address, account.chain?.id]);
-
-  const isFetching = loadingProfile || !userAttestations;
-
-  useEffect(() => {
-    if (ensProfile && setCollectorsEns) {
+    if (profile && setCollectorsEns) {
       setCollectorsEns((prev) => ({
         ...prev,
-        [collector]: ensProfile.name ?? "",
+        [profile.address]: profile.name ?? "",
       }));
     }
-  }, [ensProfile, setCollectorsEns, collector]);
+  }, [profile, setCollectorsEns, profile.address]);
 
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.5, delay: 0.2 * index }}
+      transition={{ duration: 0.5, delay: 0.1 * index }}
       className={cn(
         "flex flex-row justify-center items-center w-full p-2 gap-2 bg-secondary rounded-lg transition-all duration-200 ease-in-out",
-        !isFetching && selectable && "cursor-pointer hover:bg-green-200",
-        !isFetching && selected && "bg-green-300 hover:bg-green-300",
+        selectable && "cursor-pointer hover:bg-green-200",
+        selected && "bg-green-300 hover:bg-green-300",
       )}
       onClick={onClick}
     >
-      {isFetching ? (
+      {false ? (
         <motion.div
           className="flex justify-between items-center w-full"
           initial={{ opacity: 0 }}
@@ -96,7 +76,11 @@ export default function CollectorRow({
         >
           <div className="flex justify-start items-center gap-2">
             <img
-              src={ensProfile?.avatar ?? "/propic_placeholder.png"}
+              src={
+                profile.avatar && profile.avatar.startsWith("http")
+                  ? profile.avatar
+                  : "/propic_placeholder.png"
+              }
               alt="avatar"
               className="w-8 h-8 rounded-full object-cover"
             />
@@ -108,14 +92,9 @@ export default function CollectorRow({
                 isAddress && "font-mono",
               )}
             >
-              {ensProfile?.name || name}
+              {profile.name || name}
             </label>
           </div>
-          {!(selectable || selected || removable) && (
-            <div className="flex justify-center items-center text-center font-medium px-2.5 bg-primary rounded-lg text-white">
-              {userAttestations.length}
-            </div>
-          )}
           {selected && (
             <Check
               size="2rem"
@@ -128,7 +107,7 @@ export default function CollectorRow({
               className="bg-destructive p-1 rounded-md text-white transition-all duration-200 ease-in-out cursor-pointer"
               onClick={(e) => {
                 e.stopPropagation();
-                handleRemove(collector);
+                handleRemove(profile.address);
               }}
             />
           )}

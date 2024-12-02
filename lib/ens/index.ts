@@ -1,35 +1,59 @@
-import { createPublicClient, GetEnsNameReturnType, http } from "viem";
+import { http } from "viem";
 import { mainnet } from "viem/chains";
+import { getRecords, getName, getOwner } from "@ensdomains/ensjs/public";
+import { createEnsPublicClient } from "@ensdomains/ensjs";
 
-const client = createPublicClient({
+const client = createEnsPublicClient({
   chain: mainnet,
   transport: http(),
 });
 
 export interface EnsProfileType {
-  name: GetEnsNameReturnType;
+  name: string;
   avatar: string | undefined;
+  address: string;
 }
 
 /**
- * An utility function to get the ENS profile of an address
- * @param address - The address to get the ENS profile of
- * @returns The ENS profile of the address
+ * An utility function to get the ENS profiles of an array of addresses
+ * @param addresses - The addresses to get the ENS profiles of
+ * @returns The ENS profiles of the addresses
  */
-export const getEnsProfile = async (address: `0x${string}`) => {
-  return undefined;
+export const getEnsProfiles = async (addresses: `0x${string}`[]) => {
   try {
-    const ensName = await client.getEnsName({ address: address });
-    let avatar: string | undefined = undefined;
-    if (ensName) {
-      avatar = (await client.getEnsAvatar({
-        name: ensName as string,
-      })) as string;
+    // Get the ENS names of the addresses
+    const namesBatch = [];
+    for (const address of addresses) {
+      namesBatch.push(getName.batch({ address }));
     }
-    return { name: ensName, avatar };
+    const names = await client.ensBatch(...namesBatch);
+
+    // Get the avatars of the ENS names
+    const avatarBatch = [];
+    for (const name of names) {
+      if (name?.match) {
+        avatarBatch.push(
+          getRecords.batch({ name: name.name, texts: ["avatar"] }),
+        );
+      }
+    }
+    const avatars = await client.ensBatch(...avatarBatch);
+
+    // Create the EnsProfileType array
+    const profiles: EnsProfileType[] = [];
+    for (let i = 0; i < addresses.length; i++) {
+      profiles.push({
+        name: names[i]?.name ?? "",
+        avatar: avatars[i]?.texts[0].value ?? undefined,
+        address: addresses[i],
+      });
+    }
+
+    console.log(profiles);
+    return profiles;
   } catch (e) {
     console.log(e);
-    return;
+    return [];
   }
 };
 
@@ -40,8 +64,8 @@ export const getEnsProfile = async (address: `0x${string}`) => {
  */
 export const getEnsAddress = async (ensName: `${string}.eth`) => {
   try {
-    const ensAddress = await client.getEnsAddress({ name: ensName });
-    return ensAddress?.toLowerCase() as `0x${string}`;
+    const ensAddress = await client.ensBatch(getOwner.batch({ name: ensName }));
+    return ensAddress?.[0]?.owner.toLowerCase() as `0x${string}`;
   } catch (e) {
     console.log(e);
     return "";

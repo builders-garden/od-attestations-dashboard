@@ -1,23 +1,22 @@
-import { EnsProfileType, getEnsProfile } from "@/lib/ens";
+import { EnsProfileType, getEnsProfiles } from "@/lib/ens";
 import { useState, useEffect } from "react";
 
-export function useEnsProfile(address: `0x${string}`) {
-  const [ensProfile, setEnsProfile] = useState<EnsProfileType | undefined>();
-  const [loadingProfile, setLoadingProfile] = useState(true);
+export function useEnsProfiles(addresses: `0x${string}`[]) {
+  const [ensProfiles, setEnsProfiles] = useState<EnsProfileType[]>([]);
+  const [loadingProfiles, setLoadingProfiles] = useState(true);
 
   useEffect(() => {
-    const fetchEnsProfile = async () => {
-      if (!address) return;
-      const profile = await getEnsProfile(address);
-      // if no ENS profile is found, simulate a small delay
-      if (!profile?.name) {
-        await new Promise((resolve) => setTimeout(resolve, 500));
+    const fetchEnsProfiles = async () => {
+      if (addresses.length === 0) {
+        setLoadingProfiles(false);
+        return;
       }
-      setEnsProfile(profile);
-      setLoadingProfile(false);
+      const profiles = await getEnsProfiles(addresses);
+      setEnsProfiles(profiles);
+      setLoadingProfiles(false);
     };
-    fetchEnsProfile();
-  }, [address]);
+    fetchEnsProfiles();
+  }, [addresses.length]);
 
-  return { ensProfile, loadingProfile };
+  return { ensProfiles, loadingProfiles };
 }

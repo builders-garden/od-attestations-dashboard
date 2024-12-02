@@ -4,6 +4,8 @@ import { Attestation } from "@/lib/eas/types";
 import React from "react";
 import { ViewCollectorsButtonAvatar } from "./ViewCollectorsButtonAvatar";
 import Link from "next/link";
+import { useEnsProfiles } from "@/components/hooks/useEnsProfile";
+import { motion } from "framer-motion";
 
 interface ViewCollectorsButtonProps {
   badge: BadgeClass;
@@ -15,6 +17,11 @@ export const ViewCollectorsButton: React.FC<ViewCollectorsButtonProps> = ({
   allAttestationsOfAKind,
 }) => {
   const bgColor = ["bg-pink-400", "bg-yellow-400", "bg-slate-200"];
+  const { ensProfiles } = useEnsProfiles(
+    allAttestationsOfAKind
+      .slice(0, 3)
+      .map((attestation) => attestation.recipient as `0x${string}`),
+  );
 
   return (
     <Link href={`/user/badge/${badge.attestationUID}/collectors`}>
@@ -23,13 +30,13 @@ export const ViewCollectorsButton: React.FC<ViewCollectorsButtonProps> = ({
         variant="ghost"
       >
         <div className="flex -space-x-1">
-          {allAttestationsOfAKind
-            .slice(0, 3)
-            .map(
-              (attestation, index) =>
-                attestation && (
+          {ensProfiles &&
+            ensProfiles.map(
+              (profile, index) =>
+                profile && (
                   <ViewCollectorsButtonAvatar
-                    collector={attestation.recipient}
+                    index={index + 1}
+                    ensProfile={profile}
                     bgColor={bgColor[index % 3]}
                     key={index}
                   />
@@ -37,11 +44,16 @@ export const ViewCollectorsButton: React.FC<ViewCollectorsButtonProps> = ({
             )}
         </div>
 
-        <label className="text-black font-medium cursor-pointer">
+        <motion.label
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1 }}
+          className="text-black font-medium cursor-pointer"
+        >
           {allAttestationsOfAKind.length - 3 < 0
             ? "Collectors"
             : "and " + (allAttestationsOfAKind.length - 3) + " others..."}
-        </label>
+        </motion.label>
       </Button>
     </Link>
   );

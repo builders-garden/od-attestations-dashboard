@@ -11,7 +11,7 @@ import { Config, UseAccountReturnType, useDisconnect } from "wagmi";
 import { Squash as Hamburger } from "hamburger-react";
 import { useCountUp } from "@/components/hooks/useCountUp";
 import { useState } from "react";
-import { useEnsProfile } from "@/components/hooks/useEnsProfile";
+import { useEnsProfiles } from "@/components/hooks/useEnsProfile";
 import { adminAddresses } from "@/lib/constants";
 import { Attestation } from "@/lib/eas/types";
 import Link from "next/link";
@@ -27,7 +27,7 @@ export default function UserHeader({
 }: UserHeaderProps) {
   const { disconnect } = useDisconnect();
   const userAttestationsCount = useCountUp(userAttestations.length, 2000);
-  const { ensProfile, loadingProfile } = useEnsProfile(account.address!);
+  const { ensProfiles, loadingProfiles } = useEnsProfiles([account.address!]);
   const [isOpen, setIsOpen] = useState(false);
 
   const isAdmin = account.address && adminAddresses.includes(account.address);
@@ -74,11 +74,11 @@ export default function UserHeader({
                   toggle={setIsOpen}
                   color="#1A1AFF"
                 />
-              ) : !loadingProfile ? (
+              ) : !loadingProfiles ? (
                 <motion.img
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  src={ensProfile?.avatar ?? "/propic_placeholder.png"}
+                  src={ensProfiles[0]?.avatar ?? "/propic_placeholder.png"}
                   alt="User avatar"
                   className="w-12 h-12 rounded-full object-cover border-[1px] border-secondary"
                 />

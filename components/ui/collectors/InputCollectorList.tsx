@@ -6,6 +6,7 @@ import CollectorRow from "./CollectorRow";
 import { isAddress } from "viem";
 import { getEnsAddress } from "@/lib/ens";
 import { toast } from "sonner";
+import { useEnsProfiles } from "@/components/hooks/useEnsProfile";
 
 export interface InputCollectorListProps {
   collectors: string[];
@@ -18,6 +19,7 @@ export const InputCollectorList: React.FC<InputCollectorListProps> = ({
 }) => {
   const [input, setInput] = useState("");
   const [inputIsValid, setInputIsValid] = useState(false);
+  const { ensProfiles } = useEnsProfiles(collectors as `0x${string}`[]);
 
   const handleRemove = (collector: string) => {
     setCollectors((prev) => prev.filter((c) => c !== collector));
@@ -29,8 +31,9 @@ export const InputCollectorList: React.FC<InputCollectorListProps> = ({
       if (resolvedAddress) {
         collector = resolvedAddress;
       } else {
-        setInput("");
-        toast.error("The ENS address you added doesn't exist.");
+        toast.error("The ENS address you added doesn't exist.", {
+          position: "top-right",
+        });
         return;
       }
     }
@@ -72,10 +75,10 @@ export const InputCollectorList: React.FC<InputCollectorListProps> = ({
         </Button>
       </div>
       <div className="flex flex-col gap-3 w-full max-h-[50rem] overflow-y-auto">
-        {collectors.map((collector, index) => (
+        {ensProfiles.map((profile, index) => (
           <CollectorRow
             key={index}
-            collector={collector}
+            profile={profile}
             removable
             handleRemove={handleRemove}
           />

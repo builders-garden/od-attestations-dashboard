@@ -4,14 +4,19 @@ import { useCreateBadge } from "@/components/hooks/useCreateBadge";
 import { useGetAllAttestationsOfAKind } from "@/components/hooks/useGetAllAttestationsOfAKind";
 import CollectorRowWithInfo from "@/components/ui/collectors/CollectorRowWithInfo";
 import { motion } from "framer-motion";
-import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { use, useState, useMemo } from "react";
 import { useAccount } from "wagmi";
-import { Button } from "@/components/ui/button";
 import { Wrapper } from "@/components/ui/wrapper";
 import { Icons } from "@/components/ui/icons";
 import PaginatorButtons from "@/components/ui/paginatorButtons";
+import { useEnsProfiles } from "@/components/hooks/useEnsProfile";
+import { EnsProfileType } from "@/lib/ens";
+
+type ExtendedEnsProfileType = EnsProfileType & {
+  attestationId: string;
+};
 
 export default function BadgeCollectorsPage({
   params,
@@ -25,16 +30,27 @@ export default function BadgeCollectorsPage({
     sourceAttestation,
     account,
   });
+  const { ensProfiles } = useEnsProfiles(
+    allAttestationsOfAKind.map(
+      (attestation) => attestation.recipient as `0x${string}`,
+    ),
+  );
   const collectorsCount = useCountUp(allAttestationsOfAKind.length, 2000); // 2 seconds duration
 
   // Pagination logic
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  const paginatedAttestations = useMemo(() => {
+  const paginatedProfiles: ExtendedEnsProfileType[] = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
-    return allAttestationsOfAKind.slice(startIndex, startIndex + itemsPerPage);
-  }, [allAttestationsOfAKind, currentPage]);
+    const endIndex = startIndex + itemsPerPage;
+    return ensProfiles
+      .map((profile, index) => ({
+        ...profile,
+        attestationId: allAttestationsOfAKind[index].id,
+      }))
+      .slice(startIndex, endIndex);
+  }, [ensProfiles, currentPage]);
 
   const totalPages = Math.ceil(allAttestationsOfAKind.length / itemsPerPage);
 
@@ -76,14 +92,14 @@ export default function BadgeCollectorsPage({
             <div className="flex w-full justify-between">
               <span className="font-bold">{badge!.title} badge collectors</span>
             </div>
-            {paginatedAttestations.map((attestation, index) => (
+            {paginatedProfiles.map((profile, index) => (
               <CollectorRowWithInfo
                 key={index}
                 index={(currentPage - 1) * itemsPerPage + index + 1}
-                collector={attestation.recipient as `0x${string}`}
+                profile={profile}
                 onClick={() => {
                   window.open(
-                    `https://sepolia.easscan.org/attestation/view/${attestation.id}`,
+                    `https://sepolia.easscan.org/attestation/view/${profile.attestationId}`,
                     "_blank",
                   );
                 }}

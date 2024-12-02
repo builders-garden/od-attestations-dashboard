@@ -1,38 +1,32 @@
-import { useEnsProfile } from "@/components/hooks/useEnsProfile";
+import { EnsProfileType } from "@/lib/ens";
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 
 export const ViewCollectorsButtonAvatar: React.FC<{
+  index: number;
   bgColor: string;
-  collector: string;
-}> = ({ bgColor, collector }) => {
-  const { ensProfile, loadingProfile } = useEnsProfile(
-    collector as `0x${string}`,
-  );
-
-  if (loadingProfile) {
-    return (
-      <div
-        className={
-          "flex justify-center items-center rounded-full w-4 h-4 p-2.5 text-xs bg-skeleton animate-pulse"
-        }
-      />
-    );
-  }
-
+  ensProfile: EnsProfileType;
+}> = ({ bgColor, ensProfile, index }) => {
   return ensProfile?.avatar ? (
-    <img
+    <motion.img
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5, delay: 0.1 * index }}
       src={ensProfile.avatar}
       alt="avatar"
       className="w-5 h-5 rounded-full"
     />
   ) : (
-    <div
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5, delay: 0.1 * index }}
       className={cn(
         "flex justify-center items-center rounded-full w-4 h-4 p-2.5 text-xs",
         bgColor,
       )}
     >
-      {collector.slice(2, 3).toUpperCase()}
-    </div>
+      {ensProfile.address.slice(2, 3).toUpperCase()}
+    </motion.div>
   );
 };
