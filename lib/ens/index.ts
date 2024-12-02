@@ -49,7 +49,6 @@ export const getEnsProfiles = async (addresses: `0x${string}`[]) => {
       });
     }
 
-    console.log(profiles);
     return profiles;
   } catch (e) {
     console.log(e);
