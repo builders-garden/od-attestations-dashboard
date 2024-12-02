@@ -44,7 +44,7 @@ export const InputCollectorList: React.FC<InputCollectorListProps> = ({
   };
 
   useEffect(() => {
-    setInputIsValid(isAddress(input) || input.endsWith(".eth"));
+    setInputIsValid(input.endsWith(".eth") || isAddress(input));
   }, [input]);
 
   return (
