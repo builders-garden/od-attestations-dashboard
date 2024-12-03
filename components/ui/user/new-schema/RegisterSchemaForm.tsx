@@ -36,6 +36,12 @@ import { FieldType } from "@/lib/eas/types";
 import { motion } from "framer-motion";
 import { SafeDashboardDialog } from "../../safe-dashboard-dialog";
 import { toast } from "sonner";
+import {
+  useProtocolKitOwner,
+  useApiKit,
+} from "@/components/providers/SafeProvider";
+import { encodeFunctionData } from "viem";
+import { MetaTransactionData } from "@safe-global/safe-core-sdk-types";
 
 const formSchema = z.object({
   fields: z.array(
@@ -91,18 +97,48 @@ export const RegisterSchemaForm: React.FC = () => {
   const [openRegisterSchemaDialog, setOpenRegisterSchemaDialog] =
     useState(false);
 
-  const registerSchema = (
+  const safeProvider = useProtocolKitOwner();
+  const apiKit = useApiKit();
+
+  const registerSchema = async (
     schemaAddress: `0x${string}`,
     schema: string,
     resolverAddress: `0x${string}`,
     isRevocable: boolean,
   ) => {
-    writeContractAsync({
-      address: schemaAddress,
+    console.log(safeProvider, apiKit);
+    if (!safeProvider || !apiKit) return;
+    const data = encodeFunctionData({
       abi: SchemaRegistryAbi,
       functionName: "register",
       args: [schema, resolverAddress, isRevocable],
     });
+    const safeTransactionData: MetaTransactionData = {
+      to: schemaAddress,
+      data,
+      value: "0",
+    };
+    const safeTransaction = await safeProvider.createTransaction({
+      transactions: [safeTransactionData],
+    });
+    console.log("created tx", safeTransaction);
+    const safeTxHash = await safeProvider.getTransactionHash(safeTransaction);
+    const senderSignature = await safeProvider.signHash(safeTxHash);
+    console.log("proposing");
+    await apiKit.proposeTransaction({
+      safeAddress: "0x883ac919B42b9065C1Bc1Ea7560ba2924655762E",
+      safeTransactionData: safeTransaction.data,
+      safeTxHash,
+      senderAddress: "0xb5C99bf3F9B8EDf2A532614049e9EE4302670a4a",
+      senderSignature: senderSignature.data,
+    });
+    console.log("proposed");
+    // writeContractAsync({
+    //   address: schemaAddress,
+    //   abi: SchemaRegistryAbi,
+    //   functionName: "register",
+    //   args: [schema, resolverAddress, isRevocable],
+    // });
   };
 
   const stringifyFields = (fields: z.infer<typeof formSchema>["fields"]) => {
