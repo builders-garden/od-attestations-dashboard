@@ -22,6 +22,7 @@
     "@radix-ui/react-switch": "^1.1.1",
     "@radix-ui/react-tooltip": "^1.1.4",
     "@rainbow-me/rainbowkit": "^2.2.0",
+    "@safe-global/api-kit": "^2.5.4",
     "@safe-global/protocol-kit": "^5.0.4",
     "@safe-global/safe-core-sdk-types": "^5.1.0",
     "@safe-global/safe-react-hooks": "^0.1.0",
