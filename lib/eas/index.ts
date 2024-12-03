@@ -1,4 +1,3 @@
-import { multisigAddress } from "../constants";
 import { EAS_NAME_SCHEMA_UID, GRAPHQL_ENDPOINTS } from "./constants";
 import {
   AttestationQuery,
@@ -405,7 +404,7 @@ export const getSchemasNamesAttestations = async (
               equals: EAS_NAME_SCHEMA_UID,
             },
             attester: {
-              equals: multisigAddress,
+              equals: process.env.NEXT_PUBLIC_SAFE_ADDRESS,
             },
             OR: schemaIds.map((id) => ({
               decodedDataJson: {
