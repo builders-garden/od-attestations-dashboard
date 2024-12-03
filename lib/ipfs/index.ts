@@ -49,7 +49,7 @@ export const getImageFromIpfs: (ipfsHash: string) => Promise<string> = async (
   ipfsHash: string,
 ) => {
   if (!isCIDValid(ipfsHash)) {
-    console.log("Invalid IPFS hash");
+    console.error("Invalid IPFS hash");
     return "";
   }
   try {
@@ -66,7 +66,7 @@ export const getImageFromIpfs: (ipfsHash: string) => Promise<string> = async (
 
     return url;
   } catch (error) {
-    console.log("Error getting image:", error);
+    console.error("Error getting image:", error);
     return "";
   }
 };

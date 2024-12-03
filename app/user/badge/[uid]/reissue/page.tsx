@@ -15,7 +15,7 @@ import {
 import { LinkTextWithIcon } from "@/components/ui/linkTextWithIcon";
 import { SchemaEncoder } from "@ethereum-attestation-service/eas-sdk";
 import { motion } from "framer-motion";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { use, useState } from "react";
 import { useAccount } from "wagmi";
@@ -40,6 +40,7 @@ export default function BadgeReissuePage({
   const [openReissueDialog, setOpenReissueDialog] = useState(false);
   const [safeTxHash, setSafeTxHash] = useState<`0x${string}`>();
   const { sendSafeTransaction } = useSendSafeTransaction();
+  const [txLoading, setTxLoading] = useState(false);
 
   const handleReissueBadges = async () => {
     try {
@@ -50,9 +51,9 @@ export default function BadgeReissuePage({
         const decodedData: AttestationDecodedDataType[] = JSON.parse(
           sourceAttestation.decodedDataJson,
         );
-        console.log(decodedData);
         const values = decodedData.map((data) => data.value);
         const encodedData = schemaEncoder.encodeData(values);
+        setTxLoading(true);
         const txHash = await sendSafeTransaction(
           easMultiAttest(
             EAS_CONTRACT_ADDRESSES[
@@ -64,6 +65,7 @@ export default function BadgeReissuePage({
             true,
           ),
         );
+        setTxLoading(false);
         setOpenReissueDialog(false);
         if (txHash) {
           setSafeTxHash(txHash);
@@ -71,9 +73,10 @@ export default function BadgeReissuePage({
         }
       }
     } catch (err) {
+      setTxLoading(false);
+      setOpenReissueDialog(false);
       console.error(err);
       toast.error("An error occurred while reissuing the badge.");
-      setOpenReissueDialog(false);
     }
   };
 
@@ -174,7 +177,9 @@ export default function BadgeReissuePage({
               variant="success"
               className="w-full"
               onClick={handleReissueBadges}
+              disabled={txLoading}
             >
+              {txLoading && <Loader2 className="w-4 animate-spin" />}
               Reissue
             </Button>
           </DialogFooter>

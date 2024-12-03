@@ -99,9 +99,12 @@ export const RegisterSchemaForm: React.FC = () => {
       .join(", ");
   };
 
+  const [txLoading, setTxLoading] = useState(false);
+
   const handleRegisterSchema = async (values: z.infer<typeof formSchema>) => {
     try {
       if (account.chain) {
+        setTxLoading(true);
         const txHash = await sendSafeTransaction({
           abi: SchemaRegistryAbi,
           contractAddress:
@@ -117,6 +120,7 @@ export const RegisterSchemaForm: React.FC = () => {
           ],
           value: "0",
         });
+        setTxLoading(false);
         setOpenRegisterSchemaDialog(false);
         if (txHash) {
           setSafeTxHash(txHash);
@@ -124,10 +128,11 @@ export const RegisterSchemaForm: React.FC = () => {
         }
       }
     } catch (err) {
+      setTxLoading(false);
+      setOpenRegisterSchemaDialog(false);
       console.error(err);
       toast.error("An error occurred while registering the schema.");
     }
-    setOpenRegisterSchemaDialog(false);
   };
 
   const startFieldsIndex = mandatoryFields.length;
@@ -333,7 +338,9 @@ export const RegisterSchemaForm: React.FC = () => {
                     className="w-full"
                     type="button"
                     onClick={form.handleSubmit(handleRegisterSchema)}
+                    disabled={txLoading}
                   >
+                    {txLoading && <Loader2 className="w-4 animate-spin" />}
                     Create
                   </Button>
                 </DialogFooter>

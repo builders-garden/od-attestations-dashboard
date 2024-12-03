@@ -23,6 +23,7 @@ import {
 import { SafeDashboardDialog } from "../../SafeDashboardDialog";
 import { toast } from "sonner";
 import { useSendSafeTransaction } from "@/components/hooks/useSendSafeTransaction";
+import { Loader2 } from "lucide-react";
 
 export const ChangeSchemaName: React.FC<{
   schemaId: string | undefined;
@@ -47,11 +48,14 @@ export const ChangeSchemaName: React.FC<{
     },
   ];
 
+  const [txLoading, setTxLoading] = useState(false);
+
   const handleChangeName = async () => {
     try {
       if (schemaName && chainId) {
         const schemaEncoder = new SchemaEncoder("bytes32 schemaId,string name");
         const encodedData = schemaEncoder.encodeData(dataToEncode);
+        setTxLoading(true);
         const txHash = await sendSafeTransaction(
           easAttest(
             EAS_CONTRACT_ADDRESSES[
@@ -63,16 +67,19 @@ export const ChangeSchemaName: React.FC<{
             true,
           ),
         );
+        setTxLoading(false);
+        setOpenChangeNameDialog(false);
         if (txHash) {
           setSafeTxHash(txHash);
           setOpenSafeDialog(true);
         }
       }
     } catch (err) {
+      setTxLoading(false);
+      setOpenChangeNameDialog(false);
       console.error(err);
       toast.error("An error occurred while changing the schema name.");
     }
-    setOpenChangeNameDialog(false);
   };
 
   return (
@@ -113,8 +120,9 @@ export const ChangeSchemaName: React.FC<{
               className="w-full"
               type="button"
               onClick={handleChangeName}
-              disabled={!schemaName}
+              disabled={!schemaName || txLoading}
             >
+              {txLoading && <Loader2 className="w-4 animate-spin" />}
               Confirm
             </Button>
           </DialogFooter>

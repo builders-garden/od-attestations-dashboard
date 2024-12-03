@@ -25,7 +25,7 @@ import { EAS_CONTRACT_ADDRESSES } from "@/lib/eas/constants";
 import { EnsProfileType } from "@/lib/ens";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { use, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -90,6 +90,8 @@ export default function BadgeRevokePage({
     setSelectedCollectors(collectors);
   };
 
+  const [txLoading, setTxLoading] = useState(false);
+
   const handleRevokeBadges = async () => {
     try {
       if (account.chain && sourceAttestation) {
@@ -97,6 +99,7 @@ export default function BadgeRevokePage({
           (collector) =>
             allAttestationsOfAKind.find((a) => a.recipient === collector)?.id,
         ) as `0x${string}`[];
+        setTxLoading(true);
         const txHash = await sendSafeTransaction(
           easMultiRevoke(
             EAS_CONTRACT_ADDRESSES[
@@ -106,6 +109,7 @@ export default function BadgeRevokePage({
             attestationUIDs,
           ),
         );
+        setTxLoading(false);
         setOpenRevokeDialog(false);
         if (txHash) {
           setSafeTxHash(txHash);
@@ -113,9 +117,10 @@ export default function BadgeRevokePage({
         }
       }
     } catch (err) {
+      setTxLoading(false);
+      setOpenRevokeDialog(false);
       console.error(err);
       toast.error("An error occurred while revoking the badge.");
-      setOpenRevokeDialog(false);
     }
   };
 
@@ -257,7 +262,9 @@ export default function BadgeRevokePage({
               variant="destructive"
               className="w-full"
               onClick={handleRevokeBadges}
+              disabled={txLoading}
             >
+              {txLoading && <Loader2 className="w-4 animate-spin" />}
               Revoke
             </Button>
           </DialogFooter>

@@ -51,7 +51,7 @@ export const getEnsProfiles = async (addresses: `0x${string}`[]) => {
 
     return profiles;
   } catch (e) {
-    console.log(e);
+    console.error(e);
     return [];
   }
 };
@@ -66,7 +66,7 @@ export const getEnsAddress = async (ensName: `${string}.eth`) => {
     const ensAddress = await client.ensBatch(getOwner.batch({ name: ensName }));
     return ensAddress?.[0]?.owner.toLowerCase() as `0x${string}`;
   } catch (e) {
-    console.log(e);
+    console.error(e);
     return "";
   }
 };

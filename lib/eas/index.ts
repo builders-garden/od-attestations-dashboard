@@ -76,7 +76,7 @@ export const schemasFromWallets = async (
 ): Promise<Schema[]> => {
   // Check if the chain ID was not provided
   if (!chainId) {
-    console.log("Chain ID was not provided.");
+    console.error("Chain ID was not provided.");
     return [];
   }
   const endpoint = GRAPHQL_ENDPOINTS[chainId as keyof typeof GRAPHQL_ENDPOINTS];
@@ -110,7 +110,7 @@ export const schemasFromWallets = async (
     const payload: SchemataResponse = await response.json();
     return payload.data.schemata;
   } catch (e) {
-    console.log(e);
+    console.error(e);
     return [];
   }
 };
@@ -129,7 +129,7 @@ export const getUserAttestations = async (
 ): Promise<Attestation[]> => {
   // Check if the chain ID or issuer addresses were not provided
   if (!chainId || issuerAddresses.length === 0) {
-    console.log("Chain ID or issuer addresses were not provided.");
+    console.error("Chain ID or issuer addresses were not provided.");
     return [];
   }
 
@@ -163,7 +163,7 @@ export const getUserAttestations = async (
     attestations = getODAttestations(attestations);
     return attestations;
   } catch (e) {
-    console.log(e);
+    console.error(e);
     return [];
   }
 };
@@ -182,7 +182,7 @@ export const getUserUniqueAttestations = async (
 ): Promise<Attestation[]> => {
   // Check if the chain ID or issuer addresses were not provided
   if (!chainId || issuerAddresses.length === 0) {
-    console.log("Chain ID or issuer addresses were not provided.");
+    console.error("Chain ID or issuer addresses were not provided.");
     return [];
   }
 
@@ -227,7 +227,7 @@ export const getUserUniqueAttestations = async (
 
     return payload.data.attestations;
   } catch (e) {
-    console.log(e);
+    console.error(e);
     return [];
   }
 };
@@ -244,7 +244,7 @@ export const getEveryUniqueAttestation = async (
 ): Promise<Attestation[]> => {
   // Check if the chain ID or issuer addresses were not provided
   if (!chainId || issuerAddresses.length === 0) {
-    console.log("Chain ID or issuer addresses were not provided.");
+    console.error("Chain ID or issuer addresses were not provided.");
     return [];
   }
 
@@ -286,7 +286,7 @@ export const getEveryUniqueAttestation = async (
 
     return payload.data.attestations;
   } catch (e) {
-    console.log(e);
+    console.error(e);
     return [];
   }
 };
@@ -302,7 +302,7 @@ export const getAttestationFromUID = async (
   chainId: number | undefined,
 ): Promise<Attestation | null> => {
   if (!chainId) {
-    console.log("Chain ID was not provided.");
+    console.error("Chain ID was not provided.");
     return null;
   }
   const endpoint = GRAPHQL_ENDPOINTS[chainId as keyof typeof GRAPHQL_ENDPOINTS];
@@ -324,7 +324,7 @@ export const getAttestationFromUID = async (
     const payload: AttestationResponse = await response.json();
     return payload.data.attestation;
   } catch (e) {
-    console.log(e);
+    console.error(e);
     return null;
   }
 };
@@ -340,7 +340,7 @@ export const getAllAttestationsOfAKind = async (
   chainId: number | undefined,
 ): Promise<Attestation[]> => {
   if (!chainId || !decodedDataJson) {
-    console.log("Chain ID or decodedDataJson was not provided.");
+    console.error("Chain ID or decodedDataJson was not provided.");
     return [];
   }
   const endpoint = GRAPHQL_ENDPOINTS[chainId as keyof typeof GRAPHQL_ENDPOINTS];
@@ -368,7 +368,7 @@ export const getAllAttestationsOfAKind = async (
     const payload: AttestationsResponse = await response.json();
     return payload.data.attestations;
   } catch (e) {
-    console.log(e);
+    console.error(e);
     return [];
   }
 };
@@ -384,7 +384,7 @@ export const getSchemasNamesAttestations = async (
   chainId: number | undefined,
 ): Promise<Attestation[]> => {
   if (!chainId || schemaIds.length === 0) {
-    console.log("Chain ID or schema IDs were not provided.");
+    console.error("Chain ID or schema IDs were not provided.");
     return [];
   }
 

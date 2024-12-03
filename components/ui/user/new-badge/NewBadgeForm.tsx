@@ -125,6 +125,8 @@ export const NewBadgeForm: React.FC<NewBadgeFormProps> = ({
     return ipfsHash;
   };
 
+  const [txLoading, setTxLoading] = useState(false);
+
   const handleCreateBadge = async (data: z.infer<typeof formSchema>) => {
     try {
       if (account.chain) {
@@ -132,6 +134,7 @@ export const NewBadgeForm: React.FC<NewBadgeFormProps> = ({
           selectedSchema?.schema as string,
         );
         const encodedData = schemaEncoder.encodeData(data.fields);
+        setTxLoading(true);
         const txHash = await sendSafeTransaction(
           easMultiAttest(
             EAS_CONTRACT_ADDRESSES[
@@ -143,7 +146,7 @@ export const NewBadgeForm: React.FC<NewBadgeFormProps> = ({
             true,
           ),
         );
-
+        setTxLoading(false);
         setOpenTxDialog(false);
         if (txHash) {
           setSafeTxHash(txHash);
@@ -152,6 +155,7 @@ export const NewBadgeForm: React.FC<NewBadgeFormProps> = ({
       }
     } catch (err) {
       console.error(err);
+      setTxLoading(false);
       setOpenTxDialog(false);
       toast.error("Failed to issue badge, please try again.");
     }
@@ -379,7 +383,9 @@ export const NewBadgeForm: React.FC<NewBadgeFormProps> = ({
                   className="w-full"
                   type="button"
                   onClick={handleSubmit}
+                  disabled={txLoading}
                 >
+                  {txLoading && <Loader2 className="w-4 animate-spin" />}
                   Create
                 </Button>
               </DialogFooter>
