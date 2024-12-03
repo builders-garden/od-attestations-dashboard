@@ -19,7 +19,7 @@ export const Wrapper = ({ children, className }: WrapperProps) => {
 
   const adminPages = ["/new-schema", "/revoke", "/reissue", "/new-badge"];
   const isAdminPage = adminPages.some((page) => pathname.includes(page));
-  const userIsAdmin = isAdmin(account.address);
+  const userIsAdmin = isAdmin(account);
 
   useEffect(() => {
     if (account.isConnected && isAdminPage && !userIsAdmin) {

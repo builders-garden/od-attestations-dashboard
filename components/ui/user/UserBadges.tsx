@@ -5,17 +5,21 @@ import { useCountUp } from "@/components/hooks/useCountUp";
 import { useCreateBadges } from "@/components/hooks/useCreateBadges";
 import { useState } from "react";
 import { Switch } from "../switch";
+import { Config, UseAccountReturnType } from "wagmi";
+import { isAdmin } from "@/lib/utils";
 
 interface UserBadgesProps {
   userAttestations: Attestation[];
   allAttestations: Attestation[];
+  account: UseAccountReturnType<Config>;
 }
 
 export default function UserBadges({
   userAttestations,
   allAttestations,
+  account,
 }: UserBadgesProps) {
-  const [showAll, setShowAll] = useState<boolean>(false);
+  const [showAll, setShowAll] = useState<boolean>(isAdmin(account));
   const userAttestationsCount = useCountUp(userAttestations.length, 2000); // 2 seconds duration
   const allBadges = useCreateBadges(userAttestations, allAttestations);
 

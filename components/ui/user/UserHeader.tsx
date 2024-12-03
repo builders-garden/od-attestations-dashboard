@@ -67,7 +67,7 @@ export default function UserHeader({
         <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
           <DropdownMenuTrigger asChild>
             <div className="flex justify-center items-center h-full cursor-pointer">
-              {isAdmin(account.address) ? (
+              {isAdmin(account) ? (
                 <Hamburger
                   rounded
                   toggled={isOpen}
@@ -92,7 +92,7 @@ export default function UserHeader({
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            {isAdmin(account.address) && (
+            {isAdmin(account) && (
               <>
                 <DropdownMenuItem className="cursor-pointer w-full">
                   <Link href="/user/new-schema" className="w-full">

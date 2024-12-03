@@ -80,7 +80,7 @@ export default function BadgePage({
         )}
       </div>
 
-      {isAdmin(account.address) && badge && (
+      {isAdmin(account) && badge && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

@@ -46,6 +46,7 @@ export default function UserHome() {
         <UserBadges
           allAttestations={allAttestations}
           userAttestations={userAttestations}
+          account={account}
         />
       )}
     </Wrapper>
