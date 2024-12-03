@@ -2,6 +2,7 @@
 import { useCreateBadge } from "@/components/hooks/useCreateBadge";
 import { useEnsProfiles } from "@/components/hooks/useEnsProfile";
 import { useGetAllAttestationsOfAKind } from "@/components/hooks/useGetAllAttestationsOfAKind";
+import { useSendSafeTransaction } from "@/components/hooks/useSendSafeTransaction";
 import { Button } from "@/components/ui/button";
 import CollectorRow from "@/components/ui/collectors/CollectorRow";
 import {
@@ -17,7 +18,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { LinkTextWithIcon } from "@/components/ui/linkTextWithIcon";
 import PaginatorButtons from "@/components/ui/paginatorButtons";
-import { SafeDashboardDialog } from "@/components/ui/safe-dashboard-dialog";
+import { SafeDashboardDialog } from "@/components/ui/SafeDashboardDialog";
 import { Wrapper } from "@/components/ui/wrapper";
 import { easMultiRevoke } from "@/lib/eas/calls";
 import { EAS_CONTRACT_ADDRESSES } from "@/lib/eas/constants";
@@ -47,6 +48,8 @@ export default function BadgeRevokePage({
   const [selectedCollectors, setSelectedCollectors] = useState<string[]>([]);
   const [openSafeDialog, setOpenSafeDialog] = useState(false);
   const [openRevokeDialog, setOpenRevokeDialog] = useState(false);
+  const [safeTxHash, setSafeTxHash] = useState<`0x${string}`>();
+  const { sendSafeTransaction } = useSendSafeTransaction();
 
   // Collectors logic
   const collectors = allAttestationsOfAKind.map(
@@ -87,14 +90,14 @@ export default function BadgeRevokePage({
     setSelectedCollectors(collectors);
   };
 
-  const handleRevokeBadges = () => {
+  const handleRevokeBadges = async () => {
     try {
       if (account.chain && sourceAttestation) {
         const attestationUIDs = selectedCollectors.map(
           (collector) =>
             allAttestationsOfAKind.find((a) => a.recipient === collector)?.id,
         ) as `0x${string}`[];
-        writeContract(
+        const txHash = await sendSafeTransaction(
           easMultiRevoke(
             EAS_CONTRACT_ADDRESSES[
               account.chain.id as keyof typeof EAS_CONTRACT_ADDRESSES
@@ -104,7 +107,10 @@ export default function BadgeRevokePage({
           ),
         );
         setOpenRevokeDialog(false);
-        setOpenSafeDialog(true);
+        if (txHash) {
+          setSafeTxHash(txHash);
+          setOpenSafeDialog(true);
+        }
       }
     } catch (err) {
       console.error(err);
@@ -258,6 +264,7 @@ export default function BadgeRevokePage({
         </DialogContent>
       </Dialog>
       <SafeDashboardDialog
+        hash={safeTxHash}
         open={openSafeDialog}
         onOpenChange={(open) => {
           setOpenSafeDialog(open);

@@ -20,18 +20,19 @@ import {
   SchemaEncoder,
   SchemaItem,
 } from "@ethereum-attestation-service/eas-sdk";
-import { useWriteContract } from "wagmi";
-import { SafeDashboardDialog } from "../../safe-dashboard-dialog";
+import { SafeDashboardDialog } from "../../SafeDashboardDialog";
 import { toast } from "sonner";
+import { useSendSafeTransaction } from "@/components/hooks/useSendSafeTransaction";
 
 export const ChangeSchemaName: React.FC<{
   schemaId: string | undefined;
   chainId: number | undefined;
 }> = ({ schemaId, chainId }) => {
   const [schemaName, setSchemaName] = useState("");
-  const { writeContract } = useWriteContract();
+  const { sendSafeTransaction } = useSendSafeTransaction();
   const [openChangeNameDialog, setOpenChangeNameDialog] = useState(false);
   const [openSafeDialog, setOpenSafeDialog] = useState(false);
+  const [safeTxHash, setSafeTxHash] = useState<`0x${string}`>();
 
   const dataToEncode: SchemaItem[] = [
     {
@@ -46,12 +47,12 @@ export const ChangeSchemaName: React.FC<{
     },
   ];
 
-  const handleChangeName = () => {
+  const handleChangeName = async () => {
     try {
       if (schemaName && chainId) {
         const schemaEncoder = new SchemaEncoder("bytes32 schemaId,string name");
         const encodedData = schemaEncoder.encodeData(dataToEncode);
-        writeContract(
+        const txHash = await sendSafeTransaction(
           easAttest(
             EAS_CONTRACT_ADDRESSES[
               chainId as keyof typeof EAS_CONTRACT_ADDRESSES
@@ -62,7 +63,10 @@ export const ChangeSchemaName: React.FC<{
             true,
           ),
         );
-        setOpenSafeDialog(true);
+        if (txHash) {
+          setSafeTxHash(txHash);
+          setOpenSafeDialog(true);
+        }
       }
     } catch (err) {
       console.error(err);
@@ -117,6 +121,7 @@ export const ChangeSchemaName: React.FC<{
         </DialogContent>
       </Dialog>
       <SafeDashboardDialog
+        hash={safeTxHash}
         open={openSafeDialog}
         onOpenChange={setOpenSafeDialog}
       />

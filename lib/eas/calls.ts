@@ -1,6 +1,6 @@
 import { NO_EXPIRATION } from "@ethereum-attestation-service/eas-sdk";
 import { EASAbi } from "../abi/EAS";
-import { type WriteContractParameters } from "@wagmi/core";
+import { SendSafeTransactionParams } from "@/components/hooks/useSendSafeTransaction";
 
 export const easAttest = (
   easAddress: `0x${string}`,
@@ -9,7 +9,7 @@ export const easAttest = (
   encodedData: `0x${string}`,
   isRevocable: boolean,
   refUID?: `0x${string}`,
-): WriteContractParameters => {
+): SendSafeTransactionParams => {
   const request = {
     schema: schemaUID as `0x${string}`,
     data: {
@@ -26,10 +26,11 @@ export const easAttest = (
   };
 
   return {
-    address: easAddress,
     abi: EASAbi,
+    contractAddress: easAddress,
     functionName: "attest",
     args: [request],
+    value: "0",
   };
 };
 
@@ -40,7 +41,7 @@ export const easMultiAttest = (
   encodedData: `0x${string}`,
   isRevocable: boolean,
   refUID?: `0x${string}`,
-): WriteContractParameters => {
+): SendSafeTransactionParams => {
   const request = {
     schema: schemaUID as `0x${string}`,
     data: recipientAddresses.map((recipientAddress) => ({
@@ -56,10 +57,11 @@ export const easMultiAttest = (
   };
 
   return {
-    address: easAddress,
     abi: EASAbi,
+    contractAddress: easAddress,
     functionName: "multiAttest",
     args: [[request]],
+    value: "0",
   };
 };
 
@@ -67,7 +69,7 @@ export const easMultiRevoke = (
   easAddress: `0x${string}`,
   schemaUID: `0x${string}`,
   attestationUIDs: `0x${string}`[],
-): WriteContractParameters => {
+): SendSafeTransactionParams => {
   const request = {
     schema: schemaUID as `0x${string}`,
     data: attestationUIDs.map((attestationUID) => ({
@@ -77,9 +79,10 @@ export const easMultiRevoke = (
   };
 
   return {
-    address: easAddress,
     abi: EASAbi,
+    contractAddress: easAddress,
     functionName: "multiRevoke",
     args: [[request]],
+    value: "0",
   };
 };

@@ -18,13 +18,14 @@ import { motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { use, useState } from "react";
-import { useAccount, useWriteContract } from "wagmi";
+import { useAccount } from "wagmi";
 import { easMultiAttest } from "@/lib/eas/calls";
 import { EAS_CONTRACT_ADDRESSES } from "@/lib/eas/constants";
 import { AttestationDecodedDataType } from "@/lib/eas/types";
 import { Wrapper } from "@/components/ui/wrapper";
-import { SafeDashboardDialog } from "@/components/ui/safe-dashboard-dialog";
+import { SafeDashboardDialog } from "@/components/ui/SafeDashboardDialog";
 import { toast } from "sonner";
+import { useSendSafeTransaction } from "@/components/hooks/useSendSafeTransaction";
 
 export default function BadgeReissuePage({
   params,
@@ -35,11 +36,12 @@ export default function BadgeReissuePage({
   const account = useAccount();
   const { badge, sourceAttestation, notFound } = useCreateBadge(uid, account);
   const [collectors, setCollectors] = useState<string[]>([]);
-  const { writeContract } = useWriteContract();
   const [openSafeDialog, setOpenSafeDialog] = useState(false);
   const [openReissueDialog, setOpenReissueDialog] = useState(false);
+  const [safeTxHash, setSafeTxHash] = useState<`0x${string}`>();
+  const { sendSafeTransaction } = useSendSafeTransaction();
 
-  const handleReissueBadges = () => {
+  const handleReissueBadges = async () => {
     try {
       if (account.chain && sourceAttestation) {
         const schemaEncoder = new SchemaEncoder(
@@ -48,9 +50,10 @@ export default function BadgeReissuePage({
         const decodedData: AttestationDecodedDataType[] = JSON.parse(
           sourceAttestation.decodedDataJson,
         );
+        console.log(decodedData);
         const values = decodedData.map((data) => data.value);
         const encodedData = schemaEncoder.encodeData(values);
-        writeContract(
+        const txHash = await sendSafeTransaction(
           easMultiAttest(
             EAS_CONTRACT_ADDRESSES[
               account.chain.id as keyof typeof EAS_CONTRACT_ADDRESSES
@@ -62,7 +65,10 @@ export default function BadgeReissuePage({
           ),
         );
         setOpenReissueDialog(false);
-        setOpenSafeDialog(true);
+        if (txHash) {
+          setSafeTxHash(txHash);
+          setOpenSafeDialog(true);
+        }
       }
     } catch (err) {
       console.error(err);
@@ -175,6 +181,7 @@ export default function BadgeReissuePage({
         </DialogContent>
       </Dialog>
       <SafeDashboardDialog
+        hash={safeTxHash}
         open={openSafeDialog}
         onOpenChange={(open) => {
           setOpenSafeDialog(open);

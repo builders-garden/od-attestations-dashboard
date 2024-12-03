@@ -11,7 +11,15 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { DialogProps } from "@radix-ui/react-dialog";
 
-export const SafeDashboardDialog: React.FC<DialogProps> = ({ ...props }) => {
+interface SafeDashboardDialogProps extends DialogProps {
+  hash?: `0x${string}`;
+}
+
+export const SafeDashboardDialog: React.FC<SafeDashboardDialogProps> = ({
+  hash,
+  ...props
+}) => {
+  const safeAddress = process.env.NEXT_PUBLIC_SAFE_ADDRESS;
   return (
     <Dialog {...props}>
       <DialogContent className="max-w-sm gap-6">
@@ -26,7 +34,7 @@ export const SafeDashboardDialog: React.FC<DialogProps> = ({ ...props }) => {
           <br />
           Notify the other multisig signers to confirm the transaction on the{" "}
           <Link
-            href={"https://app.safe.global/"}
+            href={`https://app.safe.global/transactions/tx?safe=sep:${safeAddress}&id=multisig_${safeAddress}_${hash}`} // TODO: Change this to Base
             target="_blank"
             className="text-green-500 no-underline hover:underline"
           >

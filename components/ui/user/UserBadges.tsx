@@ -3,6 +3,8 @@ import BadgeCard from "../badge/BadgeCard";
 import { Attestation } from "@/lib/eas/types";
 import { useCountUp } from "@/components/hooks/useCountUp";
 import { useCreateBadges } from "@/components/hooks/useCreateBadges";
+import { useState } from "react";
+import * as Switch from "@radix-ui/react-switch";
 
 interface UserBadgesProps {
   userAttestations: Attestation[];

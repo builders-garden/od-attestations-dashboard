@@ -28,20 +28,15 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useAccount, useWriteContract } from "wagmi";
+import { useAccount } from "wagmi";
 import { useState } from "react";
 import { SchemaRegistryAbi } from "@/lib/abi/SchemaRegistry";
 import { SCHEMA_REGISTRY_CONTRACT_ADDRESSES } from "@/lib/eas/constants";
 import { FieldType } from "@/lib/eas/types";
 import { motion } from "framer-motion";
-import { SafeDashboardDialog } from "../../safe-dashboard-dialog";
+import { SafeDashboardDialog } from "../../SafeDashboardDialog";
 import { toast } from "sonner";
-import {
-  useProtocolKitOwner,
-  useApiKit,
-} from "@/components/providers/SafeProvider";
-import { encodeFunctionData } from "viem";
-import { MetaTransactionData } from "@safe-global/safe-core-sdk-types";
+import { useSendSafeTransaction } from "@/components/hooks/useSendSafeTransaction";
 
 const formSchema = z.object({
   fields: z.array(
@@ -92,54 +87,11 @@ export const RegisterSchemaForm: React.FC = () => {
   });
 
   const account = useAccount();
-  const { writeContractAsync } = useWriteContract();
   const [openSafeDialog, setOpenSafeDialog] = useState(false);
   const [openRegisterSchemaDialog, setOpenRegisterSchemaDialog] =
     useState(false);
-
-  const safeProvider = useProtocolKitOwner();
-  const apiKit = useApiKit();
-
-  const registerSchema = async (
-    schemaAddress: `0x${string}`,
-    schema: string,
-    resolverAddress: `0x${string}`,
-    isRevocable: boolean,
-  ) => {
-    console.log(safeProvider, apiKit);
-    if (!safeProvider || !apiKit) return;
-    const data = encodeFunctionData({
-      abi: SchemaRegistryAbi,
-      functionName: "register",
-      args: [schema, resolverAddress, isRevocable],
-    });
-    const safeTransactionData: MetaTransactionData = {
-      to: schemaAddress,
-      data,
-      value: "0",
-    };
-    const safeTransaction = await safeProvider.createTransaction({
-      transactions: [safeTransactionData],
-    });
-    console.log("created tx", safeTransaction);
-    const safeTxHash = await safeProvider.getTransactionHash(safeTransaction);
-    const senderSignature = await safeProvider.signHash(safeTxHash);
-    console.log("proposing");
-    await apiKit.proposeTransaction({
-      safeAddress: "0x883ac919B42b9065C1Bc1Ea7560ba2924655762E",
-      safeTransactionData: safeTransaction.data,
-      safeTxHash,
-      senderAddress: "0xb5C99bf3F9B8EDf2A532614049e9EE4302670a4a",
-      senderSignature: senderSignature.data,
-    });
-    console.log("proposed");
-    // writeContractAsync({
-    //   address: schemaAddress,
-    //   abi: SchemaRegistryAbi,
-    //   functionName: "register",
-    //   args: [schema, resolverAddress, isRevocable],
-    // });
-  };
+  const [safeTxHash, setSafeTxHash] = useState<`0x${string}`>();
+  const { sendSafeTransaction } = useSendSafeTransaction();
 
   const stringifyFields = (fields: z.infer<typeof formSchema>["fields"]) => {
     return fields
@@ -150,16 +102,26 @@ export const RegisterSchemaForm: React.FC = () => {
   const handleRegisterSchema = async (values: z.infer<typeof formSchema>) => {
     try {
       if (account.chain) {
-        registerSchema(
-          SCHEMA_REGISTRY_CONTRACT_ADDRESSES[
-            account.chain.id as keyof typeof SCHEMA_REGISTRY_CONTRACT_ADDRESSES
+        const txHash = await sendSafeTransaction({
+          abi: SchemaRegistryAbi,
+          contractAddress:
+            SCHEMA_REGISTRY_CONTRACT_ADDRESSES[
+              account.chain
+                .id as keyof typeof SCHEMA_REGISTRY_CONTRACT_ADDRESSES
+            ],
+          functionName: "register",
+          args: [
+            stringifyFields(values.fields),
+            "0x0000000000000000000000000000000000000000",
+            true,
           ],
-          stringifyFields(values.fields),
-          "0x0000000000000000000000000000000000000000",
-          true,
-        );
+          value: "0",
+        });
         setOpenRegisterSchemaDialog(false);
-        setOpenSafeDialog(true);
+        if (txHash) {
+          setSafeTxHash(txHash);
+          setOpenSafeDialog(true);
+        }
       }
     } catch (err) {
       console.error(err);
@@ -378,6 +340,7 @@ export const RegisterSchemaForm: React.FC = () => {
               </DialogContent>
             </Dialog>
             <SafeDashboardDialog
+              hash={safeTxHash}
               open={openSafeDialog}
               onOpenChange={setOpenSafeDialog}
             />

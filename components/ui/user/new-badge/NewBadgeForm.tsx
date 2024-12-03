@@ -31,13 +31,14 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { CircleX, Loader2 } from "lucide-react";
 import { SchemaEncoder } from "@ethereum-attestation-service/eas-sdk";
-import { Config, UseAccountReturnType, useWriteContract } from "wagmi";
+import { Config, UseAccountReturnType } from "wagmi";
 import { easMultiAttest } from "@/lib/eas/calls";
 import { EAS_CONTRACT_ADDRESSES } from "@/lib/eas/constants";
 import { getImageFromIpfs, uploadImageToIpfs } from "@/lib/ipfs";
 import { Checkbox } from "@/components/ui/checkbox";
-import { SafeDashboardDialog } from "@/components/ui/safe-dashboard-dialog";
+import { SafeDashboardDialog } from "@/components/ui/SafeDashboardDialog";
 import { toast } from "sonner";
+import { useSendSafeTransaction } from "@/components/hooks/useSendSafeTransaction";
 
 const formSchema = z.object({
   fields: z.array(
@@ -65,7 +66,6 @@ export const NewBadgeForm: React.FC<NewBadgeFormProps> = ({
   schemaFields,
 }) => {
   const [imageLoading, setImageLoading] = useState(false);
-  const { writeContract } = useWriteContract();
   const [collectors, setCollectors] = useState<string[]>([]);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string | undefined>(
@@ -73,6 +73,8 @@ export const NewBadgeForm: React.FC<NewBadgeFormProps> = ({
   );
   const [openTxDialog, setOpenTxDialog] = useState(false);
   const [openSafeDialog, setOpenSafeDialog] = useState(false);
+  const [safeTxHash, setSafeTxHash] = useState<`0x${string}`>();
+  const { sendSafeTransaction } = useSendSafeTransaction();
 
   const ODPASSPORT_BOOLEAN_FIELD = "ODPassport";
 
@@ -123,14 +125,14 @@ export const NewBadgeForm: React.FC<NewBadgeFormProps> = ({
     return ipfsHash;
   };
 
-  const handleCreateBadge = (data: z.infer<typeof formSchema>) => {
+  const handleCreateBadge = async (data: z.infer<typeof formSchema>) => {
     try {
       if (account.chain) {
         const schemaEncoder = new SchemaEncoder(
           selectedSchema?.schema as string,
         );
         const encodedData = schemaEncoder.encodeData(data.fields);
-        writeContract(
+        const txHash = await sendSafeTransaction(
           easMultiAttest(
             EAS_CONTRACT_ADDRESSES[
               account.chain.id as keyof typeof EAS_CONTRACT_ADDRESSES
@@ -141,8 +143,12 @@ export const NewBadgeForm: React.FC<NewBadgeFormProps> = ({
             true,
           ),
         );
+
         setOpenTxDialog(false);
-        setOpenSafeDialog(true);
+        if (txHash) {
+          setSafeTxHash(txHash);
+          setOpenSafeDialog(true);
+        }
       }
     } catch (err) {
       console.error(err);
@@ -380,6 +386,7 @@ export const NewBadgeForm: React.FC<NewBadgeFormProps> = ({
             </DialogContent>
           </Dialog>
           <SafeDashboardDialog
+            hash={safeTxHash}
             open={openSafeDialog}
             onOpenChange={setOpenSafeDialog}
           />
