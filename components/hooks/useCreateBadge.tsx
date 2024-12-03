@@ -3,7 +3,6 @@ import { Attestation, AttestationDecodedDataType } from "@/lib/eas/types";
 import BadgeClass from "@/lib/classes/BadgeClass";
 import { UseAccountReturnType } from "wagmi";
 import { getAttestationFromUID } from "@/lib/eas";
-import { getImageFromIpfs } from "@/lib/ipfs";
 
 export const useCreateBadge = (uid: string, account: UseAccountReturnType) => {
   const [badge, setBadge] = useState<BadgeClass>();
@@ -36,7 +35,7 @@ export const useCreateBadge = (uid: string, account: UseAccountReturnType) => {
         if (element.value.name === "BadgeTitle") {
           badgeTitle = element.value.value as string;
         } else if (element.value.name === "BadgeImageCID") {
-          badgeImageURL = await getImageFromIpfs(element.value.value as string);
+          badgeImageURL = `https://ipfs.io/ipfs/${element.value.value as string}`;
         } else if (element.value.name === "BadgeDescription") {
           badgeDescription = element.value.value as string;
         } else if (element.value.name === "ODPassport") {

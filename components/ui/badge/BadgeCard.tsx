@@ -1,7 +1,6 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import BadgeClass from "@/lib/classes/BadgeClass";
-import { getImageFromIpfs } from "@/lib/ipfs";
 import { useEffect, useState } from "react";
 
 interface BadgeProps {
@@ -18,10 +17,8 @@ export default function BadgeCard({ badge, index }: BadgeProps) {
     const fetchImageURL = async () => {
       setImageLoading(true);
       if (image) {
-        const imageURL = await getImageFromIpfs(image);
-        if (imageURL) {
-          setImageURL(imageURL);
-        }
+        const ImageURL = `https://ipfs.io/ipfs/${image}`;
+        setImageURL(ImageURL);
       }
       setImageLoading(false);
     };
