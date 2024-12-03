@@ -17,23 +17,5 @@ export default function Home() {
     }
   }, [account, router]);
 
-  return (
-    <Wrapper className="justify-center overflow-hidden">
-      {account.address ? (
-        <Icons.spinner className="mr-2 h-10 w-10 animate-spin" />
-      ) : (
-        <div className="z-50 flex flex-col items-center gap-3.5">
-          <div className="flex flex-col items-center gap-1">
-            <h1 className="text-3xl font-black">✨ Hello, Dreamer ✨</h1>
-            <div className="text-sm text-center max-w-xs">
-              Please connect your Wallet to start using the Onchain Dreamers
-              Passport!
-            </div>
-          </div>
-          <ConnectButton />
-        </div>
-      )}
-      <Clouds />
-    </Wrapper>
-  );
+  return <Wrapper className="justify-center overflow-hidden" />;
 }
