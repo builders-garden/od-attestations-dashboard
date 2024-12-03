@@ -1,4 +1,3 @@
-import { useEnsProfiles } from "@/components/hooks/useEnsProfile";
 import { adminAddresses } from "@/lib/constants";
 import { getUserUniqueAttestations } from "@/lib/eas";
 import { Attestation } from "@/lib/eas/types";

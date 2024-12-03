@@ -29,7 +29,7 @@ import { ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { use, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { useAccount, useWriteContract } from "wagmi";
+import { useAccount } from "wagmi";
 
 export default function BadgeRevokePage({
   params,
@@ -39,7 +39,6 @@ export default function BadgeRevokePage({
   const { uid } = use(params);
   const account = useAccount();
   const { badge, sourceAttestation, notFound } = useCreateBadge(uid, account);
-  const { writeContract } = useWriteContract();
   const { allAttestationsOfAKind } = useGetAllAttestationsOfAKind({
     sourceAttestation,
     account,
