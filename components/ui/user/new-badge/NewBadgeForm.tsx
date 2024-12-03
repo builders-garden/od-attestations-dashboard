@@ -34,7 +34,7 @@ import { SchemaEncoder } from "@ethereum-attestation-service/eas-sdk";
 import { Config, UseAccountReturnType } from "wagmi";
 import { easMultiAttest } from "@/lib/eas/calls";
 import { EAS_CONTRACT_ADDRESSES } from "@/lib/eas/constants";
-import { uploadImageToIpfs } from "@/lib/ipfs";
+import { getIpfsImageUrl, uploadImageToIpfs } from "@/lib/ipfs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { SafeDashboardDialog } from "@/components/ui/SafeDashboardDialog";
 import { toast } from "sonner";
@@ -119,7 +119,7 @@ export const NewBadgeForm: React.FC<NewBadgeFormProps> = ({
       setImageLoading(false);
       return;
     }
-    const url = `https://ipfs.io/ipfs/${ipfsHash}`;
+    const url = getIpfsImageUrl(ipfsHash);
     setUploadedImageUrl(url);
     setImageLoading(false);
     return ipfsHash;

@@ -29,7 +29,6 @@ export const SafeProvider: React.FC<{ children: ReactNode }> = ({
   useEffect(() => {
     const init = async () => {
       if (!address) {
-        console.error("Impossible to init SafeProvider without an address");
         return;
       }
       if (!process.env.NEXT_PUBLIC_SAFE_ADDRESS) {

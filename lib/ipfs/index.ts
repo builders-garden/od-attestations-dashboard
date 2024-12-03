@@ -32,3 +32,7 @@ export const uploadImageToIpfs: (
     console.error("Error uploading image:", error);
   }
 };
+
+export const getIpfsImageUrl = (cid: string) => {
+  return `https://${cid}.ipfs.flk-ipfs.xyz/`;
+};
