@@ -7,9 +7,10 @@ import { useEffect, useState } from "react";
 interface BadgeProps {
   badge: BadgeClass;
   index: number;
+  showAll?: boolean;
 }
 
-export default function BadgeCard({ badge, index }: BadgeProps) {
+export default function BadgeCard({ badge, index, showAll }: BadgeProps) {
   const { image, title, unlocked, attestationUID } = badge.getBadgeInfo();
   const [imageURL, setImageURL] = useState<string>("");
   const [imageLoading, setImageLoading] = useState<boolean>(false);
@@ -28,7 +29,7 @@ export default function BadgeCard({ badge, index }: BadgeProps) {
     fetchImageURL();
   }, [image]);
 
-  return (
+  return unlocked || (showAll && !unlocked) ? (
     <Link href={`/user/badge/${attestationUID}`}>
       <motion.div
         className="flex flex-col justify-between items-center w-full h-full pt-3 pb-5 gap-2 hover:bg-secondary-dark bg-secondary rounded-lg transition-all duration-200 ease-in-out"
@@ -66,5 +67,5 @@ export default function BadgeCard({ badge, index }: BadgeProps) {
         )}
       </motion.div>
     </Link>
-  );
+  ) : null;
 }

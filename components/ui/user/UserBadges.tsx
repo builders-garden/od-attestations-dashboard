@@ -4,7 +4,7 @@ import { Attestation } from "@/lib/eas/types";
 import { useCountUp } from "@/components/hooks/useCountUp";
 import { useCreateBadges } from "@/components/hooks/useCreateBadges";
 import { useState } from "react";
-import * as Switch from "@radix-ui/react-switch";
+import { Switch } from "../switch";
 
 interface UserBadgesProps {
   userAttestations: Attestation[];
@@ -15,6 +15,7 @@ export default function UserBadges({
   userAttestations,
   allAttestations,
 }: UserBadgesProps) {
+  const [showAll, setShowAll] = useState<boolean>(false);
   const userAttestationsCount = useCountUp(userAttestations.length, 2000); // 2 seconds duration
   const allBadges = useCreateBadges(userAttestations, allAttestations);
 
@@ -27,9 +28,20 @@ export default function UserBadges({
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
       >
-        <h1 className="text-2xl font-black text-start text-black">
-          Your Badges
-        </h1>
+        <div className="flex justify-start items-center gap-3.5">
+          <h1 className="text-2xl font-black text-start text-black">
+            Your Badges
+          </h1>
+          <div className="flex justify-start items-center gap-1.5">
+            <Switch
+              checked={showAll}
+              onCheckedChange={() => setShowAll(!showAll)}
+            />
+            <label className="text-xs" htmlFor="show-all">
+              Show All
+            </label>
+          </div>
+        </div>
         <div className="text-xs">
           Owned {userAttestationsCount}/{allAttestations.length}
         </div>
@@ -38,7 +50,14 @@ export default function UserBadges({
       {/* Badges */}
       <div className="grid grid-cols-2 justify-start items-center gap-5 w-full">
         {allBadges.map((badge, index) => {
-          return <BadgeCard key={index} index={index + 1} badge={badge} />;
+          return (
+            <BadgeCard
+              key={index}
+              index={index + 1}
+              badge={badge}
+              showAll={showAll}
+            />
+          );
         })}
       </div>
     </div>
