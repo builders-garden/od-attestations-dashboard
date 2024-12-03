@@ -12,9 +12,9 @@ import { Squash as Hamburger } from "hamburger-react";
 import { useCountUp } from "@/components/hooks/useCountUp";
 import { useState } from "react";
 import { useEnsProfiles } from "@/components/hooks/useEnsProfile";
-import { adminAddresses } from "@/lib/constants";
 import { Attestation } from "@/lib/eas/types";
 import Link from "next/link";
+import { isAdmin } from "@/lib/utils";
 
 interface UserHeaderProps {
   account: UseAccountReturnType<Config>;
@@ -27,10 +27,10 @@ export default function UserHeader({
 }: UserHeaderProps) {
   const { disconnect } = useDisconnect();
   const userAttestationsCount = useCountUp(userAttestations.length, 2000);
-  const { ensProfiles, loadingProfiles } = useEnsProfiles([account.address!]);
+  const { ensProfiles, loadingProfiles } = useEnsProfiles([
+    account.address as `0x${string}`,
+  ]);
   const [isOpen, setIsOpen] = useState(false);
-
-  const isAdmin = account.address && adminAddresses.includes(account.address);
 
   return (
     <>
@@ -67,7 +67,7 @@ export default function UserHeader({
         <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
           <DropdownMenuTrigger asChild>
             <div className="flex justify-center items-center h-full cursor-pointer">
-              {isAdmin ? (
+              {isAdmin(account.address) ? (
                 <Hamburger
                   rounded
                   toggled={isOpen}
@@ -92,7 +92,7 @@ export default function UserHeader({
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            {isAdmin && (
+            {isAdmin(account.address) && (
               <>
                 <DropdownMenuItem className="cursor-pointer w-full">
                   <Link href="/user/new-schema" className="w-full">

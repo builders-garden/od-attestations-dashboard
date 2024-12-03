@@ -50,7 +50,7 @@ export const ViewCollectorsButton: React.FC<ViewCollectorsButtonProps> = ({
           transition={{ duration: 1 }}
           className="text-black font-medium cursor-pointer"
         >
-          {allAttestationsOfAKind.length - 3 < 0
+          {allAttestationsOfAKind.length - 3 <= 0
             ? "Collectors"
             : "and " + (allAttestationsOfAKind.length - 3) + " others..."}
         </motion.label>
