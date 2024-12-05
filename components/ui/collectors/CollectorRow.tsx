@@ -1,11 +1,11 @@
-import { EnsProfileType } from "@/lib/ens";
-import { cn, shorten } from "@/lib/utils";
+import { useEnsProfile } from "@/components/hooks/useEnsProfile";
+import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { Check, CircleX } from "lucide-react";
 import { Dispatch, SetStateAction, useEffect } from "react";
 
 interface CollectorRowProps {
-  profile: EnsProfileType;
+  collector: string;
   index?: number;
   selectable?: boolean;
   selected?: boolean;
@@ -16,7 +16,7 @@ interface CollectorRowProps {
 }
 
 export default function CollectorRow({
-  profile,
+  collector,
   index = 0,
   selectable,
   selected,
@@ -25,17 +25,16 @@ export default function CollectorRow({
   handleRemove,
   setCollectorsEns,
 }: CollectorRowProps) {
-  const isAddress = profile.address.startsWith("0x");
-  const name = isAddress ? shorten(profile.address) : profile.name;
+  const { ensProfile } = useEnsProfile(collector);
 
   useEffect(() => {
-    if (profile && setCollectorsEns) {
+    if (ensProfile && setCollectorsEns) {
       setCollectorsEns((prev) => ({
         ...prev,
-        [profile.address]: profile.name ?? "",
+        [ensProfile.address.toLowerCase()]: ensProfile.identity ?? "",
       }));
     }
-  }, [profile, setCollectorsEns, profile.address]);
+  }, [ensProfile, setCollectorsEns]);
 
   return (
     <motion.div
@@ -49,20 +48,7 @@ export default function CollectorRow({
       )}
       onClick={onClick}
     >
-      {false ? (
-        <motion.div
-          className="flex justify-between items-center w-full"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.3 }}
-        >
-          <div className="flex justify-start items-center gap-2">
-            <div className="w-8 h-8 rounded-full animate-pulse bg-skeleton" />
-            <div className="bg-skeleton h-4 w-56 rounded-md animate-pulse" />
-          </div>
-          <div className="bg-skeleton h-7 w-7 rounded-md animate-pulse" />
-        </motion.div>
-      ) : (
+      { ensProfile ? (
         <motion.div
           className="flex justify-between items-center w-full"
           initial={{ opacity: 0 }}
@@ -72,8 +58,8 @@ export default function CollectorRow({
           <div className="flex justify-start items-center gap-2">
             <img
               src={
-                profile.avatar && profile.avatar.startsWith("http")
-                  ? profile.avatar
+                ensProfile.avatar && ensProfile.avatar.startsWith("http")
+                  ? ensProfile.avatar
                   : "/propic_placeholder.png"
               }
               alt="avatar"
@@ -82,12 +68,11 @@ export default function CollectorRow({
 
             <label
               className={cn(
-                "font-medium",
+                "font-medium font-mono",
                 selectable && "cursor-pointer",
-                isAddress && "font-mono",
               )}
             >
-              {profile.name || name}
+              {ensProfile.displayName}
             </label>
           </div>
           {selected && (
@@ -102,10 +87,23 @@ export default function CollectorRow({
               className="bg-destructive p-1 rounded-md text-white transition-all duration-200 ease-in-out cursor-pointer"
               onClick={(e) => {
                 e.stopPropagation();
-                handleRemove(profile.address);
+                handleRemove(collector);
               }}
             />
           )}
+        </motion.div>
+      ) : (
+        <motion.div
+          className="flex justify-between items-center w-full"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3 }}
+        >
+          <div className="flex justify-start items-center gap-2">
+            <div className="w-8 h-8 rounded-full animate-pulse bg-skeleton" />
+            <div className="bg-skeleton h-4 w-56 rounded-md animate-pulse" />
+          </div>
+          <div className="bg-skeleton h-7 w-7 rounded-md animate-pulse" />
         </motion.div>
       )}
     </motion.div>

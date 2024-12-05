@@ -11,12 +11,7 @@ import { useAccount } from "wagmi";
 import { Wrapper } from "@/components/ui/wrapper";
 import { Icons } from "@/components/ui/icons";
 import PaginatorButtons from "@/components/ui/paginatorButtons";
-import { useEnsProfiles } from "@/components/hooks/useEnsProfile";
-import { EnsProfileType } from "@/lib/ens";
-
-type ExtendedEnsProfileType = EnsProfileType & {
-  attestationId: string;
-};
+import { Attestation } from "@/lib/eas/types";
 
 export default function BadgeCollectorsPage({
   params,
@@ -30,27 +25,22 @@ export default function BadgeCollectorsPage({
     sourceAttestation,
     account,
   });
-  const { ensProfiles } = useEnsProfiles(
-    allAttestationsOfAKind.map(
-      (attestation) => attestation.recipient as `0x${string}`,
-    ),
-  );
   const collectorsCount = useCountUp(allAttestationsOfAKind.length, 2000); // 2 seconds duration
 
   // Pagination logic
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  const paginatedProfiles: ExtendedEnsProfileType[] = useMemo(() => {
+  const paginatedAttestations: Attestation[] = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
-    return ensProfiles
+    return allAttestationsOfAKind
       .map((profile, index) => ({
         ...profile,
         attestationId: allAttestationsOfAKind[index].id,
       }))
       .slice(startIndex, endIndex);
-  }, [ensProfiles, currentPage]);
+  }, [allAttestationsOfAKind, currentPage]);
 
   const totalPages = Math.ceil(allAttestationsOfAKind.length / itemsPerPage);
 
@@ -92,14 +82,14 @@ export default function BadgeCollectorsPage({
             <div className="flex w-full justify-between">
               <span className="font-bold">{badge!.title} badge collectors</span>
             </div>
-            {paginatedProfiles.map((profile, index) => (
+            {paginatedAttestations.map((attestation, index) => (
               <CollectorRowWithInfo
                 key={index}
                 index={(currentPage - 1) * itemsPerPage + index + 1}
-                profile={profile}
+                collector={attestation.recipient}
                 onClick={() => {
                   window.open(
-                    `https://sepolia.easscan.org/attestation/view/${profile.attestationId}`,
+                    `https://sepolia.easscan.org/attestation/view/${attestation.id}`,
                     "_blank",
                   );
                 }}

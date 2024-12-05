@@ -4,9 +4,9 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Button } from "../button";
 import CollectorRow from "./CollectorRow";
 import { isAddress } from "viem";
-import { getEnsAddress } from "@/lib/ens";
 import { toast } from "sonner";
-import { useEnsProfiles } from "@/components/hooks/useEnsProfile";
+import { getEnsProfileFromNameOrAddress } from "@/lib/ens";
+import { CsvInputButton } from "./CsvInputButton";
 
 export interface InputCollectorListProps {
   collectors: string[];
@@ -19,7 +19,6 @@ export const InputCollectorList: React.FC<InputCollectorListProps> = ({
 }) => {
   const [input, setInput] = useState("");
   const [inputIsValid, setInputIsValid] = useState(false);
-  const { ensProfiles } = useEnsProfiles(collectors as `0x${string}`[]);
 
   const handleRemove = (collector: string) => {
     setCollectors((prev) => prev.filter((c) => c !== collector));
@@ -27,7 +26,8 @@ export const InputCollectorList: React.FC<InputCollectorListProps> = ({
 
   const handleAdd = async (collector: string) => {
     if (collector.endsWith(".eth")) {
-      const resolvedAddress = await getEnsAddress(collector as `${string}.eth`);
+      const profile = await getEnsProfileFromNameOrAddress(collector);
+      const resolvedAddress = profile?.address;
       if (resolvedAddress) {
         collector = resolvedAddress;
       } else {
@@ -49,12 +49,7 @@ export const InputCollectorList: React.FC<InputCollectorListProps> = ({
 
   return (
     <div className="flex flex-col w-full gap-3">
-      <div
-        className={cn(
-          "flex w-full gap-0 justify-between",
-          input.length > 0 && "gap-4",
-        )}
-      >
+      <div className="flex w-full gap-1.5 justify-between">
         <Input
           placeholder="ENS or Address..."
           className="w-full"
@@ -73,12 +68,13 @@ export const InputCollectorList: React.FC<InputCollectorListProps> = ({
         >
           Add
         </Button>
+        <CsvInputButton setCollectors={setCollectors} />
       </div>
       <div className="flex flex-col gap-3 w-full max-h-[50rem] overflow-y-auto">
-        {ensProfiles.map((profile, index) => (
+        {collectors.map((collector, index) => (
           <CollectorRow
             key={index}
-            profile={profile}
+            collector={collector}
             removable
             handleRemove={handleRemove}
           />

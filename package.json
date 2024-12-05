@@ -9,7 +9,6 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@ensdomains/ensjs": "^4.0.2",
     "@ethereum-attestation-service/eas-sdk": "^2.7.0",
     "@hookform/resolvers": "^3.9.1",
     "@radix-ui/react-accordion": "^1.2.1",

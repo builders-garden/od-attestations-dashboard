@@ -4,7 +4,6 @@ import { Attestation } from "@/lib/eas/types";
 import React from "react";
 import { ViewCollectorsButtonAvatar } from "./ViewCollectorsButtonAvatar";
 import Link from "next/link";
-import { useEnsProfiles } from "@/components/hooks/useEnsProfile";
 import { motion } from "framer-motion";
 
 interface ViewCollectorsButtonProps {
@@ -17,11 +16,6 @@ export const ViewCollectorsButton: React.FC<ViewCollectorsButtonProps> = ({
   allAttestationsOfAKind,
 }) => {
   const bgColor = ["bg-pink-400", "bg-yellow-400", "bg-slate-200"];
-  const { ensProfiles } = useEnsProfiles(
-    allAttestationsOfAKind
-      .slice(0, 3)
-      .map((attestation) => attestation.recipient as `0x${string}`),
-  );
 
   return (
     <Link href={`/user/badge/${badge.attestationUID}/collectors`}>
@@ -30,18 +24,14 @@ export const ViewCollectorsButton: React.FC<ViewCollectorsButtonProps> = ({
         variant="ghost"
       >
         <div className="flex -space-x-1">
-          {ensProfiles &&
-            ensProfiles.map(
-              (profile, index) =>
-                profile && (
-                  <ViewCollectorsButtonAvatar
-                    index={index + 1}
-                    ensProfile={profile}
-                    bgColor={bgColor[index % 3]}
-                    key={index}
-                  />
-                ),
-            )}
+          {allAttestationsOfAKind.map((attestation, index) => (
+            <ViewCollectorsButtonAvatar
+              index={index + 1}
+              collector={attestation.recipient}
+              bgColor={bgColor[index % 3]}
+              key={index}
+            />
+          ))}
         </div>
 
         <motion.label

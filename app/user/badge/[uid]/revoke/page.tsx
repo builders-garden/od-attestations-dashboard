@@ -1,6 +1,5 @@
 "use client";
 import { useCreateBadge } from "@/components/hooks/useCreateBadge";
-import { useEnsProfiles } from "@/components/hooks/useEnsProfile";
 import { useGetAllAttestationsOfAKind } from "@/components/hooks/useGetAllAttestationsOfAKind";
 import { useSendSafeTransaction } from "@/components/hooks/useSendSafeTransaction";
 import { Button } from "@/components/ui/button";
@@ -22,7 +21,6 @@ import { SafeDashboardDialog } from "@/components/ui/SafeDashboardDialog";
 import { Wrapper } from "@/components/ui/wrapper";
 import { easMultiRevoke } from "@/lib/eas/calls";
 import { EAS_CONTRACT_ADDRESSES } from "@/lib/eas/constants";
-import { EnsProfileType } from "@/lib/ens";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { ArrowLeft, Loader2 } from "lucide-react";
@@ -59,21 +57,15 @@ export default function BadgeRevokePage({
   );
   const atLeastOneSelected = selectedCollectors.length > 0;
 
-  const { ensProfiles } = useEnsProfiles(
-    allAttestationsOfAKind.map(
-      (attestation) => attestation.recipient as `0x${string}`,
-    ),
-  );
-
   // Pagination logic
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
 
-  const paginatedProfiles: EnsProfileType[] = useMemo(() => {
+  const paginatedCollectors: string[] = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
-    return ensProfiles.slice(startIndex, endIndex);
-  }, [ensProfiles, currentPage]);
+    return collectors.slice(startIndex, endIndex);
+  }, [collectors, currentPage]);
 
   const totalPages = Math.ceil(allAttestationsOfAKind.length / itemsPerPage);
 
@@ -202,20 +194,25 @@ export default function BadgeRevokePage({
                 </Button>
               </div>
               <div className="flex flex-col gap-3 w-full max-h-[50rem] overflow-y-auto">
-                {paginatedProfiles
-                  .filter(
-                    (profile) =>
-                      profile.name.includes(input) ||
-                      collectorsEns[profile.name]?.includes(input),
-                  )
-                  .map((profile, index) => (
+                {paginatedCollectors
+                  .filter((collector) => {
+                    const collectorLowercase = collector.toLowerCase();
+                    const inputLowercase = input.toLowerCase();
+                    return (
+                      collectorLowercase.includes(inputLowercase) ||
+                      collectorsEns[collectorLowercase]?.includes(
+                        inputLowercase,
+                      )
+                    );
+                  })
+                  .map((collector, index) => (
                     <CollectorRow
                       key={index}
                       index={index + 1}
-                      profile={profile}
+                      collector={collector}
                       selectable
-                      selected={selectedCollectors.includes(profile.address)}
-                      onClick={() => handleSelect(profile.address)}
+                      selected={selectedCollectors.includes(collector)}
+                      onClick={() => handleSelect(collector)}
                       setCollectorsEns={setCollectorsEns}
                     />
                   ))}
