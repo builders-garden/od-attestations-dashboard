@@ -24,7 +24,7 @@ export const ViewCollectorsButton: React.FC<ViewCollectorsButtonProps> = ({
         variant="ghost"
       >
         <div className="flex -space-x-1">
-          {allAttestationsOfAKind.map((attestation, index) => (
+          {allAttestationsOfAKind.slice(0, 3).map((attestation, index) => (
             <ViewCollectorsButtonAvatar
               index={index + 1}
               collector={attestation.recipient}

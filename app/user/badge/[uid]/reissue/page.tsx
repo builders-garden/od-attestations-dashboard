@@ -13,7 +13,10 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { LinkTextWithIcon } from "@/components/ui/linkTextWithIcon";
-import { SchemaEncoder } from "@ethereum-attestation-service/eas-sdk";
+import {
+  SchemaEncoder,
+  SchemaItem,
+} from "@ethereum-attestation-service/eas-sdk";
 import { motion } from "framer-motion";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
@@ -21,7 +24,10 @@ import { use, useState } from "react";
 import { useAccount } from "wagmi";
 import { easMultiAttest } from "@/lib/eas/calls";
 import { EAS_CONTRACT_ADDRESSES } from "@/lib/eas/constants";
-import { AttestationDecodedDataType } from "@/lib/eas/types";
+import {
+  AttestationDecodedDataType,
+  AttestationDecodedDataTypeValue,
+} from "@/lib/eas/types";
 import { Wrapper } from "@/components/ui/wrapper";
 import { SafeDashboardDialog } from "@/components/ui/SafeDashboardDialog";
 import { toast } from "sonner";
@@ -42,6 +48,25 @@ export default function BadgeReissuePage({
   const { sendSafeTransaction } = useSendSafeTransaction();
   const [txLoading, setTxLoading] = useState(false);
 
+  const fixDecodedValues = (
+    decodedValues: AttestationDecodedDataTypeValue[],
+  ) => {
+    let fixedDecodedValues = decodedValues;
+    fixedDecodedValues = fixedDecodedValues.map((value) => {
+      if (value.type === "uint256") {
+        return {
+          ...value,
+          value:
+            typeof value.value === "object" && "hex" in value.value
+              ? Number(BigInt(value.value.hex))
+              : value.value,
+        };
+      }
+      return value;
+    });
+    return fixedDecodedValues as SchemaItem[];
+  };
+
   const handleReissueBadges = async () => {
     try {
       if (account.chain && sourceAttestation) {
@@ -51,8 +76,9 @@ export default function BadgeReissuePage({
         const decodedData: AttestationDecodedDataType[] = JSON.parse(
           sourceAttestation.decodedDataJson,
         );
-        const values = decodedData.map((data) => data.value);
-        const encodedData = schemaEncoder.encodeData(values);
+        const decodedValues = decodedData.map((data) => data.value);
+        const fixedDecodedValues = fixDecodedValues(decodedValues);
+        const encodedData = schemaEncoder.encodeData(fixedDecodedValues);
         setTxLoading(true);
         const txHash = await sendSafeTransaction(
           easMultiAttest(
