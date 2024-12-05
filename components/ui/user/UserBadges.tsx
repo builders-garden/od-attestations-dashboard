@@ -6,9 +6,9 @@ import { useCreateBadges } from "@/components/hooks/useCreateBadges";
 import { useMemo, useState } from "react";
 import { Switch } from "../switch";
 import { Config, UseAccountReturnType } from "wagmi";
-import { isAdmin } from "@/lib/utils";
 import PaginatorButtons from "../paginatorButtons";
 import Badge from "@/lib/classes/BadgeClass";
+import { useSafeContext } from "@/components/providers/SafeProvider";
 
 interface UserBadgesProps {
   userAttestations: Attestation[];
@@ -21,7 +21,9 @@ export default function UserBadges({
   allAttestations,
   account,
 }: UserBadgesProps) {
-  const [showAll, setShowAll] = useState<boolean>(isAdmin(account));
+  const { isAdmin } = useSafeContext();
+  const [showAll, setShowAll] = useState<boolean>(isAdmin);
+
   const userAttestationsCount = useCountUp(userAttestations.length, 2000); // 2 seconds duration
   const allBadges = useCreateBadges(userAttestations, allAttestations).filter(
     (badge) => showAll || badge.unlocked,

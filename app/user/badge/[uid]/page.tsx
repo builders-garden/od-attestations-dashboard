@@ -1,11 +1,11 @@
 "use client";
 import { useCreateBadge } from "@/components/hooks/useCreateBadge";
 import { useGetAllAttestationsOfAKind } from "@/components/hooks/useGetAllAttestationsOfAKind";
+import { useSafeContext } from "@/components/providers/SafeProvider";
 import BadgeInfo from "@/components/ui/badge/BadgeInfo";
 import { Button } from "@/components/ui/button";
 import { Icons } from "@/components/ui/icons";
 import { Wrapper } from "@/components/ui/wrapper";
-import { isAdmin } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { ArrowLeft, CircleX, Send, Share2 } from "lucide-react";
 import Link from "next/link";
@@ -24,6 +24,7 @@ export default function BadgePage({
     sourceAttestation,
     account,
   });
+  const { isAdmin } = useSafeContext();
 
   return (
     <Wrapper className="justify-between">
@@ -80,7 +81,7 @@ export default function BadgePage({
         )}
       </div>
 
-      {isAdmin(account) && badge && (
+      {isAdmin && badge && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

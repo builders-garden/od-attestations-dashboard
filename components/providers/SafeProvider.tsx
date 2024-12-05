@@ -14,10 +14,21 @@ import { sepolia } from "viem/chains";
 const SafeKitContext = createContext<{
   protocolKit: SafeFactory | null;
   apiKit: SafeApiKit | null;
-}>({ protocolKit: null, apiKit: null });
+  ownerAddresses: string[];
+  safeAddress: string | null;
+  adminAddresses: string[];
+  isAdmin: boolean;
+}>({
+  protocolKit: null,
+  apiKit: null,
+  ownerAddresses: [],
+  safeAddress: null,
+  adminAddresses: [],
+  isAdmin: false,
+});
 
 // Create a hook to access the SafeFactory and SafeApiKit instances
-export const useSafeKit = () => useContext(SafeKitContext);
+export const useSafeContext = () => useContext(SafeKitContext);
 
 export const SafeProvider: React.FC<{ children: ReactNode }> = ({
   children,
@@ -25,33 +36,52 @@ export const SafeProvider: React.FC<{ children: ReactNode }> = ({
   const { address } = useAccount();
   const [protocolKit, setProtocolKitOwner] = useState<SafeFactory | null>(null);
   const [apiKit, setApiKit] = useState<SafeApiKit | null>(null);
+  const [ownerAddresses, setOwnerAddresses] = useState<string[]>([]);
+  const [safeAddress, setSafeAddress] = useState<string | null>(null);
+  const [adminAddresses, setAdminAddresses] = useState<string[]>([]);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
   useEffect(() => {
     const init = async () => {
       if (!address) {
         return;
       }
-      if (!process.env.NEXT_PUBLIC_SAFE_ADDRESS) {
+      const safeAddress = process.env.NEXT_PUBLIC_SAFE_ADDRESS;
+      if (!safeAddress) {
         console.error("Impossible to init SafeProvider without a Safe address");
         return;
       }
       const protocolKit = await SafeFactory.init({
         provider: window.ethereum,
         signer: address,
-        safeAddress: process.env.NEXT_PUBLIC_SAFE_ADDRESS,
+        safeAddress: safeAddress,
       });
       const apiKit = new SafeApiKit({
         chainId: BigInt(sepolia.id), // TODO: set the base chainId
       });
+      const ownerAddresses = await protocolKit.getOwners();
       setProtocolKitOwner(protocolKit);
       setApiKit(apiKit);
+      setOwnerAddresses(ownerAddresses);
+      setSafeAddress(safeAddress);
+      setAdminAddresses([...ownerAddresses, safeAddress]);
+      setIsAdmin([...ownerAddresses, safeAddress].includes(address));
     };
 
     init();
   }, [address]);
 
   return (
-    <SafeKitContext.Provider value={{ protocolKit, apiKit }}>
+    <SafeKitContext.Provider
+      value={{
+        protocolKit,
+        apiKit,
+        ownerAddresses,
+        safeAddress,
+        adminAddresses,
+        isAdmin,
+      }}
+    >
       {children}
     </SafeKitContext.Provider>
   );

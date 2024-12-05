@@ -1,8 +1,8 @@
 "use client";
+import { useSafeContext } from "@/components/providers/SafeProvider";
 import UserBadges from "@/components/ui/user/UserBadges";
 import UserHeader from "@/components/ui/user/UserHeader";
 import { Wrapper } from "@/components/ui/wrapper";
-import { adminAddresses } from "@/lib/constants";
 import {
   getUserUniqueAttestations,
   getEveryUniqueAttestation,
@@ -13,13 +13,15 @@ import { useAccount } from "wagmi";
 
 export default function UserHome() {
   const account = useAccount();
+  const { adminAddresses } = useSafeContext();
   const [userAttestations, setUserAttestations] = useState<Attestation[]>([]);
   const [allAttestations, setAllAttestations] = useState<Attestation[]>([]);
   const [loadingAttestations, setLoadingAttestations] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchAttestations = async () => {
-      if (!account.address || !account.chain?.id) return;
+      if (!account.address || !account.chain?.id || adminAddresses.length <= 0)
+        return;
       const allAttestations = await getEveryUniqueAttestation(
         adminAddresses,
         account.chain.id,
@@ -37,7 +39,7 @@ export default function UserHome() {
     };
 
     fetchAttestations();
-  }, [account.address, account.chain?.id]);
+  }, [account.address, account.chain?.id, adminAddresses]);
 
   return (
     <Wrapper>

@@ -6,10 +6,10 @@ import { schemasFromWallets } from "@/lib/eas";
 import { useAccount } from "wagmi";
 import { useEffect, useState } from "react";
 import { FieldType, Schema, SchemaField } from "@/lib/eas/types";
-import { adminAddresses } from "@/lib/constants";
 import { NewBadgeForm } from "@/components/ui/user/new-badge/NewBadgeForm";
 import { SchemaSelector } from "@/components/ui/user/new-badge/SchemaSelector";
 import { Wrapper } from "@/components/ui/wrapper";
+import { useSafeContext } from "@/components/providers/SafeProvider";
 
 export default function NewBadgePage() {
   const account = useAccount();
@@ -20,9 +20,11 @@ export default function NewBadgePage() {
   const [schemaFields, setSchemaFields] = useState<SchemaField[] | undefined>(
     undefined,
   );
+  const { adminAddresses } = useSafeContext();
 
   useEffect(() => {
     const fetchSchemas = async () => {
+      if (adminAddresses.length <= 0) return;
       const schemas = await schemasFromWallets(
         adminAddresses,
         account.chain?.id,
@@ -42,7 +44,7 @@ export default function NewBadgePage() {
       );
     };
     fetchSchemas();
-  }, [account.chain?.id]);
+  }, [account.chain?.id, adminAddresses]);
 
   return (
     <Wrapper>

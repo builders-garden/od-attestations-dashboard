@@ -13,8 +13,8 @@ import { useCountUp } from "@/components/hooks/useCountUp";
 import { useState } from "react";
 import { Attestation } from "@/lib/eas/types";
 import Link from "next/link";
-import { isAdmin } from "@/lib/utils";
 import { useEnsProfile } from "@/components/hooks/useEnsProfile";
+import { useSafeContext } from "@/components/providers/SafeProvider";
 
 interface UserHeaderProps {
   account: UseAccountReturnType<Config>;
@@ -29,6 +29,7 @@ export default function UserHeader({
   const userAttestationsCount = useCountUp(userAttestations.length, 2000);
   const { ensProfile } = useEnsProfile(account.address);
   const [isOpen, setIsOpen] = useState(false);
+  const { isAdmin } = useSafeContext();
 
   return (
     <>
@@ -65,7 +66,7 @@ export default function UserHeader({
         <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
           <DropdownMenuTrigger asChild>
             <div className="flex justify-center items-center h-full cursor-pointer">
-              {isAdmin(account) ? (
+              {isAdmin ? (
                 <Hamburger
                   rounded
                   toggled={isOpen}
@@ -90,7 +91,7 @@ export default function UserHeader({
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            {isAdmin(account) && (
+            {isAdmin && (
               <>
                 <DropdownMenuItem className="cursor-pointer w-full">
                   <Link href="/user/new-schema" className="w-full">

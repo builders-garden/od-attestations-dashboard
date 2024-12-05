@@ -3,7 +3,7 @@ import { MetaTransactionData } from "@safe-global/safe-core-sdk-types";
 import { useCallback } from "react";
 import { encodeFunctionData } from "viem";
 import { useAccount } from "wagmi";
-import { useSafeKit } from "../providers/SafeProvider";
+import { useSafeContext } from "../providers/SafeProvider";
 
 export interface SendSafeTransactionParams {
   abi: any;
@@ -14,7 +14,7 @@ export interface SendSafeTransactionParams {
 }
 
 export const useSendSafeTransaction = () => {
-  const { protocolKit, apiKit } = useSafeKit();
+  const { protocolKit, apiKit } = useSafeContext();
   const account = useAccount();
 
   const sendSafeTransaction = useCallback(

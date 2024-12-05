@@ -1,5 +1,5 @@
 import { useEnsProfile } from "@/components/hooks/useEnsProfile";
-import { adminAddresses } from "@/lib/constants";
+import { useSafeContext } from "@/components/providers/SafeProvider";
 import { getUserUniqueAttestations } from "@/lib/eas";
 import { Attestation } from "@/lib/eas/types";
 import { cn } from "@/lib/utils";
@@ -21,10 +21,12 @@ export default function CollectorRowWithInfo({
   const account = useAccount();
   const [userAttestations, setUserAttestations] = useState<Attestation[]>();
   const { ensProfile } = useEnsProfile(collector);
+  const { adminAddresses } = useSafeContext();
 
   useEffect(() => {
     const fetchAttestations = async () => {
-      if (!collector || !account.chain?.id) return;
+      if (!collector || !account.chain?.id || adminAddresses.length <= 0)
+        return;
       const userAttestations = await getUserUniqueAttestations(
         collector,
         adminAddresses,
@@ -34,7 +36,7 @@ export default function CollectorRowWithInfo({
     };
 
     fetchAttestations();
-  }, [collector, account.chain?.id]);
+  }, [collector, account.chain?.id, adminAddresses]);
 
   return (
     <motion.div

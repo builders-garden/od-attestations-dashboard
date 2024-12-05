@@ -1,4 +1,4 @@
-import { cn, isAdmin } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { motion } from "framer-motion";
 import { ReactNode, useEffect } from "react";
@@ -6,6 +6,7 @@ import { useAccount } from "wagmi";
 import { Clouds } from "./clouds";
 import { usePathname, useRouter } from "next/navigation";
 import { Icons } from "./icons";
+import { useSafeContext } from "../providers/SafeProvider";
 
 interface WrapperProps {
   children?: ReactNode;
@@ -19,13 +20,13 @@ export const Wrapper = ({ children, className }: WrapperProps) => {
 
   const adminPages = ["/new-schema", "/revoke", "/reissue", "/new-badge"];
   const isAdminPage = adminPages.some((page) => pathname.includes(page));
-  const userIsAdmin = isAdmin(account);
+  const { isAdmin } = useSafeContext();
 
   useEffect(() => {
-    if (account.isConnected && isAdminPage && !userIsAdmin) {
+    if (account.isConnected && isAdminPage && !isAdmin) {
       router.push("/user");
     }
-  }, [account.isConnected, isAdminPage, userIsAdmin, router]);
+  }, [account.isConnected, isAdminPage, isAdmin, router]);
 
   return (
     <div className="flex justify-center items-center h-full w-full bg-background">
@@ -53,7 +54,7 @@ export const Wrapper = ({ children, className }: WrapperProps) => {
             </div>
             <Clouds />
           </>
-        ) : isAdminPage && !userIsAdmin ? (
+        ) : isAdminPage && !isAdmin ? (
           <div className="flex justify-center items-center w-full h-full mt-32">
             <Icons.spinner className="mr-2 h-10 w-10 animate-spin" />
           </div>
