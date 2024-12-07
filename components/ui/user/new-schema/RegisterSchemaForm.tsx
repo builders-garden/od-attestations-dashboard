@@ -268,7 +268,7 @@ export const RegisterSchemaForm: React.FC = () => {
               </div>
             ))}
 
-          <div className="flex flex-col gap-4 m-auto fixed bottom-0 left-0 right-0 bg-white p-4 w-full sm:max-w-md shadow-2xl shadow-zinc-500 rounded-2xl">
+          <div className="flex flex-col gap-4 m-auto fixed bottom-0 left-0 right-0 bg-white p-4 w-full sm:max-w-md shadow-top-2xl shadow-zinc-500 rounded-2xl">
             <Button
               type="button"
               className="w-full"

@@ -4,6 +4,13 @@ import { useRef } from "react";
 import { toast } from "sonner";
 import { getEnsProfileFromNameOrAddress } from "@/lib/ens";
 import { isAddress } from "viem";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+  TooltipArrow,
+} from "../tooltip";
 
 export interface CsvInputButtonProps {
   setCollectors: (collectors: React.SetStateAction<string[]>) => void;
@@ -64,14 +71,29 @@ export const CsvInputButton: React.FC<CsvInputButtonProps> = ({
 
   return (
     <>
-      <Button
-        type="button"
-        variant="success"
-        onClick={() => fileInputRef.current?.click()}
-        className="w-fit px-1.5"
-      >
-        <FileUp className="h-[22px] w-[22px]" />
-      </Button>
+      <TooltipProvider>
+        <Tooltip delayDuration={150}>
+          <TooltipTrigger asChild>
+            <div>
+              <Button
+                type="button"
+                variant="success"
+                onClick={(e) => {
+                  e.preventDefault();
+                  fileInputRef.current?.click();
+                }}
+                className="w-fit px-1.5"
+              >
+                <FileUp className="h-[22px] w-[22px]" />
+              </Button>
+            </div>
+          </TooltipTrigger>
+          <TooltipContent className="bg-secondary-foreground">
+            Upload CSV file
+            <TooltipArrow />
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
       <input
         type="file"
         ref={fileInputRef}

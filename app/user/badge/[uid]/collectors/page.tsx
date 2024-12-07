@@ -6,12 +6,12 @@ import CollectorRowWithInfo from "@/components/ui/collectors/CollectorRowWithInf
 import { motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import { use, useState, useMemo } from "react";
+import { use } from "react";
 import { useAccount } from "wagmi";
 import { Wrapper } from "@/components/ui/wrapper";
 import { Icons } from "@/components/ui/icons";
 import PaginatorButtons from "@/components/ui/paginatorButtons";
-import { Attestation } from "@/lib/eas/types";
+import { usePagination } from "@/components/hooks/usePagination";
 
 export default function BadgeCollectorsPage({
   params,
@@ -26,23 +26,18 @@ export default function BadgeCollectorsPage({
     account,
   });
   const collectorsCount = useCountUp(allAttestationsOfAKind.length, 2000); // 2 seconds duration
-
-  // Pagination logic
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
-
-  const paginatedAttestations: Attestation[] = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    return allAttestationsOfAKind
-      .map((profile, index) => ({
-        ...profile,
-        attestationId: allAttestationsOfAKind[index].id,
-      }))
-      .slice(startIndex, endIndex);
-  }, [allAttestationsOfAKind, currentPage]);
-
-  const totalPages = Math.ceil(allAttestationsOfAKind.length / itemsPerPage);
+  const {
+    currentPage,
+    totalPages,
+    setCurrentPage,
+    paginatedItems: paginatedAttestations,
+  } = usePagination(
+    allAttestationsOfAKind.map((profile, index) => ({
+      ...profile,
+      attestationId: allAttestationsOfAKind[index].id,
+    })),
+    10,
+  );
 
   return (
     <Wrapper className="gap-6">
@@ -85,7 +80,6 @@ export default function BadgeCollectorsPage({
             {paginatedAttestations.map((attestation, index) => (
               <CollectorRowWithInfo
                 key={index}
-                index={(currentPage - 1) * itemsPerPage + index + 1}
                 collector={attestation.recipient}
                 onClick={() => {
                   window.open(
@@ -96,14 +90,11 @@ export default function BadgeCollectorsPage({
               />
             ))}
           </div>
-
-          {totalPages > 1 && (
-            <PaginatorButtons
-              currentPage={currentPage}
-              setCurrentPage={setCurrentPage}
-              totalPages={totalPages}
-            />
-          )}
+          <PaginatorButtons
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            totalPages={totalPages}
+          />
         </motion.div>
       ) : (
         <div className="flex justify-center items-center w-full h-full mt-32">

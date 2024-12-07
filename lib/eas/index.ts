@@ -76,7 +76,6 @@ export const schemasFromWallets = async (
 ): Promise<Schema[]> => {
   // Check if the chain ID was not provided
   if (!chainId) {
-    console.log("Chain ID was not provided.");
     return [];
   }
   const endpoint = GRAPHQL_ENDPOINTS[chainId as keyof typeof GRAPHQL_ENDPOINTS];
@@ -129,7 +128,6 @@ export const getUserAttestations = async (
 ): Promise<Attestation[]> => {
   // Check if the chain ID or issuer addresses were not provided
   if (!chainId || issuerAddresses.length === 0) {
-    console.log("Chain ID or issuer addresses were not provided.");
     return [];
   }
 
@@ -182,7 +180,6 @@ export const getUserUniqueAttestations = async (
 ): Promise<Attestation[]> => {
   // Check if the chain ID or issuer addresses were not provided
   if (!chainId || issuerAddresses.length === 0) {
-    console.log("Chain ID or issuer addresses were not provided.");
     return [];
   }
 
@@ -244,7 +241,6 @@ export const getEveryUniqueAttestation = async (
 ): Promise<Attestation[]> => {
   // Check if the chain ID or issuer addresses were not provided
   if (!chainId || issuerAddresses.length === 0) {
-    console.log("Chain ID or issuer addresses were not provided.");
     return [];
   }
 
@@ -302,7 +298,6 @@ export const getAttestationFromUID = async (
   chainId: number | undefined,
 ): Promise<Attestation | null> => {
   if (!chainId) {
-    console.log("Chain ID was not provided.");
     return null;
   }
   const endpoint = GRAPHQL_ENDPOINTS[chainId as keyof typeof GRAPHQL_ENDPOINTS];
@@ -340,7 +335,6 @@ export const getAllAttestationsOfAKind = async (
   chainId: number | undefined,
 ): Promise<Attestation[]> => {
   if (!chainId || !decodedDataJson) {
-    console.log("Chain ID or decodedDataJson was not provided.");
     return [];
   }
   const endpoint = GRAPHQL_ENDPOINTS[chainId as keyof typeof GRAPHQL_ENDPOINTS];
@@ -384,7 +378,6 @@ export const getSchemasNamesAttestations = async (
   chainId: number | undefined,
 ): Promise<Attestation[]> => {
   if (!chainId || schemaIds.length === 0) {
-    console.log("Chain ID or schema IDs were not provided.");
     return [];
   }
 

@@ -1,6 +1,7 @@
 "use client";
 import { useCreateBadge } from "@/components/hooks/useCreateBadge";
 import { useGetAllAttestationsOfAKind } from "@/components/hooks/useGetAllAttestationsOfAKind";
+import { usePagination } from "@/components/hooks/usePagination";
 import { useSendSafeTransaction } from "@/components/hooks/useSendSafeTransaction";
 import { Button } from "@/components/ui/button";
 import CollectorRow from "@/components/ui/collectors/CollectorRow";
@@ -25,7 +26,7 @@ import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
-import { use, useMemo, useState } from "react";
+import { use, useState } from "react";
 import { toast } from "sonner";
 import { useAccount } from "wagmi";
 
@@ -47,27 +48,28 @@ export default function BadgeRevokePage({
   const [openRevokeDialog, setOpenRevokeDialog] = useState(false);
   const [safeTxHash, setSafeTxHash] = useState<`0x${string}`>();
   const { sendSafeTransaction } = useSendSafeTransaction();
-
-  // Collectors logic
-  const collectors = allAttestationsOfAKind.map(
-    (attestation) => attestation.recipient,
-  );
   const [collectorsEns, setCollectorsEns] = useState<Record<string, string>>(
     {},
   );
+
+  // Collectors logic
+  const collectors = allAttestationsOfAKind
+    .map((attestation) => attestation.recipient)
+    .filter((collector) => {
+      const collectorLowercase = collector.toLowerCase();
+      const inputLowercase = input.toLowerCase();
+      return (
+        collectorLowercase.includes(inputLowercase) ||
+        collectorsEns[collectorLowercase]?.includes(inputLowercase)
+      );
+    });
   const atLeastOneSelected = selectedCollectors.length > 0;
-
-  // Pagination logic
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 8;
-
-  const paginatedCollectors: string[] = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    return collectors.slice(startIndex, endIndex);
-  }, [collectors, currentPage]);
-
-  const totalPages = Math.ceil(allAttestationsOfAKind.length / itemsPerPage);
+  const {
+    currentPage,
+    totalPages,
+    setCurrentPage,
+    paginatedItems: paginatedCollectors,
+  } = usePagination(collectors, 10);
 
   const handleSelect = (collector: string) => {
     setSelectedCollectors((prev) =>
@@ -194,35 +196,21 @@ export default function BadgeRevokePage({
                 </Button>
               </div>
               <div className="flex flex-col gap-3 w-full max-h-[50rem] overflow-y-auto">
-                {paginatedCollectors
-                  .filter((collector) => {
-                    const collectorLowercase = collector.toLowerCase();
-                    const inputLowercase = input.toLowerCase();
-                    return (
-                      collectorLowercase.includes(inputLowercase) ||
-                      collectorsEns[collectorLowercase]?.includes(
-                        inputLowercase,
-                      )
-                    );
-                  })
-                  .map((collector, index) => (
-                    <CollectorRow
-                      key={index}
-                      index={index + 1}
-                      collector={collector}
-                      selectable
-                      selected={selectedCollectors.includes(collector)}
-                      onClick={() => handleSelect(collector)}
-                      setCollectorsEns={setCollectorsEns}
-                    />
-                  ))}
-                {totalPages > 1 && (
-                  <PaginatorButtons
-                    currentPage={currentPage}
-                    setCurrentPage={setCurrentPage}
-                    totalPages={totalPages}
+                {paginatedCollectors.map((collector, index) => (
+                  <CollectorRow
+                    key={index}
+                    collector={collector}
+                    selectable
+                    selected={selectedCollectors.includes(collector)}
+                    onClick={() => handleSelect(collector)}
+                    setCollectorsEns={setCollectorsEns}
                   />
-                )}
+                ))}
+                <PaginatorButtons
+                  currentPage={currentPage}
+                  setCurrentPage={setCurrentPage}
+                  totalPages={totalPages}
+                />
               </div>
             </div>
           </>

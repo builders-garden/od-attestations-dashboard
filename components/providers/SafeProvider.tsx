@@ -34,7 +34,7 @@ export const SafeProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const { address } = useAccount();
-  const [protocolKit, setProtocolKitOwner] = useState<SafeFactory | null>(null);
+  const [protocolKit, setProtocolKit] = useState<SafeFactory | null>(null);
   const [apiKit, setApiKit] = useState<SafeApiKit | null>(null);
   const [ownerAddresses, setOwnerAddresses] = useState<string[]>([]);
   const [safeAddress, setSafeAddress] = useState<string | null>(null);
@@ -60,7 +60,7 @@ export const SafeProvider: React.FC<{ children: ReactNode }> = ({
         chainId: BigInt(sepolia.id), // TODO: set the base chainId
       });
       const ownerAddresses = await protocolKit.getOwners();
-      setProtocolKitOwner(protocolKit);
+      setProtocolKit(protocolKit);
       setApiKit(apiKit);
       setOwnerAddresses(ownerAddresses);
       setSafeAddress(safeAddress);

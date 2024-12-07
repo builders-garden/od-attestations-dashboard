@@ -42,7 +42,7 @@ export default function CollectorRowWithInfo({
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.5, delay: 0.1 * index }}
+      transition={{ duration: 1, delay: 0.1 * index }}
       className={cn(
         "flex flex-row justify-center items-center w-full p-2 gap-2 bg-secondary hover:bg-secondary-dark rounded-lg transition-all duration-200 ease-in-out",
         onClick && "cursor-pointer",
