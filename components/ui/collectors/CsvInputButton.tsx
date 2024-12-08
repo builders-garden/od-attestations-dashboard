@@ -1,6 +1,6 @@
-import { FileUp } from "lucide-react";
+import { FileUp, Loader2Icon } from "lucide-react";
 import { Button } from "../button";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { getEnsProfileFromNameOrAddress } from "@/lib/ens";
 import { isAddress } from "viem";
@@ -20,6 +20,7 @@ export const CsvInputButton: React.FC<CsvInputButtonProps> = ({
   setCollectors,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [loadingFile, setLoadingFile] = useState(false);
 
   const handleFileUpload = async (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -28,6 +29,7 @@ export const CsvInputButton: React.FC<CsvInputButtonProps> = ({
     if (file && file.type === "text/csv") {
       const reader = new FileReader();
       reader.onload = async (e) => {
+        setLoadingFile(true);
         const content = e.target?.result as string;
         const lines = content.split("\n");
         const firstColumnData = lines
@@ -55,6 +57,7 @@ export const CsvInputButton: React.FC<CsvInputButtonProps> = ({
             (address) => !prevCollectors.includes(address),
           ),
         ]);
+        setLoadingFile(false);
       };
       reader.readAsText(file);
     } else {
@@ -82,9 +85,14 @@ export const CsvInputButton: React.FC<CsvInputButtonProps> = ({
                   e.preventDefault();
                   fileInputRef.current?.click();
                 }}
+                disabled={loadingFile}
                 className="w-fit px-1.5"
               >
-                <FileUp className="h-[22px] w-[22px]" />
+                {!loadingFile ? (
+                  <FileUp className="h-[22px] w-[22px]" />
+                ) : (
+                  <Loader2Icon className="h-[22px] w-[22px] animate-spin" />
+                )}
               </Button>
             </div>
           </TooltipTrigger>
