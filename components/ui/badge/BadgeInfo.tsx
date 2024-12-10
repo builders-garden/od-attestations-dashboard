@@ -24,6 +24,8 @@ export default function BadgeInfo({
 }: BadgeInfoProps) {
   const account = useAccount();
 
+  const isProduction = process.env.NODE_ENV === "production";
+
   // Get the index of the attestation that has the same recipient address as account.address
   const userAttestationIndex =
     allAttestationsOfAKind.findIndex(
@@ -38,7 +40,7 @@ export default function BadgeInfo({
         <>
           <div className="flex gap-3 items-center justify-center">
             <Link
-              href={`https://sepolia.easscan.org/attestation/view/${badge.attestationUID}`}
+              href={`https://${isProduction ? "base" : "sepolia"}.easscan.org/attestation/view/${badge.attestationUID}`}
               className="flex justify-start items-center gap-2 px-2 h-7 bg-primary rounded-md"
               target="_blank"
             >

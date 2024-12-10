@@ -39,6 +39,8 @@ export default function BadgeCollectorsPage({
     10,
   );
 
+  const isProduction = process.env.NODE_ENV === "production";
+
   return (
     <Wrapper className="gap-6">
       <motion.div
@@ -83,7 +85,7 @@ export default function BadgeCollectorsPage({
                 collector={attestation.recipient}
                 onClick={() => {
                   window.open(
-                    `https://sepolia.easscan.org/attestation/view/${attestation.id}`,
+                    `https://${isProduction ? "base" : "sepolia"}.easscan.org/attestation/view/${attestation.id}`,
                     "_blank",
                   );
                 }}

@@ -20,6 +20,7 @@ export const SafeDashboardDialog: React.FC<SafeDashboardDialogProps> = ({
   ...props
 }) => {
   const safeAddress = process.env.NEXT_PUBLIC_SAFE_ADDRESS;
+  const isProduction = process.env.NODE_ENV === "production";
   return (
     <Dialog {...props}>
       <DialogContent className="max-w-sm gap-6">
@@ -34,7 +35,7 @@ export const SafeDashboardDialog: React.FC<SafeDashboardDialogProps> = ({
           <br />
           Notify the other multisig signers to confirm the transaction on the{" "}
           <Link
-            href={`https://app.safe.global/transactions/tx?safe=sep:${safeAddress}&id=multisig_${safeAddress}_${hash}`} // TODO: Change this to Base
+            href={`https://app.safe.global/transactions/tx?safe=${isProduction ? "base" : "sep"}:${safeAddress}&id=multisig_${safeAddress}_${hash}`}
             target="_blank"
             className="text-green-500 no-underline hover:underline"
           >

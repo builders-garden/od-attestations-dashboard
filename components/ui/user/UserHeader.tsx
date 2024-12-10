@@ -6,6 +6,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Config, UseAccountReturnType, useDisconnect } from "wagmi";
 import { Squash as Hamburger } from "hamburger-react";
@@ -30,6 +31,8 @@ export default function UserHeader({
   const { ensProfile } = useEnsProfile(account.address);
   const [isOpen, setIsOpen] = useState(false);
   const { isAdmin } = useSafeContext();
+
+  const isProduction = process.env.NODE_ENV === "production";
 
   return (
     <>
@@ -91,6 +94,19 @@ export default function UserHeader({
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
+            {ensProfile && (
+              <>
+                <DropdownMenuItem className="cursor-pointer w-full">
+                  <Link
+                    href={`https://${isProduction ? "basescan.org" : "sepolia.etherscan.io"}/address/${ensProfile.address}`}
+                    target="_blank"
+                  >
+                    {ensProfile.displayName}
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="mx-0 my-0" />
+              </>
+            )}
             {isAdmin && (
               <>
                 <DropdownMenuItem className="cursor-pointer w-full">

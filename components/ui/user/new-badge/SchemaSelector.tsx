@@ -45,6 +45,7 @@ export const SchemaSelector: React.FC<SchemaSelectorProps> = ({
   }, [selectedSchema]);
 
   const schemaNames = useGetSchemasNames(schemas, account.chain?.id);
+  const isProduction = process.env.NODE_ENV === "production";
 
   return (
     <div className="flex flex-col gap-2">
@@ -52,7 +53,7 @@ export const SchemaSelector: React.FC<SchemaSelectorProps> = ({
         <span className="text-sm">Select a Schema</span>
         {selectedSchema?.id && (
           <LinkTextWithIcon
-            href={`https://sepolia.easscan.org/schema/view/${selectedSchema.id}`}
+            href={`https://${isProduction ? "base" : "sepolia"}.easscan.org/schema/view/${selectedSchema.id}`}
           >
             Easscan
           </LinkTextWithIcon>

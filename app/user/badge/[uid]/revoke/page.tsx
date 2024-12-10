@@ -52,6 +52,8 @@ export default function BadgeRevokePage({
     {},
   );
 
+  const isProduction = process.env.NODE_ENV === "production";
+
   // Collectors logic
   const collectors = allAttestationsOfAKind
     .map((attestation) => attestation.recipient)
@@ -154,7 +156,7 @@ export default function BadgeRevokePage({
                 <div className="flex w-full justify-between">
                   <span className="font-bold">{badge.title} collectors</span>
                   <LinkTextWithIcon
-                    href={`https://sepolia.easscan.org/attestation/view/${badge.attestationUID}`}
+                    href={`https://${isProduction ? "base" : "sepolia"}.easscan.org/attestation/view/${badge.attestationUID}`}
                   >
                     Easscan
                   </LinkTextWithIcon>

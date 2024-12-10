@@ -11,6 +11,7 @@ import { ArrowLeft, CircleX, Send, Share2 } from "lucide-react";
 import Link from "next/link";
 import { use } from "react";
 import { useAccount } from "wagmi";
+import { toast } from "sonner";
 
 export default function BadgePage({
   params,
@@ -39,7 +40,23 @@ export default function BadgePage({
             <ArrowLeft size={24} />
           </Link>
 
-          {badge && <Share2 size={24} /> /* TODO: Add share functionality*/}
+          {badge && (
+            <Button
+              variant="ghost"
+              className="h-[24] w-[24] p-0"
+              onClick={
+                //Copy to clipboard and show a toast
+                () => {
+                  navigator.clipboard.writeText(
+                    `${process.env.NEXT_PUBLIC_BASE_URL}/user/badge/${badge.attestationUID}`,
+                  );
+                  toast.success("Badge link copied to clipboard");
+                }
+              }
+            >
+              <Share2 size={24} />
+            </Button>
+          )}
         </motion.div>
         {badge && allAttestationsOfAKind.length > 0 ? (
           <>

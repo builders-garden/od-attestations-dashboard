@@ -8,7 +8,7 @@ import {
 import SafeFactory from "@safe-global/protocol-kit";
 import SafeApiKit from "@safe-global/api-kit";
 import { useAccount } from "wagmi";
-import { sepolia } from "viem/chains";
+import { base, sepolia } from "viem/chains";
 
 // Create a context to store the instances of the SafeFactory and SafeApiKit
 const SafeKitContext = createContext<{
@@ -41,6 +41,8 @@ export const SafeProvider: React.FC<{ children: ReactNode }> = ({
   const [adminAddresses, setAdminAddresses] = useState<string[]>([]);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
+  const isProduction = process.env.NODE_ENV === "production";
+
   useEffect(() => {
     const init = async () => {
       if (!address) {
@@ -57,7 +59,7 @@ export const SafeProvider: React.FC<{ children: ReactNode }> = ({
         safeAddress: safeAddress,
       });
       const apiKit = new SafeApiKit({
-        chainId: BigInt(sepolia.id), // TODO: set the base chainId
+        chainId: BigInt(isProduction ? base.id : sepolia.id),
       });
       const ownerAddresses = await protocolKit.getOwners();
       setProtocolKit(protocolKit);

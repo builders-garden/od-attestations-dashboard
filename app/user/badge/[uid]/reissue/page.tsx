@@ -48,6 +48,8 @@ export default function BadgeReissuePage({
   const { sendSafeTransaction } = useSendSafeTransaction();
   const [txLoading, setTxLoading] = useState(false);
 
+  const isProduction = process.env.NODE_ENV === "production";
+
   const fixDecodedValues = (
     decodedValues: AttestationDecodedDataTypeValue[],
   ) => {
@@ -145,7 +147,7 @@ export default function BadgeReissuePage({
                     New {badge.title} collectors
                   </span>
                   <LinkTextWithIcon
-                    href={`https://sepolia.easscan.org/attestation/view/${badge.attestationUID}`}
+                    href={`https://${isProduction ? "base" : "sepolia"}.easscan.org/attestation/view/${badge.attestationUID}`}
                   >
                     Easscan
                   </LinkTextWithIcon>
