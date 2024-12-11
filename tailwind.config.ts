@@ -58,7 +58,7 @@ const config: Config = {
         },
       },
       fontFamily: {
-        inter: ["var(--font-inter-tight)"],
+        euclid: ['"Euclid Circular A"', "sans-serif"],
       },
       borderRadius: {
         lg: "var(--radius)",

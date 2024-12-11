@@ -36,7 +36,7 @@ export default function UserBadges({
     <div className="flex flex-col gap-6 w-full">
       {/* Badges Header */}
       <motion.div
-        className="flex flex-row justify-between items-end w-full"
+        className="flex flex-row justify-between items-center w-full"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
