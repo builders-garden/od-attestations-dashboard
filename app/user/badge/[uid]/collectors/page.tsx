@@ -12,6 +12,7 @@ import { Wrapper } from "@/components/ui/wrapper";
 import { Icons } from "@/components/ui/icons";
 import PaginatorButtons from "@/components/ui/paginatorButtons";
 import { usePagination } from "@/components/hooks/usePagination";
+import { isProduction } from "@/lib/utils";
 
 export default function BadgeCollectorsPage({
   params,
@@ -38,8 +39,6 @@ export default function BadgeCollectorsPage({
     })),
     10,
   );
-
-  const isProduction = process.env.NODE_ENV === "production";
 
   return (
     <Wrapper className="gap-6">

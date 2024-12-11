@@ -9,6 +9,7 @@ import SafeFactory from "@safe-global/protocol-kit";
 import SafeApiKit from "@safe-global/api-kit";
 import { useAccount } from "wagmi";
 import { base, sepolia } from "viem/chains";
+import { isProduction } from "@/lib/utils";
 
 // Create a context to store the instances of the SafeFactory and SafeApiKit
 const SafeKitContext = createContext<{
@@ -40,8 +41,6 @@ export const SafeProvider: React.FC<{ children: ReactNode }> = ({
   const [safeAddress, setSafeAddress] = useState<string | null>(null);
   const [adminAddresses, setAdminAddresses] = useState<string[]>([]);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
-
-  const isProduction = process.env.NODE_ENV === "production";
 
   useEffect(() => {
     const init = async () => {

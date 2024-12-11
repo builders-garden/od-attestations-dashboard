@@ -7,7 +7,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { FieldType, Schema, SchemaField } from "@/lib/eas/types";
-import { shorten } from "@/lib/utils";
+import { isProduction, shorten } from "@/lib/utils";
 import { Dispatch, SetStateAction, useEffect } from "react";
 import { ChangeSchemaName } from "./ChangeSchemaName";
 import { Config, UseAccountReturnType } from "wagmi";
@@ -45,7 +45,6 @@ export const SchemaSelector: React.FC<SchemaSelectorProps> = ({
   }, [selectedSchema]);
 
   const schemaNames = useGetSchemasNames(schemas, account.chain?.id);
-  const isProduction = process.env.NODE_ENV === "production";
 
   return (
     <div className="flex flex-col gap-2">

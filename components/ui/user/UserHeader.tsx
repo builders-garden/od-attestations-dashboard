@@ -16,6 +16,7 @@ import { Attestation } from "@/lib/eas/types";
 import Link from "next/link";
 import { useEnsProfile } from "@/components/hooks/useEnsProfile";
 import { useSafeContext } from "@/components/providers/SafeProvider";
+import { isProduction } from "@/lib/utils";
 
 interface UserHeaderProps {
   account: UseAccountReturnType<Config>;
@@ -31,8 +32,6 @@ export default function UserHeader({
   const { ensProfile } = useEnsProfile(account.address);
   const [isOpen, setIsOpen] = useState(false);
   const { isAdmin } = useSafeContext();
-
-  const isProduction = process.env.NODE_ENV === "production";
 
   return (
     <>

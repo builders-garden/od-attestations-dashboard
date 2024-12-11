@@ -10,6 +10,7 @@ import {
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { DialogProps } from "@radix-ui/react-dialog";
+import { isProduction } from "@/lib/utils";
 
 interface SafeDashboardDialogProps extends DialogProps {
   hash?: `0x${string}`;
@@ -20,7 +21,7 @@ export const SafeDashboardDialog: React.FC<SafeDashboardDialogProps> = ({
   ...props
 }) => {
   const safeAddress = process.env.NEXT_PUBLIC_SAFE_ADDRESS;
-  const isProduction = process.env.NODE_ENV === "production";
+
   return (
     <Dialog {...props}>
       <DialogContent className="max-w-sm gap-6">

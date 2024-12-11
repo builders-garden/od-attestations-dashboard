@@ -10,3 +10,5 @@ export function shorten(str: string, length = 4) {
     ? str.slice(0, 2 + length) + "..." + str.slice(-length)
     : str;
 }
+
+export const isProduction = process.env.NODE_ENV === "production";

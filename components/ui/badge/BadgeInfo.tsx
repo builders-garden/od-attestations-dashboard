@@ -1,6 +1,6 @@
 import BadgeClass from "@/lib/classes/BadgeClass";
 import { Calendar, Hash, IdCard } from "lucide-react";
-import { shorten } from "@/lib/utils";
+import { isProduction, shorten } from "@/lib/utils";
 import Link from "next/link";
 import { Attestation } from "@/lib/eas/types";
 import { useAccount } from "wagmi";
@@ -23,8 +23,6 @@ export default function BadgeInfo({
   allAttestationsOfAKind,
 }: BadgeInfoProps) {
   const account = useAccount();
-
-  const isProduction = process.env.NODE_ENV === "production";
 
   // Get the index of the attestation that has the same recipient address as account.address
   const userAttestationIndex =

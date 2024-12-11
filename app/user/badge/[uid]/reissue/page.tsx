@@ -32,6 +32,7 @@ import { Wrapper } from "@/components/ui/wrapper";
 import { SafeDashboardDialog } from "@/components/ui/SafeDashboardDialog";
 import { toast } from "sonner";
 import { useSendSafeTransaction } from "@/components/hooks/useSendSafeTransaction";
+import { isProduction } from "@/lib/utils";
 
 export default function BadgeReissuePage({
   params,
@@ -47,8 +48,6 @@ export default function BadgeReissuePage({
   const [safeTxHash, setSafeTxHash] = useState<`0x${string}`>();
   const { sendSafeTransaction } = useSendSafeTransaction();
   const [txLoading, setTxLoading] = useState(false);
-
-  const isProduction = process.env.NODE_ENV === "production";
 
   const fixDecodedValues = (
     decodedValues: AttestationDecodedDataTypeValue[],

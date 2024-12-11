@@ -22,7 +22,7 @@ import { SafeDashboardDialog } from "@/components/ui/SafeDashboardDialog";
 import { Wrapper } from "@/components/ui/wrapper";
 import { easMultiRevoke } from "@/lib/eas/calls";
 import { EAS_CONTRACT_ADDRESSES } from "@/lib/eas/constants";
-import { cn } from "@/lib/utils";
+import { cn, isProduction } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
@@ -51,8 +51,6 @@ export default function BadgeRevokePage({
   const [collectorsEns, setCollectorsEns] = useState<Record<string, string>>(
     {},
   );
-
-  const isProduction = process.env.NODE_ENV === "production";
 
   // Collectors logic
   const collectors = allAttestationsOfAKind
