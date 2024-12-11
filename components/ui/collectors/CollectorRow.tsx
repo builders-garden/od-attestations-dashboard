@@ -43,9 +43,9 @@ export default function CollectorRow({
       animate={{ opacity: 1 }}
       transition={{ duration: 1, delay: 0.1 * index }}
       className={cn(
-        "flex flex-row justify-center items-center w-full p-2 gap-2 bg-secondary rounded-lg transition-all duration-200 ease-in-out",
-        selectable && "cursor-pointer hover:bg-green-200",
-        selected && "bg-green-300 hover:bg-green-300",
+        "flex flex-row justify-center items-center w-full p-2 gap-2 bg-primary-light rounded-full transition-all duration-200 ease-in-out",
+        selectable && "cursor-pointer hover:bg-primary-light-darker",
+        selected && "bg-primary-light-darker hover:primary-light-darker",
       )}
       onClick={onClick}
     >
@@ -79,13 +79,12 @@ export default function CollectorRow({
           {selected && (
             <Check
               size="2rem"
-              className="bg-green-600 p-1 rounded-md text-white transition-all duration-200 ease-in-out"
+              className="bg-primary p-1 rounded-full text-white transition-all duration-200 ease-in-out"
             />
           )}
           {removable && handleRemove && (
             <Button
-              variant="destructive"
-              className="flex justify-center items-center h-8 w-8 rounded-md"
+              className="flex justify-center items-center h-8 w-8 rounded-full"
               onClick={(e) => {
                 e.preventDefault();
                 handleRemove(collector);

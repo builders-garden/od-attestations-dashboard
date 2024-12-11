@@ -179,7 +179,6 @@ export default function BadgeReissuePage({
           <Button
             className="text-2xl px-8 py-6 w-full transition-opacity duration-200 ease-in-out"
             disabled={collectors.length === 0}
-            variant="success"
           >
             Reissue
           </Button>
@@ -201,7 +200,6 @@ export default function BadgeReissuePage({
               </Button>
             </DialogClose>
             <Button
-              variant="success"
               className="w-full"
               onClick={handleReissueBadges}
               disabled={txLoading}

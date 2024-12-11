@@ -44,7 +44,7 @@ export default function CollectorRowWithInfo({
       animate={{ opacity: 1 }}
       transition={{ duration: 1, delay: 0.1 * index }}
       className={cn(
-        "flex flex-row justify-center items-center w-full p-2 gap-2 bg-secondary hover:bg-secondary-dark rounded-lg transition-all duration-200 ease-in-out",
+        "flex flex-row justify-center items-center w-full p-2 gap-2 bg-primary-light hover:bg-primary-light-darker rounded-full transition-all duration-200 ease-in-out",
         onClick && "cursor-pointer",
       )}
       onClick={onClick}
@@ -71,7 +71,7 @@ export default function CollectorRowWithInfo({
               {ensProfile.displayName}
             </label>
           </div>
-          <div className="flex justify-center items-center text-center font-medium px-2.5 bg-primary rounded-lg text-white">
+          <div className="flex justify-center items-center text-center font-medium px-2.5 bg-primary rounded-full text-white w-12 h-8">
             {userAttestations.length}
           </div>
         </motion.div>

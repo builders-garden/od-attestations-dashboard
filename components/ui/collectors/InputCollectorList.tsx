@@ -10,6 +10,7 @@ import { CsvInputButton } from "./CsvInputButton";
 import PaginatorButtons from "../paginatorButtons";
 import { usePagination } from "@/components/hooks/usePagination";
 import { RemoveAllButton } from "./RemoveAllButton";
+import { Loader2 } from "lucide-react";
 
 export interface InputCollectorListProps {
   collectors: string[];
@@ -38,7 +39,10 @@ export const InputCollectorList: React.FC<InputCollectorListProps> = ({
     setCurrentPage(1);
   };
 
+  const [loading, setLoading] = useState(false);
+
   const handleAdd = async (collector: string) => {
+    setLoading(true);
     if (collector.endsWith(".eth")) {
       const profile = await getEnsProfileFromNameOrAddress(collector);
       const resolvedAddress = profile?.address;
@@ -55,6 +59,7 @@ export const InputCollectorList: React.FC<InputCollectorListProps> = ({
     setCollectors((prev) =>
       prev.includes(collector) ? prev : [...prev, collector],
     );
+    setLoading(false);
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -87,6 +92,7 @@ export const InputCollectorList: React.FC<InputCollectorListProps> = ({
             input.length === 0 && "text-transparent w-0 p-0",
           )}
         >
+          {loading && <Loader2 className="w-4 animate-spin" />}
           Add
         </Button>
         <CsvInputButton setCollectors={setCollectors} />

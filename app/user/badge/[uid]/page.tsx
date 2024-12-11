@@ -118,7 +118,7 @@ export default function BadgePage({
             href={`/user/badge/${badge.attestationUID}/reissue`}
             className="w-full"
           >
-            <Button className="text-2xl px-8 py-6 w-full" variant="success">
+            <Button className="text-2xl px-8 py-6 w-full">
               <Send size={24} />
               Reissue
             </Button>
