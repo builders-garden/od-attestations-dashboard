@@ -222,7 +222,7 @@ export default function BadgeRevokePage({
         <DialogTrigger asChild>
           <Button
             variant="destructive"
-            className="text-2xl px-8 py-6 rounded-lg w-full transition-opacity duration-200 ease-in-out"
+            className="text-2xl px-8 py-6 w-full transition-opacity duration-200 ease-in-out"
             disabled={!atLeastOneSelected}
           >
             Revoke

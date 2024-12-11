@@ -9,12 +9,12 @@ const LinkTextWithIcon: React.FC<{
     <div className="flex items-center gap-1">
       <Link
         href={href}
-        className="text-primary-light leading-none hover:underline"
+        className="text-primary leading-none hover:underline"
         target="_blank"
       >
         {children}
       </Link>
-      <SquareArrowOutUpRight size={16} className="text-primary-light" />
+      <SquareArrowOutUpRight size={16} className="text-primary" />
     </div>
   );
 };

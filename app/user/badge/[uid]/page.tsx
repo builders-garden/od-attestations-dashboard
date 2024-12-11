@@ -66,7 +66,7 @@ export default function BadgePage({
               transition={{ duration: 0.5, delay: 0.1 }}
               src={badge.image || "/badges/badge_placeholder.png"}
               alt="logo"
-              className="w-[270px] h-[270px] rounded-full object-cover border-8 border-primary p-3"
+              className="w-[270px] h-[270px] rounded-full object-cover p-[0.65rem] bg-primary"
             />
             <motion.div
               initial={{ opacity: 0 }}
@@ -109,10 +109,7 @@ export default function BadgePage({
             href={`/user/badge/${badge.attestationUID}/revoke`}
             className="w-full"
           >
-            <Button
-              variant="destructive"
-              className="text-2xl px-8 py-6 rounded-lg w-full"
-            >
+            <Button variant="destructive" className="text-2xl px-8 py-6 w-full">
               <CircleX size={24} />
               Revoke
             </Button>
@@ -121,10 +118,7 @@ export default function BadgePage({
             href={`/user/badge/${badge.attestationUID}/reissue`}
             className="w-full"
           >
-            <Button
-              className="text-2xl px-8 py-6 rounded-lg w-full"
-              variant="success"
-            >
+            <Button className="text-2xl px-8 py-6 w-full" variant="success">
               <Send size={24} />
               Reissue
             </Button>

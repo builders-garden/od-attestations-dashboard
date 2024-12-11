@@ -80,7 +80,6 @@ export const CsvInputButton: React.FC<CsvInputButtonProps> = ({
             <div>
               <Button
                 type="button"
-                variant="success"
                 onClick={(e) => {
                   e.preventDefault();
                   fileInputRef.current?.click();

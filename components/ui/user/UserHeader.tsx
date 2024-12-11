@@ -74,7 +74,7 @@ export default function UserHeader({
                   rounded
                   toggled={isOpen}
                   toggle={setIsOpen}
-                  color="#1A1AFF"
+                  color="hsl(259 84% 53%)"
                 />
               ) : ensProfile ? (
                 <motion.img

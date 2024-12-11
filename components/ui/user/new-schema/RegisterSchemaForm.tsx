@@ -139,7 +139,7 @@ export const RegisterSchemaForm: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="w-full flex gap-4 px-4 py-2 bg-secondary rounded-md">
+      <div className="w-full flex gap-4 px-4 py-2 bg-primary-light rounded-md">
         <span className="text-sm">
           By default, the fields{" "}
           {mandatoryFields
@@ -287,7 +287,7 @@ export const RegisterSchemaForm: React.FC = () => {
                 <Button
                   type="button"
                   variant="success"
-                  className="text-2xl px-8 py-6 rounded-lg w-full transition-opacity duration-200 ease-in-out"
+                  className="text-2xl px-8 py-6 w-full transition-opacity duration-200 ease-in-out"
                   disabled={
                     // @ts-ignore
                     form.formState.errors.fields?.some((error) => error) ||

@@ -29,7 +29,7 @@ export default function BadgeCard({ badge, index }: BadgeProps) {
   return (
     <Link href={`/user/badge/${attestationUID}`}>
       <motion.div
-        className="flex flex-col justify-between items-center w-full h-full pt-3 pb-5 gap-2 hover:bg-secondary-dark bg-secondary rounded-lg transition-all duration-200 ease-in-out"
+        className="flex flex-col justify-between items-center w-full h-full pt-3 pb-5 gap-2 hover:bg-primary-light-darker bg-primary-light rounded-2xl transition-all duration-200 ease-in-out border border-primary-light-darker"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: unlocked ? 1 : 0.5, y: 0 }}
         transition={{ duration: 0.5, delay: index * 0.25 }}
@@ -46,7 +46,7 @@ export default function BadgeCard({ badge, index }: BadgeProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             alt="badge image"
-            className="rounded-full w-28 h-28 object-cover"
+            className="rounded-full w-28 h-28 object-cover p-1 bg-primary"
             src={imageURL}
             width={100}
             height={100}

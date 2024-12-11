@@ -42,7 +42,7 @@ export const Wrapper = ({ children, className }: WrapperProps) => {
       >
         {!account.isConnected ? (
           <>
-            <div className="z-50 flex flex-col items-center gap-3.5">
+            <div className="z-50 flex flex-col items-center gap-3.5 m-auto">
               <div className="flex flex-col items-center gap-1">
                 <h1 className="text-3xl font-black">✨ Hello, Dreamer ✨</h1>
                 <div className="text-sm text-center max-w-xs">
@@ -55,7 +55,7 @@ export const Wrapper = ({ children, className }: WrapperProps) => {
             <Clouds />
           </>
         ) : isAdminPage && !isAdmin ? (
-          <div className="flex justify-center items-center w-full h-full mt-32">
+          <div className="flex justify-center items-center w-full h-full m-auto">
             <Icons.spinner className="mr-2 h-10 w-10 animate-spin" />
           </div>
         ) : (

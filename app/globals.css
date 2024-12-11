@@ -101,8 +101,9 @@
     --card-foreground: 0 0% 3.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 3.9%;
-    --primary: 240 100% 55%; /* #1A1AFF */
-    --primary-light: 240 100% 70%; /* #6A9AFF  */
+    --primary: 259 84% 53%;
+    --primary-light: 259.6 100% 91%;
+    --primary-light-darker: 258.2 100% 84.5%;
     --primary-foreground: 0 0% 98%;
     --secondary: 210 100% 95%; /* #D2E1FF */
     --secondary-dark: 210 100% 93%; /* #A4C3FF */

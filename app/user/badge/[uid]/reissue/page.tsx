@@ -178,7 +178,7 @@ export default function BadgeReissuePage({
       <Dialog open={openReissueDialog} onOpenChange={setOpenReissueDialog}>
         <DialogTrigger asChild>
           <Button
-            className="text-2xl px-8 py-6 rounded-lg w-full transition-opacity duration-200 ease-in-out"
+            className="text-2xl px-8 py-6 w-full transition-opacity duration-200 ease-in-out"
             disabled={collectors.length === 0}
             variant="success"
           >
