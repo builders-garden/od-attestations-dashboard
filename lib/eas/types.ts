@@ -29,6 +29,7 @@ export type Schema = {
 
 export type SchemaName = {
   name: string;
+  time: number;
 };
 
 export type Attestation = {

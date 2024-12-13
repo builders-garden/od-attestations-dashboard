@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Providers from "../components/providers/Providers";
 import { Toaster } from "@/components/ui/sonner";
-import { Inter_Tight } from "next/font/google";
 
 export const metadata: Metadata = {
   title: "Onchain Dreamers Passport",

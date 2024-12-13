@@ -12,12 +12,12 @@ export const useCreateBadge = (uid: string, account: UseAccountReturnType) => {
 
   useEffect(() => {
     const createBadge = async () => {
-      if (!account.address || !account.chain?.id) {
+      if (!account.address) {
         return;
       }
 
       // Fetch the attestation from the UID
-      const attestation = await getAttestationFromUID(uid, account.chain.id);
+      const attestation = await getAttestationFromUID(uid);
 
       // Get the decoded data from the attestation
       if (!attestation || !attestation.decodedDataJson) {
@@ -83,7 +83,7 @@ export const useCreateBadge = (uid: string, account: UseAccountReturnType) => {
     };
 
     createBadge();
-  }, [account.address, account.chain?.id, uid]);
+  }, [account.address, uid]);
 
   return { badge, sourceAttestation, notFound };
 };

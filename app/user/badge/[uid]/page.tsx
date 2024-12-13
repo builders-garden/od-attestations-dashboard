@@ -23,7 +23,6 @@ export default function BadgePage({
   const { badge, sourceAttestation, notFound } = useCreateBadge(uid, account);
   const { allAttestationsOfAKind } = useGetAllAttestationsOfAKind({
     sourceAttestation,
-    account,
   });
   const { isAdmin } = useSafeContext();
 

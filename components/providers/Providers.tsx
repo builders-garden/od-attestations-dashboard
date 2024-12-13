@@ -11,7 +11,7 @@ import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import { ReactNode } from "react";
 import { SafeProvider } from "./SafeProvider";
 
-const config = getDefaultConfig({
+export const config = getDefaultConfig({
   appName: "OD Passport App",
   projectId: process.env.NEXT_PUBLIC_PROJECT_ID!,
   chains: [base, sepolia],

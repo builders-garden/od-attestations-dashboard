@@ -23,7 +23,7 @@ import Link from "next/link";
 import { use, useState } from "react";
 import { useAccount } from "wagmi";
 import { easMultiAttest } from "@/lib/eas/calls";
-import { EAS_CONTRACT_ADDRESSES } from "@/lib/eas/constants";
+import { EAS_EXPLORER_ROOT_URLS } from "@/lib/eas/constants";
 import {
   AttestationDecodedDataType,
   AttestationDecodedDataTypeValue,
@@ -32,7 +32,7 @@ import { Wrapper } from "@/components/ui/wrapper";
 import { SafeDashboardDialog } from "@/components/ui/SafeDashboardDialog";
 import { toast } from "sonner";
 import { useSendSafeTransaction } from "@/components/hooks/useSendSafeTransaction";
-import { isProduction } from "@/lib/utils";
+import { getEnvironmentChainId } from "@/lib/utils";
 
 export default function BadgeReissuePage({
   params,
@@ -70,7 +70,7 @@ export default function BadgeReissuePage({
 
   const handleReissueBadges = async () => {
     try {
-      if (account.chain && sourceAttestation) {
+      if (sourceAttestation) {
         const schemaEncoder = new SchemaEncoder(
           sourceAttestation?.schema.schema as string,
         );
@@ -83,9 +83,6 @@ export default function BadgeReissuePage({
         setTxLoading(true);
         const txHash = await sendSafeTransaction(
           easMultiAttest(
-            EAS_CONTRACT_ADDRESSES[
-              account.chain.id as keyof typeof EAS_CONTRACT_ADDRESSES
-            ],
             sourceAttestation.schema.id as `0x${string}`,
             collectors as `0x${string}`[],
             encodedData as `0x${string}`,
@@ -146,7 +143,7 @@ export default function BadgeReissuePage({
                     New {badge.title} collectors
                   </span>
                   <LinkTextWithIcon
-                    href={`https://${isProduction ? "base" : "sepolia"}.easscan.org/attestation/view/${badge.attestationUID}`}
+                    href={`${EAS_EXPLORER_ROOT_URLS[getEnvironmentChainId()]}/attestation/view/${badge.attestationUID}`}
                   >
                     Easscan
                   </LinkTextWithIcon>

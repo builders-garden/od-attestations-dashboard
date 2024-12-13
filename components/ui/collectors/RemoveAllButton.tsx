@@ -31,8 +31,8 @@ export const RemoveAllButton: React.FC<RemoveAllButtonProps> = ({
                 handleRemoveAll();
               }}
               className={cn(
-                "w-fit transition-all duration-200 ease-in-out px-1.5",
-                collectors.length > 0 && "w-fit px-1.5",
+                "transition-all duration-200 ease-in-out",
+                collectors.length > 0 && "w-[36px] h-[36px]",
                 collectors.length === 0 && "text-transparent w-0 p-0",
               )}
             >

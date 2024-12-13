@@ -3,7 +3,6 @@ import { motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { schemasFromWallets } from "@/lib/eas";
-import { useAccount } from "wagmi";
 import { useEffect, useState } from "react";
 import { FieldType, Schema, SchemaField } from "@/lib/eas/types";
 import { NewBadgeForm } from "@/components/ui/user/new-badge/NewBadgeForm";
@@ -12,7 +11,6 @@ import { Wrapper } from "@/components/ui/wrapper";
 import { useSafeContext } from "@/components/providers/SafeProvider";
 
 export default function NewBadgePage() {
-  const account = useAccount();
   const [schemas, setSchemas] = useState<Schema[]>([]);
   const [selectedSchema, setSelectedSchema] = useState<Schema | undefined>(
     undefined,
@@ -25,10 +23,7 @@ export default function NewBadgePage() {
   useEffect(() => {
     const fetchSchemas = async () => {
       if (adminAddresses.length <= 0) return;
-      const schemas = await schemasFromWallets(
-        adminAddresses,
-        account.chain?.id,
-      );
+      const schemas = await schemasFromWallets(adminAddresses);
       if (schemas.length === 0) return;
       setSchemas(schemas);
       setSelectedSchema(schemas[0]);
@@ -44,7 +39,7 @@ export default function NewBadgePage() {
       );
     };
     fetchSchemas();
-  }, [account.chain?.id, adminAddresses]);
+  }, [adminAddresses]);
 
   return (
     <Wrapper>
@@ -70,11 +65,9 @@ export default function NewBadgePage() {
           selectedSchema={selectedSchema}
           setSelectedSchema={setSelectedSchema}
           setSchemaFields={setSchemaFields}
-          account={account}
         />
 
         <NewBadgeForm
-          account={account}
           selectedSchema={selectedSchema}
           schemaFields={schemaFields}
         />

@@ -12,7 +12,8 @@ import { Wrapper } from "@/components/ui/wrapper";
 import { Icons } from "@/components/ui/icons";
 import PaginatorButtons from "@/components/ui/paginatorButtons";
 import { usePagination } from "@/components/hooks/usePagination";
-import { isProduction } from "@/lib/utils";
+import { EAS_EXPLORER_ROOT_URLS } from "@/lib/eas/constants";
+import { getEnvironmentChainId } from "@/lib/utils";
 
 export default function BadgeCollectorsPage({
   params,
@@ -24,7 +25,6 @@ export default function BadgeCollectorsPage({
   const { sourceAttestation, badge } = useCreateBadge(uid, account);
   const { allAttestationsOfAKind } = useGetAllAttestationsOfAKind({
     sourceAttestation,
-    account,
   });
   const collectorsCount = useCountUp(allAttestationsOfAKind.length, 2000); // 2 seconds duration
   const {
@@ -84,7 +84,7 @@ export default function BadgeCollectorsPage({
                 collector={attestation.recipient}
                 onClick={() => {
                   window.open(
-                    `https://${isProduction ? "base" : "sepolia"}.easscan.org/attestation/view/${attestation.id}`,
+                    `${EAS_EXPLORER_ROOT_URLS[getEnvironmentChainId()]}/attestation/view/${attestation.id}`,
                     "_blank",
                   );
                 }}

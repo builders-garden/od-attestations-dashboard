@@ -85,7 +85,7 @@ export const CsvInputButton: React.FC<CsvInputButtonProps> = ({
                   fileInputRef.current?.click();
                 }}
                 disabled={loadingFile}
-                className="w-fit px-1.5"
+                className="w-[36px] h-[36px]"
               >
                 {!loadingFile ? (
                   <FileUp className="h-[22px] w-[22px]" />

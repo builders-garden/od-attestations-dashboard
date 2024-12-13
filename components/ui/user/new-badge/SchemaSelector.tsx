@@ -7,18 +7,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { FieldType, Schema, SchemaField } from "@/lib/eas/types";
-import { isProduction, shorten } from "@/lib/utils";
+import { getEnvironmentChainId, shorten } from "@/lib/utils";
 import { Dispatch, SetStateAction, useEffect } from "react";
 import { ChangeSchemaName } from "./ChangeSchemaName";
-import { Config, UseAccountReturnType } from "wagmi";
-import { useGetSchemasNames } from "@/components/hooks/useGetSchemasNames";
+import { EAS_EXPLORER_ROOT_URLS } from "@/lib/eas/constants";
 
 interface SchemaSelectorProps {
   selectedSchema: Schema | undefined;
   setSelectedSchema: (schema: Schema | undefined) => void;
   schemas: Schema[];
   setSchemaFields: Dispatch<SetStateAction<SchemaField[] | undefined>>;
-  account: UseAccountReturnType<Config>;
 }
 
 export const SchemaSelector: React.FC<SchemaSelectorProps> = ({
@@ -26,7 +24,6 @@ export const SchemaSelector: React.FC<SchemaSelectorProps> = ({
   setSelectedSchema,
   schemas,
   setSchemaFields,
-  account,
 }) => {
   useEffect(() => {
     if (selectedSchema) {
@@ -41,10 +38,7 @@ export const SchemaSelector: React.FC<SchemaSelectorProps> = ({
         }),
       );
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedSchema]);
-
-  const schemaNames = useGetSchemasNames(schemas, account.chain?.id);
 
   return (
     <div className="flex flex-col gap-2">
@@ -52,7 +46,7 @@ export const SchemaSelector: React.FC<SchemaSelectorProps> = ({
         <span className="text-sm">Select a Schema</span>
         {selectedSchema?.id && (
           <LinkTextWithIcon
-            href={`https://${isProduction ? "base" : "sepolia"}.easscan.org/schema/view/${selectedSchema.id}`}
+            href={`${EAS_EXPLORER_ROOT_URLS[getEnvironmentChainId()]}/schema/view/${selectedSchema.id}`}
           >
             Easscan
           </LinkTextWithIcon>
@@ -76,9 +70,9 @@ export const SchemaSelector: React.FC<SchemaSelectorProps> = ({
                   value={schema.id}
                   className="font-mono cursor-pointer"
                 >
-                  {schemaNames[schema.id]?.length > 20
-                    ? `${schemaNames[schema.id].substring(0, 20)}...`
-                    : (schemaNames[schema.id] ?? shorten(schema.id, 6))}
+                  {schema.schemaNames[0]?.name.length > 20
+                    ? `${schema.schemaNames[0].name.substring(0, 20)}...`
+                    : (schema.schemaNames[0]?.name ?? shorten(schema.id, 6))}
                 </SelectItem>
               );
             })}
@@ -86,7 +80,7 @@ export const SchemaSelector: React.FC<SchemaSelectorProps> = ({
         </Select>
         <ChangeSchemaName
           schemaId={selectedSchema?.id}
-          chainId={account.chain?.id}
+          chainId={getEnvironmentChainId()}
         />
       </div>
     </div>

@@ -21,8 +21,8 @@ import PaginatorButtons from "@/components/ui/paginatorButtons";
 import { SafeDashboardDialog } from "@/components/ui/SafeDashboardDialog";
 import { Wrapper } from "@/components/ui/wrapper";
 import { easMultiRevoke } from "@/lib/eas/calls";
-import { EAS_CONTRACT_ADDRESSES } from "@/lib/eas/constants";
-import { cn, isProduction } from "@/lib/utils";
+import { EAS_EXPLORER_ROOT_URLS } from "@/lib/eas/constants";
+import { cn, getEnvironmentChainId } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
@@ -40,7 +40,6 @@ export default function BadgeRevokePage({
   const { badge, sourceAttestation, notFound } = useCreateBadge(uid, account);
   const { allAttestationsOfAKind } = useGetAllAttestationsOfAKind({
     sourceAttestation,
-    account,
   });
   const [input, setInput] = useState("");
   const [selectedCollectors, setSelectedCollectors] = useState<string[]>([]);
@@ -87,7 +86,7 @@ export default function BadgeRevokePage({
 
   const handleRevokeBadges = async () => {
     try {
-      if (account.chain && sourceAttestation) {
+      if (sourceAttestation) {
         const attestationUIDs = selectedCollectors.map(
           (collector) =>
             allAttestationsOfAKind.find((a) => a.recipient === collector)?.id,
@@ -95,9 +94,6 @@ export default function BadgeRevokePage({
         setTxLoading(true);
         const txHash = await sendSafeTransaction(
           easMultiRevoke(
-            EAS_CONTRACT_ADDRESSES[
-              account.chain.id as keyof typeof EAS_CONTRACT_ADDRESSES
-            ],
             sourceAttestation.schema.id as `0x${string}`,
             attestationUIDs,
           ),
@@ -154,7 +150,7 @@ export default function BadgeRevokePage({
                 <div className="flex w-full justify-between">
                   <span className="font-bold">{badge.title} collectors</span>
                   <LinkTextWithIcon
-                    href={`https://${isProduction ? "base" : "sepolia"}.easscan.org/attestation/view/${badge.attestationUID}`}
+                    href={`${EAS_EXPLORER_ROOT_URLS[getEnvironmentChainId()]}/attestation/view/${badge.attestationUID}`}
                   >
                     Easscan
                   </LinkTextWithIcon>
@@ -186,9 +182,10 @@ export default function BadgeRevokePage({
                 <Button
                   onClick={() => setSelectedCollectors([])}
                   className={cn(
-                    "w-fit transition-all duration-200 ease-in-out",
+                    "transition-all duration-200 ease-in-out",
                     atLeastOneSelected && "w-fit px-4",
-                    !atLeastOneSelected && "text-transparent w-0 p-0",
+                    !atLeastOneSelected &&
+                      "text-transparent bg-transparent w-0 p-0",
                   )}
                   variant="destructive"
                 >

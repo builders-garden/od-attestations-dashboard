@@ -5,7 +5,6 @@ import { Attestation } from "@/lib/eas/types";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { useAccount } from "wagmi";
 
 interface CollectorRowProps {
   collector: string;
@@ -18,25 +17,22 @@ export default function CollectorRowWithInfo({
   index = 0,
   onClick,
 }: CollectorRowProps) {
-  const account = useAccount();
   const [userAttestations, setUserAttestations] = useState<Attestation[]>();
   const { ensProfile } = useEnsProfile(collector);
   const { adminAddresses } = useSafeContext();
 
   useEffect(() => {
     const fetchAttestations = async () => {
-      if (!collector || !account.chain?.id || adminAddresses.length <= 0)
-        return;
+      if (!collector || adminAddresses.length <= 0) return;
       const userAttestations = await getUserUniqueAttestations(
         collector,
         adminAddresses,
-        account.chain.id,
       );
       setUserAttestations(userAttestations);
     };
 
     fetchAttestations();
-  }, [collector, account.chain?.id, adminAddresses]);
+  }, [collector, adminAddresses]);
 
   return (
     <motion.div
@@ -84,9 +80,9 @@ export default function CollectorRowWithInfo({
         >
           <div className="flex justify-start items-center gap-2">
             <div className="w-8 h-8 rounded-full animate-pulse bg-skeleton" />
-            <div className="bg-skeleton h-4 w-56 rounded-md animate-pulse" />
+            <div className="bg-skeleton h-4 w-32 rounded-full animate-pulse" />
           </div>
-          <div className="bg-skeleton h-7 w-7 rounded-md animate-pulse" />
+          <div className="bg-skeleton h-8 w-12 rounded-full animate-pulse" />
         </motion.div>
       )}
     </motion.div>

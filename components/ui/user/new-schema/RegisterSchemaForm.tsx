@@ -28,7 +28,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useAccount } from "wagmi";
 import { useState } from "react";
 import { SchemaRegistryAbi } from "@/lib/abi/SchemaRegistry";
 import { SCHEMA_REGISTRY_CONTRACT_ADDRESSES } from "@/lib/eas/constants";
@@ -37,6 +36,7 @@ import { motion } from "framer-motion";
 import { SafeDashboardDialog } from "../../SafeDashboardDialog";
 import { toast } from "sonner";
 import { useSendSafeTransaction } from "@/components/hooks/useSendSafeTransaction";
+import { getEnvironmentChainId } from "@/lib/utils";
 
 const formSchema = z.object({
   fields: z.array(
@@ -86,7 +86,6 @@ export const RegisterSchemaForm: React.FC = () => {
     name: "fields",
   });
 
-  const account = useAccount();
   const [openSafeDialog, setOpenSafeDialog] = useState(false);
   const [openRegisterSchemaDialog, setOpenRegisterSchemaDialog] =
     useState(false);
@@ -103,29 +102,24 @@ export const RegisterSchemaForm: React.FC = () => {
 
   const handleRegisterSchema = async (values: z.infer<typeof formSchema>) => {
     try {
-      if (account.chain) {
-        setTxLoading(true);
-        const txHash = await sendSafeTransaction({
-          abi: SchemaRegistryAbi,
-          contractAddress:
-            SCHEMA_REGISTRY_CONTRACT_ADDRESSES[
-              account.chain
-                .id as keyof typeof SCHEMA_REGISTRY_CONTRACT_ADDRESSES
-            ],
-          functionName: "register",
-          args: [
-            stringifyFields(values.fields),
-            "0x0000000000000000000000000000000000000000",
-            true,
-          ],
-          value: "0",
-        });
-        setTxLoading(false);
-        setOpenRegisterSchemaDialog(false);
-        if (txHash) {
-          setSafeTxHash(txHash);
-          setOpenSafeDialog(true);
-        }
+      setTxLoading(true);
+      const txHash = await sendSafeTransaction({
+        abi: SchemaRegistryAbi,
+        contractAddress:
+          SCHEMA_REGISTRY_CONTRACT_ADDRESSES[getEnvironmentChainId()],
+        functionName: "register",
+        args: [
+          stringifyFields(values.fields),
+          "0x0000000000000000000000000000000000000000",
+          true,
+        ],
+        value: "0",
+      });
+      setTxLoading(false);
+      setOpenRegisterSchemaDialog(false);
+      if (txHash) {
+        setSafeTxHash(txHash);
+        setOpenSafeDialog(true);
       }
     } catch (err) {
       setTxLoading(false);

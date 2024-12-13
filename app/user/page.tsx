@@ -20,18 +20,13 @@ export default function UserHome() {
 
   useEffect(() => {
     const fetchAttestations = async () => {
-      if (!account.address || !account.chain?.id || adminAddresses.length <= 0)
-        return;
-      const allAttestations = await getEveryUniqueAttestation(
-        adminAddresses,
-        account.chain.id,
-      );
+      if (!account.address || adminAddresses.length <= 0) return;
+      const allAttestations = await getEveryUniqueAttestation(adminAddresses);
       setAllAttestations(allAttestations);
 
       const userAttestations = await getUserUniqueAttestations(
         account.address,
         adminAddresses,
-        account.chain.id,
       );
       setUserAttestations(userAttestations);
 
@@ -39,7 +34,7 @@ export default function UserHome() {
     };
 
     fetchAttestations();
-  }, [account.address, account.chain?.id, adminAddresses]);
+  }, [account.address, adminAddresses]);
 
   return (
     <Wrapper>

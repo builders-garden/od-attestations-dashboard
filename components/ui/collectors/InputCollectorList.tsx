@@ -87,13 +87,13 @@ export const InputCollectorList: React.FC<InputCollectorListProps> = ({
           onClick={() => handleAdd(input)}
           disabled={!inputIsValid}
           className={cn(
-            "w-fit transition-all duration-200 ease-in-out",
+            "transition-all duration-200 ease-in-out",
             input.length > 0 && "w-fit px-4",
-            input.length === 0 && "text-transparent w-0 p-0",
+            input.length === 0 && "text-transparent bg-transparent w-0 p-0",
           )}
         >
           {loading && <Loader2 className="w-4 animate-spin" />}
-          Add
+          {input.length > 0 && "Add"}
         </Button>
         <CsvInputButton setCollectors={setCollectors} />
         <RemoveAllButton

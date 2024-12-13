@@ -16,7 +16,8 @@ import { Attestation } from "@/lib/eas/types";
 import Link from "next/link";
 import { useEnsProfile } from "@/components/hooks/useEnsProfile";
 import { useSafeContext } from "@/components/providers/SafeProvider";
-import { isProduction } from "@/lib/utils";
+import { ETH_EXPLORER_ROOT_URLS } from "@/lib/eas/constants";
+import { getEnvironmentChainId } from "@/lib/utils";
 
 interface UserHeaderProps {
   account: UseAccountReturnType<Config>;
@@ -97,7 +98,7 @@ export default function UserHeader({
               <>
                 <DropdownMenuItem className="cursor-pointer w-full">
                   <Link
-                    href={`https://${isProduction ? "basescan.org" : "sepolia.etherscan.io"}/address/${ensProfile.address}`}
+                    href={`${ETH_EXPLORER_ROOT_URLS[getEnvironmentChainId()]}/address/${ensProfile.address}`}
                     target="_blank"
                   >
                     {ensProfile.displayName}

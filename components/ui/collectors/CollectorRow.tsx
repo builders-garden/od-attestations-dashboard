@@ -103,9 +103,9 @@ export default function CollectorRow({
         >
           <div className="flex justify-start items-center gap-2">
             <div className="w-8 h-8 rounded-full animate-pulse bg-skeleton" />
-            <div className="bg-skeleton h-4 w-56 rounded-md animate-pulse" />
+            <div className="bg-skeleton h-4 w-32 rounded-full animate-pulse" />
           </div>
-          <div className="bg-skeleton h-7 w-7 rounded-md animate-pulse" />
+          <div className="bg-skeleton h-8 w-8 rounded-full animate-pulse" />
         </motion.div>
       )}
     </motion.div>

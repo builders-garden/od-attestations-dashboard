@@ -19,7 +19,7 @@ export default function UserBadges({
   allAttestations,
 }: UserBadgesProps) {
   const { isAdmin } = useSafeContext();
-  const [showAll, setShowAll] = useState<boolean>(isAdmin);
+  const [showAll, setShowAll] = useState<boolean>(isAdmin ?? false);
 
   const userAttestationsCount = useCountUp(userAttestations.length, 2000); // 2 seconds duration
   const allBadges = useCreateBadges(userAttestations, allAttestations).filter(
