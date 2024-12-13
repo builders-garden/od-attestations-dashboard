@@ -28,7 +28,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useAccount } from "wagmi";
 import { useState } from "react";
 import { SchemaRegistryAbi } from "@/lib/abi/SchemaRegistry";
 import { SCHEMA_REGISTRY_CONTRACT_ADDRESSES } from "@/lib/eas/constants";
@@ -37,6 +36,7 @@ import { motion } from "framer-motion";
 import { SafeDashboardDialog } from "../../SafeDashboardDialog";
 import { toast } from "sonner";
 import { useSendSafeTransaction } from "@/components/hooks/useSendSafeTransaction";
+import { getEnvironmentChainId } from "@/lib/utils";
 
 const formSchema = z.object({
   fields: z.array(
@@ -86,7 +86,6 @@ export const RegisterSchemaForm: React.FC = () => {
     name: "fields",
   });
 
-  const account = useAccount();
   const [openSafeDialog, setOpenSafeDialog] = useState(false);
   const [openRegisterSchemaDialog, setOpenRegisterSchemaDialog] =
     useState(false);
@@ -103,29 +102,24 @@ export const RegisterSchemaForm: React.FC = () => {
 
   const handleRegisterSchema = async (values: z.infer<typeof formSchema>) => {
     try {
-      if (account.chain) {
-        setTxLoading(true);
-        const txHash = await sendSafeTransaction({
-          abi: SchemaRegistryAbi,
-          contractAddress:
-            SCHEMA_REGISTRY_CONTRACT_ADDRESSES[
-              account.chain
-                .id as keyof typeof SCHEMA_REGISTRY_CONTRACT_ADDRESSES
-            ],
-          functionName: "register",
-          args: [
-            stringifyFields(values.fields),
-            "0x0000000000000000000000000000000000000000",
-            true,
-          ],
-          value: "0",
-        });
-        setTxLoading(false);
-        setOpenRegisterSchemaDialog(false);
-        if (txHash) {
-          setSafeTxHash(txHash);
-          setOpenSafeDialog(true);
-        }
+      setTxLoading(true);
+      const txHash = await sendSafeTransaction({
+        abi: SchemaRegistryAbi,
+        contractAddress:
+          SCHEMA_REGISTRY_CONTRACT_ADDRESSES[getEnvironmentChainId()],
+        functionName: "register",
+        args: [
+          stringifyFields(values.fields),
+          "0x0000000000000000000000000000000000000000",
+          true,
+        ],
+        value: "0",
+      });
+      setTxLoading(false);
+      setOpenRegisterSchemaDialog(false);
+      if (txHash) {
+        setSafeTxHash(txHash);
+        setOpenSafeDialog(true);
       }
     } catch (err) {
       setTxLoading(false);
@@ -139,7 +133,7 @@ export const RegisterSchemaForm: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="w-full flex gap-4 px-4 py-2 bg-secondary rounded-md">
+      <div className="w-full flex gap-4 px-4 py-2 bg-primary-light rounded-md">
         <span className="text-sm">
           By default, the fields{" "}
           {mandatoryFields
@@ -268,7 +262,7 @@ export const RegisterSchemaForm: React.FC = () => {
               </div>
             ))}
 
-          <div className="flex flex-col gap-4 m-auto fixed bottom-0 left-0 right-0 bg-white p-4 w-full sm:max-w-md shadow-2xl shadow-zinc-500 rounded-2xl">
+          <div className="flex flex-col gap-4 m-auto fixed bottom-0 left-0 right-0 bg-white p-4 w-full sm:max-w-md shadow-top-2xl shadow-zinc-500 rounded-2xl">
             <Button
               type="button"
               className="w-full"
@@ -287,7 +281,7 @@ export const RegisterSchemaForm: React.FC = () => {
                 <Button
                   type="button"
                   variant="success"
-                  className="text-2xl px-8 py-6 rounded-lg w-full transition-opacity duration-200 ease-in-out"
+                  className="text-2xl px-8 py-6 w-full transition-opacity duration-200 ease-in-out"
                   disabled={
                     // @ts-ignore
                     form.formState.errors.fields?.some((error) => error) ||

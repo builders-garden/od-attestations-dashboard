@@ -29,6 +29,7 @@ export type Schema = {
 
 export type SchemaName = {
   name: string;
+  time: number;
 };
 
 export type Attestation = {
@@ -57,20 +58,22 @@ export type SchemaField = {
   type: FieldType;
 };
 
+export type AttestationDecodedDataTypeValue = {
+  name: string;
+  type: string;
+  value:
+    | string
+    | number
+    | boolean
+    | {
+        type: string;
+        hex: string;
+      };
+};
+
 export type AttestationDecodedDataType = {
   name: string;
   signature: string;
   type: string;
-  value: {
-    name: string;
-    type: string;
-    value:
-      | string
-      | number
-      | boolean
-      | {
-          type: string;
-          hex: string;
-        };
-  };
+  value: AttestationDecodedDataTypeValue;
 };

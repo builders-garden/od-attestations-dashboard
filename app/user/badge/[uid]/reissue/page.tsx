@@ -13,19 +13,26 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { LinkTextWithIcon } from "@/components/ui/linkTextWithIcon";
-import { SchemaEncoder } from "@ethereum-attestation-service/eas-sdk";
+import {
+  SchemaEncoder,
+  SchemaItem,
+} from "@ethereum-attestation-service/eas-sdk";
 import { motion } from "framer-motion";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { use, useState } from "react";
 import { useAccount } from "wagmi";
 import { easMultiAttest } from "@/lib/eas/calls";
-import { EAS_CONTRACT_ADDRESSES } from "@/lib/eas/constants";
-import { AttestationDecodedDataType } from "@/lib/eas/types";
+import { EAS_EXPLORER_ROOT_URLS } from "@/lib/eas/constants";
+import {
+  AttestationDecodedDataType,
+  AttestationDecodedDataTypeValue,
+} from "@/lib/eas/types";
 import { Wrapper } from "@/components/ui/wrapper";
 import { SafeDashboardDialog } from "@/components/ui/SafeDashboardDialog";
 import { toast } from "sonner";
 import { useSendSafeTransaction } from "@/components/hooks/useSendSafeTransaction";
+import { getEnvironmentChainId } from "@/lib/utils";
 
 export default function BadgeReissuePage({
   params,
@@ -42,23 +49,40 @@ export default function BadgeReissuePage({
   const { sendSafeTransaction } = useSendSafeTransaction();
   const [txLoading, setTxLoading] = useState(false);
 
+  const fixDecodedValues = (
+    decodedValues: AttestationDecodedDataTypeValue[],
+  ) => {
+    let fixedDecodedValues = decodedValues;
+    fixedDecodedValues = fixedDecodedValues.map((value) => {
+      if (value.type === "uint256") {
+        return {
+          ...value,
+          value:
+            typeof value.value === "object" && "hex" in value.value
+              ? Number(BigInt(value.value.hex))
+              : value.value,
+        };
+      }
+      return value;
+    });
+    return fixedDecodedValues as SchemaItem[];
+  };
+
   const handleReissueBadges = async () => {
     try {
-      if (account.chain && sourceAttestation) {
+      if (sourceAttestation) {
         const schemaEncoder = new SchemaEncoder(
           sourceAttestation?.schema.schema as string,
         );
         const decodedData: AttestationDecodedDataType[] = JSON.parse(
           sourceAttestation.decodedDataJson,
         );
-        const values = decodedData.map((data) => data.value);
-        const encodedData = schemaEncoder.encodeData(values);
+        const decodedValues = decodedData.map((data) => data.value);
+        const fixedDecodedValues = fixDecodedValues(decodedValues);
+        const encodedData = schemaEncoder.encodeData(fixedDecodedValues);
         setTxLoading(true);
         const txHash = await sendSafeTransaction(
           easMultiAttest(
-            EAS_CONTRACT_ADDRESSES[
-              account.chain.id as keyof typeof EAS_CONTRACT_ADDRESSES
-            ],
             sourceAttestation.schema.id as `0x${string}`,
             collectors as `0x${string}`[],
             encodedData as `0x${string}`,
@@ -119,7 +143,7 @@ export default function BadgeReissuePage({
                     New {badge.title} collectors
                   </span>
                   <LinkTextWithIcon
-                    href={`https://sepolia.easscan.org/attestation/view/${badge.attestationUID}`}
+                    href={`${EAS_EXPLORER_ROOT_URLS[getEnvironmentChainId()]}/attestation/view/${badge.attestationUID}`}
                   >
                     Easscan
                   </LinkTextWithIcon>
@@ -150,9 +174,8 @@ export default function BadgeReissuePage({
       <Dialog open={openReissueDialog} onOpenChange={setOpenReissueDialog}>
         <DialogTrigger asChild>
           <Button
-            className="text-2xl px-8 py-6 rounded-lg w-full transition-opacity duration-200 ease-in-out"
+            className="text-2xl px-8 py-6 w-full transition-opacity duration-200 ease-in-out"
             disabled={collectors.length === 0}
-            variant="success"
           >
             Reissue
           </Button>
@@ -174,7 +197,6 @@ export default function BadgeReissuePage({
               </Button>
             </DialogClose>
             <Button
-              variant="success"
               className="w-full"
               onClick={handleReissueBadges}
               disabled={txLoading}

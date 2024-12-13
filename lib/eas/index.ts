@@ -1,3 +1,4 @@
+import { getEnvironmentChainId } from "../utils";
 import { EAS_NAME_SCHEMA_UID, GRAPHQL_ENDPOINTS } from "./constants";
 import {
   AttestationQuery,
@@ -67,19 +68,12 @@ export const createUniqueKey = (
 /**
  * A function that fetches all the schemas registered by specific wallets.
  * @param creatorAddresses - An array of wallet addresses of the schemas' creators.
- * @param chainId - The chain ID of the blockchain where the schemas are registered.
  * @returns An array of Schemas or [] if there was an error.
  */
 export const schemasFromWallets = async (
   creatorAddresses: string[],
-  chainId: number | undefined,
 ): Promise<Schema[]> => {
-  // Check if the chain ID was not provided
-  if (!chainId) {
-    console.error("Chain ID was not provided.");
-    return [];
-  }
-  const endpoint = GRAPHQL_ENDPOINTS[chainId as keyof typeof GRAPHQL_ENDPOINTS];
+  const endpoint = GRAPHQL_ENDPOINTS[getEnvironmentChainId()];
   try {
     const response = await fetch(endpoint, {
       method: "POST",
@@ -98,11 +92,22 @@ export const schemasFromWallets = async (
                 "string BadgeTitle, string BadgeDescription, string BadgeImageCID, bool ODPassport",
             },
           },
+          distinct: "schema",
+          orderBy: [
+            {
+              time: "desc",
+            },
+          ],
           schemaNamesWhere2: {
             attesterAddress: {
               in: creatorAddresses,
             },
           },
+          schemaNamesOrderBy2: [
+            {
+              time: "desc",
+            },
+          ],
         },
       }),
     });
@@ -119,21 +124,18 @@ export const schemasFromWallets = async (
  * A function that fetches ALL the OD Passport attestations received by a specific wallet and issued by various wallets.
  * @param recipientAddress - The wallet address of the attestations' recipient.
  * @param issuerAddresses - An array of wallet addresses of the attestations' issuers.
- * @param chainId - The chain ID of the blockchain where the attestations are registered.
  * @returns An array of Attestations or [] if there was an error.
  */
 export const getUserAttestations = async (
   recipientAddress: string,
   issuerAddresses: string[],
-  chainId: number | undefined,
 ): Promise<Attestation[]> => {
-  // Check if the chain ID or issuer addresses were not provided
-  if (!chainId || issuerAddresses.length === 0) {
-    console.error("Chain ID or issuer addresses were not provided.");
+  // Check if issuer addresses were not provided
+  if (issuerAddresses.length === 0) {
     return [];
   }
 
-  const endpoint = GRAPHQL_ENDPOINTS[chainId as keyof typeof GRAPHQL_ENDPOINTS];
+  const endpoint = GRAPHQL_ENDPOINTS[getEnvironmentChainId()];
   let attestations: Attestation[] = [];
   try {
     for (const issuerAddress of issuerAddresses) {
@@ -172,21 +174,18 @@ export const getUserAttestations = async (
  * A function that fetches all the unrevoked and unique attestations received by a specific wallet and issued by various wallets.
  * @param recipientAddress - The wallet address of the attestations' recipient.
  * @param issuerAddresses - An array of wallet addresses of the attestations' issuers.
- * @param chainId - The chain ID of the blockchain where the attestations are registered.
  * @returns An array of Attestations or [] if there was an error.
  */
 export const getUserUniqueAttestations = async (
   recipientAddress: string,
   issuerAddresses: string[],
-  chainId: number | undefined,
 ): Promise<Attestation[]> => {
-  // Check if the chain ID or issuer addresses were not provided
-  if (!chainId || issuerAddresses.length === 0) {
-    console.error("Chain ID or issuer addresses were not provided.");
+  // Check if the issuer addresses were not provided
+  if (issuerAddresses.length === 0) {
     return [];
   }
 
-  const endpoint = GRAPHQL_ENDPOINTS[chainId as keyof typeof GRAPHQL_ENDPOINTS];
+  const endpoint = GRAPHQL_ENDPOINTS[getEnvironmentChainId()];
   try {
     const response = await fetch(endpoint, {
       method: "POST",
@@ -235,20 +234,17 @@ export const getUserUniqueAttestations = async (
 /**
  * A function that fetches all the unrevoked and unique attestations issued by various wallets.
  * @param issuerAddresses - An array of wallet addresses of the attestations' issuers.
- * @param chainId - The chain ID of the blockchain where the attestations are registered.
  * @returns An array of Attestations or [] if there was an error.
  */
 export const getEveryUniqueAttestation = async (
   issuerAddresses: string[],
-  chainId: number | undefined,
 ): Promise<Attestation[]> => {
-  // Check if the chain ID or issuer addresses were not provided
-  if (!chainId || issuerAddresses.length === 0) {
-    console.error("Chain ID or issuer addresses were not provided.");
+  // Check if the issuer addresses were not provided
+  if (issuerAddresses.length === 0) {
     return [];
   }
 
-  const endpoint = GRAPHQL_ENDPOINTS[chainId as keyof typeof GRAPHQL_ENDPOINTS];
+  const endpoint = GRAPHQL_ENDPOINTS[getEnvironmentChainId()];
   try {
     const response = await fetch(endpoint, {
       method: "POST",
@@ -294,18 +290,12 @@ export const getEveryUniqueAttestation = async (
 /**
  * A function that fetches an attestation given its UID.
  * @param attestationUID - The UID of the attestation.
- * @param chainId - The chain ID of the blockchain where the attestation is registered.
  * @returns An Attestation or null if there was an error.
  */
 export const getAttestationFromUID = async (
   attestationUID: string,
-  chainId: number | undefined,
 ): Promise<Attestation | null> => {
-  if (!chainId) {
-    console.error("Chain ID was not provided.");
-    return null;
-  }
-  const endpoint = GRAPHQL_ENDPOINTS[chainId as keyof typeof GRAPHQL_ENDPOINTS];
+  const endpoint = GRAPHQL_ENDPOINTS[getEnvironmentChainId()];
   try {
     const response = await fetch(endpoint, {
       method: "POST",
@@ -332,18 +322,15 @@ export const getAttestationFromUID = async (
 /**
  * A function to get all the attestations of a specific kind.
  * @param decodedDataJson - The decoded data of the attestation.
- * @param chainId - The chain ID of the blockchain where the attestations are registered.
  * @returns An array of Attestations or [] if there was an error.
  */
 export const getAllAttestationsOfAKind = async (
   decodedDataJson: string | undefined,
-  chainId: number | undefined,
 ): Promise<Attestation[]> => {
-  if (!chainId || !decodedDataJson) {
-    console.error("Chain ID or decodedDataJson was not provided.");
+  if (!decodedDataJson) {
     return [];
   }
-  const endpoint = GRAPHQL_ENDPOINTS[chainId as keyof typeof GRAPHQL_ENDPOINTS];
+  const endpoint = GRAPHQL_ENDPOINTS[getEnvironmentChainId()];
   try {
     const response = await fetch(endpoint, {
       method: "POST",
@@ -362,56 +349,6 @@ export const getAllAttestationsOfAKind = async (
             },
           },
           distinct: "recipient",
-        },
-      }),
-    });
-    const payload: AttestationsResponse = await response.json();
-    return payload.data.attestations;
-  } catch (e) {
-    console.error(e);
-    return [];
-  }
-};
-
-/**
- * A function to get all the attestation names of one or more schemas.
- * @param schemaIds - An array of schema IDs.
- * @param chainId - The chain ID of the blockchain where the attestations are registered.
- * @returns An array of Attestations or [] if there was an error - data and decodedDataJson will contain the schema name.
- */
-export const getSchemasNamesAttestations = async (
-  schemaIds: string[],
-  chainId: number | undefined,
-): Promise<Attestation[]> => {
-  if (!chainId || schemaIds.length === 0) {
-    console.error("Chain ID or schema IDs were not provided.");
-    return [];
-  }
-
-  const endpoint = GRAPHQL_ENDPOINTS[chainId as keyof typeof GRAPHQL_ENDPOINTS];
-
-  try {
-    const response = await fetch(endpoint, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        query: SchemasNamesQuery,
-        variables: {
-          where: {
-            schemaId: {
-              equals: EAS_NAME_SCHEMA_UID,
-            },
-            attester: {
-              equals: process.env.NEXT_PUBLIC_SAFE_ADDRESS,
-            },
-            OR: schemaIds.map((id) => ({
-              decodedDataJson: {
-                contains: id,
-              },
-            })),
-          },
         },
       }),
     });

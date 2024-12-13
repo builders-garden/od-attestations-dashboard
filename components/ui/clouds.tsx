@@ -18,7 +18,7 @@ export const Clouds = () => {
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5, delay: 0 }}
         style={{ scale: 1.1 }}
-        className="z-20 absolute top-0 left-28"
+        className="z-10 absolute top-0 left-28"
         src="/assets/cloud_2.png"
         layoutId="cloud1"
       />
@@ -28,7 +28,7 @@ export const Clouds = () => {
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5, delay: 0.25 }}
         style={{ scale: 1.1 }}
-        className="z-30 absolute top-40 right-56"
+        className="z-10 absolute top-40 right-56"
         src="/assets/cloud_3.png"
         layoutId="cloud1"
       />
@@ -38,7 +38,7 @@ export const Clouds = () => {
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5, delay: 0.5 }}
         style={{ scale: 1.1 }}
-        className="z-40 absolute bottom-52 left-7"
+        className="z-10 absolute bottom-52 left-7"
         src="/assets/cloud_4.png"
         layoutId="cloud1"
       />

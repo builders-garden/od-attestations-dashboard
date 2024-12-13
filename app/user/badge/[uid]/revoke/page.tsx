@@ -1,7 +1,7 @@
 "use client";
 import { useCreateBadge } from "@/components/hooks/useCreateBadge";
-import { useEnsProfiles } from "@/components/hooks/useEnsProfile";
 import { useGetAllAttestationsOfAKind } from "@/components/hooks/useGetAllAttestationsOfAKind";
+import { usePagination } from "@/components/hooks/usePagination";
 import { useSendSafeTransaction } from "@/components/hooks/useSendSafeTransaction";
 import { Button } from "@/components/ui/button";
 import CollectorRow from "@/components/ui/collectors/CollectorRow";
@@ -21,13 +21,12 @@ import PaginatorButtons from "@/components/ui/paginatorButtons";
 import { SafeDashboardDialog } from "@/components/ui/SafeDashboardDialog";
 import { Wrapper } from "@/components/ui/wrapper";
 import { easMultiRevoke } from "@/lib/eas/calls";
-import { EAS_CONTRACT_ADDRESSES } from "@/lib/eas/constants";
-import { EnsProfileType } from "@/lib/ens";
-import { cn } from "@/lib/utils";
+import { EAS_EXPLORER_ROOT_URLS } from "@/lib/eas/constants";
+import { cn, getEnvironmentChainId } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
-import { use, useMemo, useState } from "react";
+import { use, useState } from "react";
 import { toast } from "sonner";
 import { useAccount } from "wagmi";
 
@@ -41,7 +40,6 @@ export default function BadgeRevokePage({
   const { badge, sourceAttestation, notFound } = useCreateBadge(uid, account);
   const { allAttestationsOfAKind } = useGetAllAttestationsOfAKind({
     sourceAttestation,
-    account,
   });
   const [input, setInput] = useState("");
   const [selectedCollectors, setSelectedCollectors] = useState<string[]>([]);
@@ -49,33 +47,28 @@ export default function BadgeRevokePage({
   const [openRevokeDialog, setOpenRevokeDialog] = useState(false);
   const [safeTxHash, setSafeTxHash] = useState<`0x${string}`>();
   const { sendSafeTransaction } = useSendSafeTransaction();
-
-  // Collectors logic
-  const collectors = allAttestationsOfAKind.map(
-    (attestation) => attestation.recipient,
-  );
   const [collectorsEns, setCollectorsEns] = useState<Record<string, string>>(
     {},
   );
+
+  // Collectors logic
+  const collectors = allAttestationsOfAKind
+    .map((attestation) => attestation.recipient)
+    .filter((collector) => {
+      const collectorLowercase = collector.toLowerCase();
+      const inputLowercase = input.toLowerCase();
+      return (
+        collectorLowercase.includes(inputLowercase) ||
+        collectorsEns[collectorLowercase]?.includes(inputLowercase)
+      );
+    });
   const atLeastOneSelected = selectedCollectors.length > 0;
-
-  const { ensProfiles } = useEnsProfiles(
-    allAttestationsOfAKind.map(
-      (attestation) => attestation.recipient as `0x${string}`,
-    ),
-  );
-
-  // Pagination logic
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 8;
-
-  const paginatedProfiles: EnsProfileType[] = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    return ensProfiles.slice(startIndex, endIndex);
-  }, [ensProfiles, currentPage]);
-
-  const totalPages = Math.ceil(allAttestationsOfAKind.length / itemsPerPage);
+  const {
+    currentPage,
+    totalPages,
+    setCurrentPage,
+    paginatedItems: paginatedCollectors,
+  } = usePagination(collectors, 10);
 
   const handleSelect = (collector: string) => {
     setSelectedCollectors((prev) =>
@@ -93,7 +86,7 @@ export default function BadgeRevokePage({
 
   const handleRevokeBadges = async () => {
     try {
-      if (account.chain && sourceAttestation) {
+      if (sourceAttestation) {
         const attestationUIDs = selectedCollectors.map(
           (collector) =>
             allAttestationsOfAKind.find((a) => a.recipient === collector)?.id,
@@ -101,9 +94,6 @@ export default function BadgeRevokePage({
         setTxLoading(true);
         const txHash = await sendSafeTransaction(
           easMultiRevoke(
-            EAS_CONTRACT_ADDRESSES[
-              account.chain.id as keyof typeof EAS_CONTRACT_ADDRESSES
-            ],
             sourceAttestation.schema.id as `0x${string}`,
             attestationUIDs,
           ),
@@ -160,7 +150,7 @@ export default function BadgeRevokePage({
                 <div className="flex w-full justify-between">
                   <span className="font-bold">{badge.title} collectors</span>
                   <LinkTextWithIcon
-                    href={`https://sepolia.easscan.org/attestation/view/${badge.attestationUID}`}
+                    href={`${EAS_EXPLORER_ROOT_URLS[getEnvironmentChainId()]}/attestation/view/${badge.attestationUID}`}
                   >
                     Easscan
                   </LinkTextWithIcon>
@@ -192,9 +182,10 @@ export default function BadgeRevokePage({
                 <Button
                   onClick={() => setSelectedCollectors([])}
                   className={cn(
-                    "w-fit transition-all duration-200 ease-in-out",
+                    "transition-all duration-200 ease-in-out",
                     atLeastOneSelected && "w-fit px-4",
-                    !atLeastOneSelected && "text-transparent w-0 p-0",
+                    !atLeastOneSelected &&
+                      "text-transparent bg-transparent w-0 p-0",
                   )}
                   variant="destructive"
                 >
@@ -202,30 +193,21 @@ export default function BadgeRevokePage({
                 </Button>
               </div>
               <div className="flex flex-col gap-3 w-full max-h-[50rem] overflow-y-auto">
-                {paginatedProfiles
-                  .filter(
-                    (profile) =>
-                      profile.name.includes(input) ||
-                      collectorsEns[profile.name]?.includes(input),
-                  )
-                  .map((profile, index) => (
-                    <CollectorRow
-                      key={index}
-                      index={index + 1}
-                      profile={profile}
-                      selectable
-                      selected={selectedCollectors.includes(profile.address)}
-                      onClick={() => handleSelect(profile.address)}
-                      setCollectorsEns={setCollectorsEns}
-                    />
-                  ))}
-                {totalPages > 1 && (
-                  <PaginatorButtons
-                    currentPage={currentPage}
-                    setCurrentPage={setCurrentPage}
-                    totalPages={totalPages}
+                {paginatedCollectors.map((collector, index) => (
+                  <CollectorRow
+                    key={index}
+                    collector={collector}
+                    selectable
+                    selected={selectedCollectors.includes(collector)}
+                    onClick={() => handleSelect(collector)}
+                    setCollectorsEns={setCollectorsEns}
                   />
-                )}
+                ))}
+                <PaginatorButtons
+                  currentPage={currentPage}
+                  setCurrentPage={setCurrentPage}
+                  totalPages={totalPages}
+                />
               </div>
             </div>
           </>
@@ -235,7 +217,7 @@ export default function BadgeRevokePage({
         <DialogTrigger asChild>
           <Button
             variant="destructive"
-            className="text-2xl px-8 py-6 rounded-lg w-full transition-opacity duration-200 ease-in-out"
+            className="text-2xl px-8 py-6 w-full transition-opacity duration-200 ease-in-out"
             disabled={!atLeastOneSelected}
           >
             Revoke

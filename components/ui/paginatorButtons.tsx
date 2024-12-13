@@ -13,26 +13,34 @@ export default function PaginatorButtons({
   totalPages,
 }: PaginatorButtonsProps) {
   return (
-    <div className="flex justify-center items-center gap-4 mt-4">
-      <Button
-        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-        disabled={currentPage === 1}
-        variant="outline"
-        size="icon"
-      >
-        <ChevronLeft className="h-4 w-4" />
-      </Button>
-      <span>
-        Page {currentPage} of {totalPages}
-      </span>
-      <Button
-        onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-        disabled={currentPage === totalPages}
-        variant="outline"
-        size="icon"
-      >
-        <ChevronRight className="h-4 w-4" />
-      </Button>
-    </div>
+    totalPages > 1 && (
+      <div className="flex justify-center items-center gap-4 mt-4">
+        <Button
+          onClick={(e) => {
+            e.preventDefault();
+            setCurrentPage((prev) => Math.max(prev - 1, 1));
+          }}
+          disabled={currentPage === 1}
+          variant="outline"
+          size="icon"
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+        <span>
+          Page {currentPage} of {totalPages}
+        </span>
+        <Button
+          onClick={(e) => {
+            e.preventDefault();
+            setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+          }}
+          disabled={currentPage === totalPages}
+          variant="outline"
+          size="icon"
+        >
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+      </div>
+    )
   );
 }

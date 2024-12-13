@@ -1,16 +1,17 @@
 "use client";
 import { useCreateBadge } from "@/components/hooks/useCreateBadge";
 import { useGetAllAttestationsOfAKind } from "@/components/hooks/useGetAllAttestationsOfAKind";
+import { useSafeContext } from "@/components/providers/SafeProvider";
 import BadgeInfo from "@/components/ui/badge/BadgeInfo";
 import { Button } from "@/components/ui/button";
 import { Icons } from "@/components/ui/icons";
 import { Wrapper } from "@/components/ui/wrapper";
-import { isAdmin } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { ArrowLeft, CircleX, Send, Share2 } from "lucide-react";
 import Link from "next/link";
 import { use } from "react";
 import { useAccount } from "wagmi";
+import { toast } from "sonner";
 
 export default function BadgePage({
   params,
@@ -22,8 +23,8 @@ export default function BadgePage({
   const { badge, sourceAttestation, notFound } = useCreateBadge(uid, account);
   const { allAttestationsOfAKind } = useGetAllAttestationsOfAKind({
     sourceAttestation,
-    account,
   });
+  const { isAdmin } = useSafeContext();
 
   return (
     <Wrapper className="justify-between">
@@ -38,7 +39,23 @@ export default function BadgePage({
             <ArrowLeft size={24} />
           </Link>
 
-          {badge && <Share2 size={24} /> /* TODO: Add share functionality*/}
+          {badge && (
+            <Button
+              variant="ghost"
+              className="h-[24] w-[24] p-0"
+              onClick={
+                //Copy to clipboard and show a toast
+                () => {
+                  navigator.clipboard.writeText(
+                    `${process.env.NEXT_PUBLIC_BASE_URL}/user/badge/${badge.attestationUID}`,
+                  );
+                  toast.success("Badge link copied to clipboard");
+                }
+              }
+            >
+              <Share2 size={24} />
+            </Button>
+          )}
         </motion.div>
         {badge && allAttestationsOfAKind.length > 0 ? (
           <>
@@ -48,7 +65,7 @@ export default function BadgePage({
               transition={{ duration: 0.5, delay: 0.1 }}
               src={badge.image || "/badges/badge_placeholder.png"}
               alt="logo"
-              className="w-[270px] h-[270px] rounded-full object-cover border-8 border-primary p-3"
+              className="w-[270px] h-[270px] rounded-full object-cover p-[0.65rem] bg-primary"
             />
             <motion.div
               initial={{ opacity: 0 }}
@@ -80,7 +97,7 @@ export default function BadgePage({
         )}
       </div>
 
-      {isAdmin(account) && badge && (
+      {isAdmin && badge && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -91,10 +108,7 @@ export default function BadgePage({
             href={`/user/badge/${badge.attestationUID}/revoke`}
             className="w-full"
           >
-            <Button
-              variant="destructive"
-              className="text-2xl px-8 py-6 rounded-lg w-full"
-            >
+            <Button variant="destructive" className="text-2xl px-8 py-6 w-full">
               <CircleX size={24} />
               Revoke
             </Button>
@@ -103,10 +117,7 @@ export default function BadgePage({
             href={`/user/badge/${badge.attestationUID}/reissue`}
             className="w-full"
           >
-            <Button
-              className="text-2xl px-8 py-6 rounded-lg w-full"
-              variant="success"
-            >
+            <Button className="text-2xl px-8 py-6 w-full">
               <Send size={24} />
               Reissue
             </Button>

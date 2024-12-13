@@ -31,9 +31,7 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { CircleX, Loader2 } from "lucide-react";
 import { SchemaEncoder } from "@ethereum-attestation-service/eas-sdk";
-import { Config, UseAccountReturnType } from "wagmi";
 import { easMultiAttest } from "@/lib/eas/calls";
-import { EAS_CONTRACT_ADDRESSES } from "@/lib/eas/constants";
 import { getIpfsImageUrl, uploadImageToIpfs } from "@/lib/ipfs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { SafeDashboardDialog } from "@/components/ui/SafeDashboardDialog";
@@ -55,13 +53,11 @@ const formSchema = z.object({
 });
 
 interface NewBadgeFormProps {
-  account: UseAccountReturnType<Config>;
   selectedSchema: Schema | undefined;
   schemaFields: SchemaField[] | undefined;
 }
 
 export const NewBadgeForm: React.FC<NewBadgeFormProps> = ({
-  account,
   selectedSchema,
   schemaFields,
 }) => {
@@ -129,29 +125,22 @@ export const NewBadgeForm: React.FC<NewBadgeFormProps> = ({
 
   const handleCreateBadge = async (data: z.infer<typeof formSchema>) => {
     try {
-      if (account.chain) {
-        const schemaEncoder = new SchemaEncoder(
-          selectedSchema?.schema as string,
-        );
-        const encodedData = schemaEncoder.encodeData(data.fields);
-        setTxLoading(true);
-        const txHash = await sendSafeTransaction(
-          easMultiAttest(
-            EAS_CONTRACT_ADDRESSES[
-              account.chain.id as keyof typeof EAS_CONTRACT_ADDRESSES
-            ],
-            selectedSchema?.id as `0x${string}`,
-            collectors as `0x${string}`[],
-            encodedData as `0x${string}`,
-            true,
-          ),
-        );
-        setTxLoading(false);
-        setOpenTxDialog(false);
-        if (txHash) {
-          setSafeTxHash(txHash);
-          setOpenSafeDialog(true);
-        }
+      const schemaEncoder = new SchemaEncoder(selectedSchema?.schema as string);
+      const encodedData = schemaEncoder.encodeData(data.fields);
+      setTxLoading(true);
+      const txHash = await sendSafeTransaction(
+        easMultiAttest(
+          selectedSchema?.id as `0x${string}`,
+          collectors as `0x${string}`[],
+          encodedData as `0x${string}`,
+          true,
+        ),
+      );
+      setTxLoading(false);
+      setOpenTxDialog(false);
+      if (txHash) {
+        setSafeTxHash(txHash);
+        setOpenSafeDialog(true);
       }
     } catch (err) {
       console.error(err);
@@ -351,13 +340,13 @@ export const NewBadgeForm: React.FC<NewBadgeFormProps> = ({
           </Accordion>
         </div>
 
-        <div className="flex flex-col gap-4 m-auto fixed bottom-0 left-0 right-0 bg-white p-4 w-full sm:max-w-md shadow-2xl shadow-zinc-500 rounded-2xl">
+        <div className="flex flex-col gap-4 m-auto fixed bottom-0 left-0 right-0 bg-white p-4 w-full sm:max-w-md shadow-top-2xl shadow-zinc-500 rounded-2xl">
           <Dialog open={openTxDialog} onOpenChange={setOpenTxDialog}>
             <DialogTrigger asChild>
               <Button
                 type="button"
                 variant="success"
-                className="text-2xl px-8 py-6 rounded-lg w-full transition-opacity duration-200 ease-in-out"
+                className="text-2xl px-8 py-6 w-full transition-opacity duration-200 ease-in-out"
                 disabled={disableIssueButton}
               >
                 Issue

@@ -12,10 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { easAttest } from "@/lib/eas/calls";
-import {
-  EAS_CONTRACT_ADDRESSES,
-  EAS_NAME_SCHEMA_UID,
-} from "@/lib/eas/constants";
+import { EAS_NAME_SCHEMA_UID } from "@/lib/eas/constants";
 import {
   SchemaEncoder,
   SchemaItem,
@@ -58,9 +55,6 @@ export const ChangeSchemaName: React.FC<{
         setTxLoading(true);
         const txHash = await sendSafeTransaction(
           easAttest(
-            EAS_CONTRACT_ADDRESSES[
-              chainId as keyof typeof EAS_CONTRACT_ADDRESSES
-            ],
             EAS_NAME_SCHEMA_UID,
             undefined,
             encodedData as `0x${string}`,

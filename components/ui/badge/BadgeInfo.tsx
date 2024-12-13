@@ -1,6 +1,6 @@
 import BadgeClass from "@/lib/classes/BadgeClass";
 import { Calendar, Hash, IdCard } from "lucide-react";
-import { shorten } from "@/lib/utils";
+import { getEnvironmentChainId, shorten } from "@/lib/utils";
 import Link from "next/link";
 import { Attestation } from "@/lib/eas/types";
 import { useAccount } from "wagmi";
@@ -12,6 +12,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { EAS_EXPLORER_ROOT_URLS } from "@/lib/eas/constants";
 
 interface BadgeInfoProps {
   badge: BadgeClass;
@@ -38,7 +39,7 @@ export default function BadgeInfo({
         <>
           <div className="flex gap-3 items-center justify-center">
             <Link
-              href={`https://sepolia.easscan.org/attestation/view/${badge.attestationUID}`}
+              href={`${EAS_EXPLORER_ROOT_URLS[getEnvironmentChainId()]}/attestation/view/${badge.attestationUID}`}
               className="flex justify-start items-center gap-2 px-2 h-7 bg-primary rounded-md"
               target="_blank"
             >

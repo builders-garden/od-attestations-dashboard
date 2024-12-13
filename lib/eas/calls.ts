@@ -1,9 +1,10 @@
 import { NO_EXPIRATION } from "@ethereum-attestation-service/eas-sdk";
 import { EASAbi } from "../abi/EAS";
 import { SendSafeTransactionParams } from "@/components/hooks/useSendSafeTransaction";
+import { EAS_CONTRACT_ADDRESSES } from "./constants";
+import { getEnvironmentChainId } from "../utils";
 
 export const easAttest = (
-  easAddress: `0x${string}`,
   schemaUID: `0x${string}`,
   recipientAddress: `0x${string}` | undefined,
   encodedData: `0x${string}`,
@@ -27,7 +28,7 @@ export const easAttest = (
 
   return {
     abi: EASAbi,
-    contractAddress: easAddress,
+    contractAddress: EAS_CONTRACT_ADDRESSES[getEnvironmentChainId()],
     functionName: "attest",
     args: [request],
     value: "0",
@@ -35,7 +36,6 @@ export const easAttest = (
 };
 
 export const easMultiAttest = (
-  easAddress: `0x${string}`,
   schemaUID: `0x${string}`,
   recipientAddresses: `0x${string}`[],
   encodedData: `0x${string}`,
@@ -58,7 +58,7 @@ export const easMultiAttest = (
 
   return {
     abi: EASAbi,
-    contractAddress: easAddress,
+    contractAddress: EAS_CONTRACT_ADDRESSES[getEnvironmentChainId()],
     functionName: "multiAttest",
     args: [[request]],
     value: "0",
@@ -66,7 +66,6 @@ export const easMultiAttest = (
 };
 
 export const easMultiRevoke = (
-  easAddress: `0x${string}`,
   schemaUID: `0x${string}`,
   attestationUIDs: `0x${string}`[],
 ): SendSafeTransactionParams => {
@@ -80,7 +79,7 @@ export const easMultiRevoke = (
 
   return {
     abi: EASAbi,
-    contractAddress: easAddress,
+    contractAddress: EAS_CONTRACT_ADDRESSES[getEnvironmentChainId()],
     functionName: "multiRevoke",
     args: [[request]],
     value: "0",

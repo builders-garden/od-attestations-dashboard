@@ -6,15 +6,18 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Config, UseAccountReturnType, useDisconnect } from "wagmi";
 import { Squash as Hamburger } from "hamburger-react";
 import { useCountUp } from "@/components/hooks/useCountUp";
 import { useState } from "react";
-import { useEnsProfiles } from "@/components/hooks/useEnsProfile";
 import { Attestation } from "@/lib/eas/types";
 import Link from "next/link";
-import { isAdmin } from "@/lib/utils";
+import { useEnsProfile } from "@/components/hooks/useEnsProfile";
+import { useSafeContext } from "@/components/providers/SafeProvider";
+import { ETH_EXPLORER_ROOT_URLS } from "@/lib/eas/constants";
+import { getEnvironmentChainId } from "@/lib/utils";
 
 interface UserHeaderProps {
   account: UseAccountReturnType<Config>;
@@ -27,10 +30,9 @@ export default function UserHeader({
 }: UserHeaderProps) {
   const { disconnect } = useDisconnect();
   const userAttestationsCount = useCountUp(userAttestations.length, 2000);
-  const { ensProfiles, loadingProfiles } = useEnsProfiles([
-    account.address as `0x${string}`,
-  ]);
+  const { ensProfile } = useEnsProfile(account.address);
   const [isOpen, setIsOpen] = useState(false);
+  const { isAdmin } = useSafeContext();
 
   return (
     <>
@@ -67,18 +69,18 @@ export default function UserHeader({
         <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
           <DropdownMenuTrigger asChild>
             <div className="flex justify-center items-center h-full cursor-pointer">
-              {isAdmin(account) ? (
+              {isAdmin ? (
                 <Hamburger
                   rounded
                   toggled={isOpen}
                   toggle={setIsOpen}
-                  color="#1A1AFF"
+                  color="hsl(259 84% 53%)"
                 />
-              ) : !loadingProfiles ? (
+              ) : ensProfile ? (
                 <motion.img
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  src={ensProfiles[0]?.avatar ?? "/propic_placeholder.png"}
+                  src={ensProfile.avatar ?? "/propic_placeholder.png"}
                   alt="User avatar"
                   className="w-12 h-12 rounded-full object-cover border-[1px] border-secondary"
                 />
@@ -92,7 +94,20 @@ export default function UserHeader({
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            {isAdmin(account) && (
+            {ensProfile && (
+              <>
+                <DropdownMenuItem className="cursor-pointer w-full">
+                  <Link
+                    href={`${ETH_EXPLORER_ROOT_URLS[getEnvironmentChainId()]}/address/${ensProfile.address}`}
+                    target="_blank"
+                  >
+                    {ensProfile.displayName}
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="mx-0 my-0" />
+              </>
+            )}
+            {isAdmin && (
               <>
                 <DropdownMenuItem className="cursor-pointer w-full">
                   <Link href="/user/new-schema" className="w-full">

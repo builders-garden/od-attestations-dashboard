@@ -3,47 +3,40 @@ import BadgeCard from "../badge/BadgeCard";
 import { Attestation } from "@/lib/eas/types";
 import { useCountUp } from "@/components/hooks/useCountUp";
 import { useCreateBadges } from "@/components/hooks/useCreateBadges";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Switch } from "../switch";
-import { Config, UseAccountReturnType } from "wagmi";
-import { isAdmin } from "@/lib/utils";
 import PaginatorButtons from "../paginatorButtons";
-import Badge from "@/lib/classes/BadgeClass";
+import { useSafeContext } from "@/components/providers/SafeProvider";
+import { usePagination } from "@/components/hooks/usePagination";
 
 interface UserBadgesProps {
   userAttestations: Attestation[];
   allAttestations: Attestation[];
-  account: UseAccountReturnType<Config>;
 }
 
 export default function UserBadges({
   userAttestations,
   allAttestations,
-  account,
 }: UserBadgesProps) {
-  const [showAll, setShowAll] = useState<boolean>(isAdmin(account));
+  const { isAdmin } = useSafeContext();
+  const [showAll, setShowAll] = useState<boolean>(isAdmin ?? false);
+
   const userAttestationsCount = useCountUp(userAttestations.length, 2000); // 2 seconds duration
   const allBadges = useCreateBadges(userAttestations, allAttestations).filter(
     (badge) => showAll || badge.unlocked,
   );
-
-  // Pagination logic
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6;
-
-  const paginatedBadges: Badge[] = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    return allBadges.slice(startIndex, endIndex);
-  }, [allBadges, currentPage]);
-
-  const totalPages = Math.ceil(allBadges.length / itemsPerPage);
+  const {
+    currentPage,
+    totalPages,
+    setCurrentPage,
+    paginatedItems: paginatedBadges,
+  } = usePagination(allBadges, 6);
 
   return (
     <div className="flex flex-col gap-6 w-full">
       {/* Badges Header */}
       <motion.div
-        className="flex flex-row justify-between items-end w-full"
+        className="flex flex-row justify-between items-center w-full"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
@@ -76,13 +69,11 @@ export default function UserBadges({
           return <BadgeCard key={index} index={index + 1} badge={badge} />;
         })}
       </div>
-      {totalPages > 1 && (
-        <PaginatorButtons
-          currentPage={currentPage}
-          setCurrentPage={setCurrentPage}
-          totalPages={totalPages}
-        />
-      )}
+      <PaginatorButtons
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
+        totalPages={totalPages}
+      />
     </div>
   );
 }

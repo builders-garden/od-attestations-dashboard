@@ -25,6 +25,7 @@ const config: Config = {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
           light: "hsl(var(--primary-light))",
+          "light-darker": "hsl(var(--primary-light-darker))",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
@@ -58,7 +59,7 @@ const config: Config = {
         },
       },
       fontFamily: {
-        inter: ["var(--font-inter-tight)"],
+        euclid: ['"Euclid Circular A"', "sans-serif"],
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -86,6 +87,9 @@ const config: Config = {
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+      },
+      boxShadow: {
+        "top-2xl": "0 -5px 9px -10px rgba(0, 0, 0, 0.1)",
       },
     },
   },

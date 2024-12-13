@@ -1,7 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { adminAddresses } from "./constants";
-import { Config, UseAccountReturnType } from "wagmi";
+import { base, sepolia } from "viem/chains";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -13,7 +12,11 @@ export function shorten(str: string, length = 4) {
     : str;
 }
 
-export function isAdmin(account: UseAccountReturnType<Config>) {
-  if (!account.address) return false;
-  return adminAddresses.includes(account.address);
+export function getEnvironmentChainId() {
+  const isProduction = process.env.NODE_ENV === "production";
+  if (isProduction) {
+    return base.id;
+  } else {
+    return sepolia.id;
+  }
 }

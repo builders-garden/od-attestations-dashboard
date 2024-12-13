@@ -1,14 +1,11 @@
 import { getAllAttestationsOfAKind } from "@/lib/eas";
 import { Attestation } from "@/lib/eas/types";
 import { useEffect, useState } from "react";
-import { Config, UseAccountReturnType } from "wagmi";
 
 export const useGetAllAttestationsOfAKind = ({
   sourceAttestation,
-  account,
 }: {
   sourceAttestation: Attestation | undefined;
-  account: UseAccountReturnType<Config>;
 }) => {
   const [allAttestationsOfAKind, setAllAttestationsOfAKind] = useState<
     Attestation[]
@@ -18,7 +15,6 @@ export const useGetAllAttestationsOfAKind = ({
     const fetchAllAttestationsOfAKind = async () => {
       const attestations = await getAllAttestationsOfAKind(
         sourceAttestation?.decodedDataJson,
-        account.chain?.id,
       );
       const collectorAddresses: string[] = [];
       attestations.forEach((attestation) => {
@@ -29,7 +25,7 @@ export const useGetAllAttestationsOfAKind = ({
       setAllAttestationsOfAKind(attestations);
     };
     if (sourceAttestation) fetchAllAttestationsOfAKind();
-  }, [account.chain?.id, sourceAttestation]);
+  }, [sourceAttestation]);
 
   return { allAttestationsOfAKind };
 };

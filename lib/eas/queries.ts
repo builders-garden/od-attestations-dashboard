@@ -1,7 +1,7 @@
 // This query gets many schemas and can be filtered.
 export const SchemasQuery = `
-query Schemata($where: SchemaWhereInput, $schemaNamesWhere2: SchemaNameWhereInput) {
-  schemata(where: $where) {
+query Schemata($where: SchemaWhereInput, $schemaNamesWhere2: SchemaNameWhereInput, $distinct: [SchemaScalarFieldEnum!], $orderBy: [SchemaOrderByWithRelationInput!], $schemaNamesOrderBy2: [SchemaNameOrderByWithRelationInput!]) {
+  schemata(where: $where, distinct: $distinct, orderBy: $orderBy) {
     id
     schema
     creator
@@ -9,8 +9,9 @@ query Schemata($where: SchemaWhereInput, $schemaNamesWhere2: SchemaNameWhereInpu
     index
     txid
     time
-    schemaNames(where: $schemaNamesWhere2) {
+    schemaNames(where: $schemaNamesWhere2, orderBy: $schemaNamesOrderBy2) {
       name
+      time
     }
   }
 }
