@@ -24,6 +24,11 @@ export const getEnsProfileFromNameOrAddress = async (
     if (data.error) {
       return null;
     }
+    // Store the profile in the session storage
+    sessionStorage.setItem(data.address.toLowerCase(), JSON.stringify(data));
+    if (data.identity !== data.address) {
+      sessionStorage.setItem(data.identity, JSON.stringify(data));
+    }
     return data;
   } catch (e) {
     console.log(e);
@@ -69,31 +74,46 @@ export const getEnsProfilesFromNamesOrAddresses = async (
     return profilesObject;
   }
 
-  // Fetch the profiles of the pending names or addresses by encoding them in the URL
-  const encodedPendingArray = encodeURIComponent(JSON.stringify(pending));
-  try {
-    const response = await fetch(
-      `https://api.web3.bio/ns/batch/${encodedPendingArray}`,
-    );
-    const data = await response.json();
+  // Fetch the profiles of the pending names or addresses 30 by 30 by encoding them in the URL
+  const iterations = pending.length / 30;
 
-    // If there is an error, return null
-    if (data.error) {
+  for (let i = 0; i < iterations; i++) {
+    const usersBatch = pending.slice(i * 30, (i + 1) * 30);
+    const encodedPendingBatchArray = encodeURIComponent(
+      JSON.stringify(usersBatch),
+    );
+    try {
+      const response = await fetch(
+        `https://api.web3.bio/ns/batch/${encodedPendingBatchArray}`,
+      );
+      const data = await response.json();
+
+      // If there is an error, return null
+      if (data.error) {
+        return null;
+      }
+
+      // For each profile, add it to the data object and store it in the session storage
+      // Sometimes the identity is the address and sometimes it's the ENS name
+      data.forEach((profile: EnsProfileType) => {
+        profilesObject[profile.address.toLowerCase()] = profile;
+        sessionStorage.setItem(
+          profile.address.toLowerCase(),
+          JSON.stringify(profile),
+        );
+        if (profile.identity !== profile.address) {
+          sessionStorage.setItem(profile.identity, JSON.stringify(profile));
+        }
+      });
+
+      // Set a 1.5 seconds timeout to avoid rate limiting if it's not the last iteration
+      if (i + 1 < iterations) {
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+      }
+    } catch (e) {
+      console.log(e);
       return null;
     }
-
-    // For each profile, add it to the data object and store it in the session storage
-    data.forEach((profile: EnsProfileType) => {
-      profilesObject[profile.address.toLowerCase()] = profile;
-      sessionStorage.setItem(
-        profile.address.toLowerCase(),
-        JSON.stringify(profile),
-      );
-    });
-
-    return profilesObject;
-  } catch (e) {
-    console.log(e);
-    return null;
   }
+  return profilesObject;
 };
