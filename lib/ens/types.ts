@@ -5,5 +5,6 @@ export interface EnsProfileType {
   displayName: string;
   avatar: string;
   description: string | null;
+  aliases?: string[];
   error?: string;
 }

@@ -1,12 +1,13 @@
-import { useEnsProfile } from "@/components/hooks/useEnsProfile";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { Check, CircleX } from "lucide-react";
 import { Dispatch, SetStateAction, useEffect } from "react";
 import { Button } from "../button";
+import { EnsProfileType } from "@/lib/ens/types";
 
 interface CollectorRowProps {
   collector: string;
+  ensProfile: EnsProfileType;
   index?: number;
   selectable?: boolean;
   selected?: boolean;
@@ -18,6 +19,7 @@ interface CollectorRowProps {
 
 export default function CollectorRow({
   collector,
+  ensProfile,
   index = 0,
   selectable,
   selected,
@@ -26,8 +28,6 @@ export default function CollectorRow({
   handleRemove,
   setCollectorsEns,
 }: CollectorRowProps) {
-  const { ensProfile } = useEnsProfile(collector);
-
   useEffect(() => {
     if (ensProfile && setCollectorsEns) {
       setCollectorsEns((prev) => ({

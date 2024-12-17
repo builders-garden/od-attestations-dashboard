@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 
 export const usePagination = (items: any[], itemsPerPage: number) => {
-  // Pagination logic
   const [currentPage, setCurrentPage] = useState(1);
 
   const totalPages = Math.ceil(items.length / itemsPerPage);

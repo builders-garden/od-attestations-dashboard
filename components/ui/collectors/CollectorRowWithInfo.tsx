@@ -1,24 +1,25 @@
-import { useEnsProfile } from "@/components/hooks/useEnsProfile";
 import { useSafeContext } from "@/components/providers/SafeProvider";
 import { getUserUniqueAttestations } from "@/lib/eas";
 import { Attestation } from "@/lib/eas/types";
+import { EnsProfileType } from "@/lib/ens/types";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
-interface CollectorRowProps {
-  collector: string;
+interface CollectorRowWithInfoProps {
   index?: number;
   onClick?: () => void;
+  collector: string;
+  ensProfile: EnsProfileType;
 }
 
 export default function CollectorRowWithInfo({
-  collector,
   index = 0,
   onClick,
-}: CollectorRowProps) {
+  collector,
+  ensProfile,
+}: CollectorRowWithInfoProps) {
   const [userAttestations, setUserAttestations] = useState<Attestation[]>();
-  const { ensProfile } = useEnsProfile(collector);
   const { adminAddresses } = useSafeContext();
 
   useEffect(() => {

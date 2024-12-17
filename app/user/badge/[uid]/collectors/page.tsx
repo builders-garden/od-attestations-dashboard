@@ -14,6 +14,7 @@ import PaginatorButtons from "@/components/ui/paginatorButtons";
 import { usePagination } from "@/components/hooks/usePagination";
 import { EAS_EXPLORER_ROOT_URLS } from "@/lib/eas/constants";
 import { getEnvironmentChainId } from "@/lib/utils";
+import { useEnsProfiles } from "@/components/hooks/useEnsProfiles";
 
 export default function BadgeCollectorsPage({
   params,
@@ -32,12 +33,9 @@ export default function BadgeCollectorsPage({
     totalPages,
     setCurrentPage,
     paginatedItems: paginatedAttestations,
-  } = usePagination(
-    allAttestationsOfAKind.map((profile, index) => ({
-      ...profile,
-      attestationId: allAttestationsOfAKind[index].id,
-    })),
-    10,
+  } = usePagination(allAttestationsOfAKind, 10);
+  const { ensProfiles: paginatedEnsProfiles } = useEnsProfiles(
+    paginatedAttestations.map((attestation) => attestation.recipient),
   );
 
   return (
@@ -78,18 +76,22 @@ export default function BadgeCollectorsPage({
             <div className="flex w-full justify-between">
               <span className="font-bold">{badge!.title} badge collectors</span>
             </div>
-            {paginatedAttestations.map((attestation, index) => (
-              <CollectorRowWithInfo
-                key={index}
-                collector={attestation.recipient}
-                onClick={() => {
-                  window.open(
-                    `${EAS_EXPLORER_ROOT_URLS[getEnvironmentChainId()]}/attestation/view/${attestation.id}`,
-                    "_blank",
-                  );
-                }}
-              />
-            ))}
+            {paginatedEnsProfiles &&
+              paginatedAttestations.map((attestation, index) => (
+                <CollectorRowWithInfo
+                  key={index}
+                  collector={attestation.recipient}
+                  ensProfile={
+                    paginatedEnsProfiles[attestation.recipient.toLowerCase()]
+                  }
+                  onClick={() => {
+                    window.open(
+                      `${EAS_EXPLORER_ROOT_URLS[getEnvironmentChainId()]}/attestation/view/${attestation.id}`,
+                      "_blank",
+                    );
+                  }}
+                />
+              ))}
           </div>
           <PaginatorButtons
             currentPage={currentPage}
