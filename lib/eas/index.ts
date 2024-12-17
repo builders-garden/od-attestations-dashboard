@@ -1,11 +1,6 @@
 import { getEnvironmentChainId } from "../utils";
-import { EAS_NAME_SCHEMA_UID, GRAPHQL_ENDPOINTS } from "./constants";
-import {
-  AttestationQuery,
-  AttestationsQuery,
-  SchemasNamesQuery,
-  SchemasQuery,
-} from "./queries";
+import { GRAPHQL_ENDPOINTS } from "./constants";
+import { AttestationQuery, AttestationsQuery, SchemasQuery } from "./queries";
 import {
   Attestation,
   AttestationsResponse,

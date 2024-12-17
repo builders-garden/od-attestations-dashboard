@@ -11,6 +11,7 @@ import PaginatorButtons from "../paginatorButtons";
 import { usePagination } from "@/components/hooks/usePagination";
 import { RemoveAllButton } from "./RemoveAllButton";
 import { Loader2 } from "lucide-react";
+import { useEnsProfiles } from "@/components/hooks/useEnsProfiles";
 
 export interface InputCollectorListProps {
   collectors: string[];
@@ -29,6 +30,8 @@ export const InputCollectorList: React.FC<InputCollectorListProps> = ({
     setCurrentPage,
     paginatedItems: paginatedCollectors,
   } = usePagination(collectors, 6);
+  const { ensProfiles: paginatedEnsProfiles } =
+    useEnsProfiles(paginatedCollectors);
 
   const handleRemove = (collector: string) => {
     setCollectors((prev) => prev.filter((c) => c !== collector));
@@ -106,6 +109,7 @@ export const InputCollectorList: React.FC<InputCollectorListProps> = ({
           <CollectorRow
             key={index}
             collector={collector}
+            ensProfile={paginatedEnsProfiles[collector.toLowerCase()]}
             removable
             handleRemove={handleRemove}
           />

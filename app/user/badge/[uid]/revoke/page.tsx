@@ -1,5 +1,6 @@
 "use client";
 import { useCreateBadge } from "@/components/hooks/useCreateBadge";
+import { useEnsProfiles } from "@/components/hooks/useEnsProfiles";
 import { useGetAllAttestationsOfAKind } from "@/components/hooks/useGetAllAttestationsOfAKind";
 import { usePagination } from "@/components/hooks/usePagination";
 import { useSendSafeTransaction } from "@/components/hooks/useSendSafeTransaction";
@@ -69,6 +70,8 @@ export default function BadgeRevokePage({
     setCurrentPage,
     paginatedItems: paginatedCollectors,
   } = usePagination(collectors, 10);
+  const { ensProfiles: paginatedEnsProfiles } =
+    useEnsProfiles(paginatedCollectors);
 
   const handleSelect = (collector: string) => {
     setSelectedCollectors((prev) =>
@@ -193,16 +196,18 @@ export default function BadgeRevokePage({
                 </Button>
               </div>
               <div className="flex flex-col gap-3 w-full max-h-[50rem] overflow-y-auto">
-                {paginatedCollectors.map((collector, index) => (
-                  <CollectorRow
-                    key={index}
-                    collector={collector}
-                    selectable
-                    selected={selectedCollectors.includes(collector)}
-                    onClick={() => handleSelect(collector)}
-                    setCollectorsEns={setCollectorsEns}
-                  />
-                ))}
+                {paginatedEnsProfiles &&
+                  paginatedCollectors.map((collector, index) => (
+                    <CollectorRow
+                      key={index}
+                      collector={collector}
+                      ensProfile={paginatedEnsProfiles[collector.toLowerCase()]}
+                      selectable
+                      selected={selectedCollectors.includes(collector)}
+                      onClick={() => handleSelect(collector)}
+                      setCollectorsEns={setCollectorsEns}
+                    />
+                  ))}
                 <PaginatorButtons
                   currentPage={currentPage}
                   setCurrentPage={setCurrentPage}
