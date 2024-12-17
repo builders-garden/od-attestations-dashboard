@@ -2,7 +2,10 @@ import { FileUp, Loader2Icon } from "lucide-react";
 import { Button } from "../button";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
-import { getEnsProfileFromNameOrAddress } from "@/lib/ens";
+import {
+  getEnsProfileFromNameOrAddress,
+  getEnsProfilesFromNamesOrAddresses,
+} from "@/lib/ens";
 import { isAddress } from "viem";
 import {
   Tooltip,
@@ -37,14 +40,20 @@ export const CsvInputButton: React.FC<CsvInputButtonProps> = ({
           .map((line) => line.split(",")[0].trim())
           .filter(Boolean);
 
-        const resolvedAddresses = await Promise.all(
-          firstColumnData.map(async (user: string) => {
-            if (user.endsWith(".eth")) {
-              const profile = await getEnsProfileFromNameOrAddress(user);
-              return profile?.address || user;
-            }
-            return user;
-          }),
+        // Initialize the resolved addresses array
+        const resolvedAddresses: string[] = [];
+
+        const profiles =
+          await getEnsProfilesFromNamesOrAddresses(firstColumnData);
+
+        // If there are no profiles, return
+        if (!profiles) {
+          return setLoadingFile(false);
+        }
+
+        // Add the resolved addresses to the resolvedAddresses array
+        resolvedAddresses.push(
+          ...Object.values(profiles).map((profile) => profile.address),
         );
 
         const validAddresses = resolvedAddresses.filter((address) =>
